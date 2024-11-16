@@ -4,6 +4,7 @@
 #include "Characters/MainCharacter.h"
 #include "Camera/CameraComponent.h"
 #include "MotionControllerComponent.h"
+#include "HandPoseRecognizer.h"
 #include "OculusXRHandComponent.h"
 
 // Sets default values
@@ -13,10 +14,10 @@ AMainCharacter::AMainCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 
 	VROrigin = CreateDefaultSubobject<USceneComponent>(TEXT("Scene Component"));
-
+	VROrigin->SetupAttachment(RootComponent);
 
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera Component"));
-	//CameraComp->SetupAttachment(VROrigin);
+	CameraComp->SetupAttachment(RootComponent);
 
 	LeftMotionControllerComp = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("Left Motion Controller Component"));
 	LeftMotionControllerComp->SetupAttachment(VROrigin);
@@ -29,6 +30,12 @@ AMainCharacter::AMainCharacter()
 
 	RightXRHandComp = CreateDefaultSubobject<UOculusXRHandComponent>(TEXT("Right Oculus XR Hand Component"));
 	RightXRHandComp->SetupAttachment(RightMotionControllerComp);
+
+	LeftPoseRecognizer = CreateDefaultSubobject<UHandPoseRecognizer>(TEXT("Left Hand Pose Recognizer"));
+	LeftPoseRecognizer->SetupAttachment(LeftMotionControllerComp);
+
+	RightPoseRecognizer = CreateDefaultSubobject<UHandPoseRecognizer>(TEXT("Right Hand Pose Recognizer"));
+	RightPoseRecognizer->SetupAttachment(RightMotionControllerComp);
 
 }
 

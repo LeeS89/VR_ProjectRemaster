@@ -15,6 +15,7 @@ public:
 	// Sets default values for this character's properties
 	AMainCharacter();
 
+	// Camera and Hand Visuals
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	class UCameraComponent* CameraComp;
 
@@ -29,6 +30,13 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	class UOculusXRHandComponent* RightXRHandComp;
+
+	// Hand Pose Recognizers
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	class UHandPoseRecognizer* LeftPoseRecognizer;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	class UHandPoseRecognizer* RightPoseRecognizer;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	USceneComponent* VROrigin;

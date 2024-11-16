@@ -8,7 +8,7 @@ public class ProjectRemaster : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay", "OculusXRInput" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay", "OculusXRInput", "OculusHandPoseRecognition" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
