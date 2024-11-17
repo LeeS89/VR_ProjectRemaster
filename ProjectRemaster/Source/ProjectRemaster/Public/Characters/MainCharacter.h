@@ -17,7 +17,7 @@ public:
 
 	// Camera and Hand Visuals
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	class UCameraComponent* CameraComp;
+	class UVRCameraComponent* VRCameraComp;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	class UMotionControllerComponent* LeftMotionControllerComp;
@@ -40,6 +40,10 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	USceneComponent* VROrigin;
+
+	// Actor Components
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	class ULocomotionComponent* LocomotionComp;
 
 protected:
 	// Called when the game starts or when spawned

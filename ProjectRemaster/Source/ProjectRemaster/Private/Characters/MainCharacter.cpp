@@ -6,6 +6,8 @@
 #include "MotionControllerComponent.h"
 #include "HandPoseRecognizer.h"
 #include "OculusXRHandComponent.h"
+#include "CharacterComponents/VRCameraComponent.h"
+#include "CharacterComponents/LocomotionComponent.h"
 
 // Sets default values
 AMainCharacter::AMainCharacter()
@@ -16,8 +18,8 @@ AMainCharacter::AMainCharacter()
 	VROrigin = CreateDefaultSubobject<USceneComponent>(TEXT("Scene Component"));
 	VROrigin->SetupAttachment(RootComponent);
 
-	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera Component"));
-	CameraComp->SetupAttachment(RootComponent);
+	VRCameraComp = CreateDefaultSubobject<UVRCameraComponent>(TEXT("Camera Component"));
+	VRCameraComp->SetupAttachment(RootComponent);
 
 	LeftMotionControllerComp = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("Left Motion Controller Component"));
 	LeftMotionControllerComp->SetupAttachment(VROrigin);
@@ -36,6 +38,9 @@ AMainCharacter::AMainCharacter()
 
 	RightPoseRecognizer = CreateDefaultSubobject<UHandPoseRecognizer>(TEXT("Right Hand Pose Recognizer"));
 	RightPoseRecognizer->SetupAttachment(RightMotionControllerComp);
+
+	// Actor Components
+	LocomotionComp = CreateDefaultSubobject<ULocomotionComponent>(TEXT("Locomotion Component"));
 
 }
 
