@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Structs/FTraceSockets.h"
 #include "TraceComponent.generated.h"
 
 
@@ -12,9 +13,24 @@ class PROJECTREMASTER_API UTraceComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
+	UPROPERTY(EditAnywhere)
+	TArray<FTraceSockets> Sockets;
+
+	class UCustomXRHandComponent* LeftHandGrabComp;
+	class UCustomXRHandComponent* RightHandGrabComp;
+
+
+	class IMainPlayer* IPlayerRef;
+
 public:	
 	// Sets default values for this component's properties
 	UTraceComponent();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float CapsuleHalfHeight{ 8.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float CapsuleRadius{ 4.0f };
 
 protected:
 	// Called when the game starts
@@ -26,17 +42,6 @@ public:
 
 private:
 
-	//UPROPERTY(VisibleAnywhere)
-	class UCustomXRHandComponent* LeftHandComp;
-
-	//UPROPERTY(VisibleAnywhere)
-	class UCustomXRHandComponent* RightHandComp;
-
-	UPROPERTY(VisibleAnywhere)
-	USkeletalMesh* LeftHandMesh;
-
-	UPROPERTY(VisibleAnywhere)
-	USkeletalMesh* RightHandMesh;
-
-	class IMainPlayer* IPlayerRef;
+	void InitializeHands();
+	
 };

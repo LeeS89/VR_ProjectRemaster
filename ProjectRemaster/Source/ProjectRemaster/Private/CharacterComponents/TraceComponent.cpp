@@ -6,6 +6,8 @@
 #include "Enums/EHand.h"
 #include "CharacterComponents/CustomXRHandComponent.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "CharacterComponents/TraceComponent.h"
 
 // Sets default values for this component's properties
@@ -32,6 +34,12 @@ void UTraceComponent::BeginPlay()
 
 	IPlayerRef = Cast<IMainPlayer>(CharacterRef);
 
+	InitializeHands();
+	
+}
+
+void UTraceComponent::InitializeHands()
+{
 	TArray<UCustomXRHandComponent*> HandComponents = IPlayerRef->GetHandComponents();
 
 	for (UCustomXRHandComponent* HandComponent : HandComponents)
@@ -42,15 +50,14 @@ void UTraceComponent::BeginPlay()
 
 			if (CurrentHandType == EHand::Left)
 			{
-				LeftHandMesh = HandComponent->SkeletalMesh;
+				LeftHandGrabComp = HandComponent;
 			}
 			else if (CurrentHandType == EHand::Right)
 			{
-				RightHandMesh = HandComponent->SkeletalMesh;
+				RightHandGrabComp = HandComponent;
 			}
 		}
 	}
-	
 }
 
 
@@ -59,6 +66,62 @@ void UTraceComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// ...
+	//TArray<FHitResult> AllResults;
+
+	for (const FTraceSockets Socket : Sockets)
+	{
+		FVector SocketLocation{ RightHandGrabComp->GetSocketLocation(Socket.Start) };
+		//FVector EndLocation = SocketLocation + RightHandGrabComp->GetForwardVector() * TraceDistance;
+		FQuat SocketRotation{ RightHandGrabComp->GetSocketQuaternion(Socket.Rotation) };
+
+		FCollisionShape Capsule{
+			FCollisionShape::MakeCapsule(CapsuleRadius,CapsuleHalfHeight)
+		};
+
+		FCollisionQueryParams IgnoreParams{
+			FName{TEXT("Ignore Params")},
+			false,
+			GetOwner()
+		};
+		TArray<FHitResult> OutResults;
+
+		
+		bool bHasFoundTargets{ GetWorld()->SweepMultiByChannel(
+			OutResults,
+			SocketLocation,
+			SocketLocation,
+			SocketRotation,
+			ECollisionChannel::ECC_GameTraceChannel1,
+			Capsule,
+			IgnoreParams
+		) };
+
+		FVector CenterPoint{
+				UKismetMathLibrary::VLerp(
+					SocketLocation, SocketLocation, 0.5f
+				)
+		};
+
+		UKismetSystemLibrary::DrawDebugCapsule(
+			GetWorld(),
+			CenterPoint,
+			Capsule.GetCapsuleHalfHeight(),
+			Capsule.GetCapsuleRadius(),
+			SocketRotation.Rotator(),
+			bHasFoundTargets ? FLinearColor::Green : FLinearColor::Red,
+			0.5f,
+			2.0f
+			//bHasFoundTargets ? FLinearColor::Green : FLinearColor::Red,
+		);
+
+		/*if (bHasFoundTargets)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("GRABBALE OBJECT DETECTED!!!"));
+		}*/
+	}
+
+	
 }
+
+
 
