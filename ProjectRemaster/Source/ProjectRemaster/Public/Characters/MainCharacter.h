@@ -3,11 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Interfaces/MainPlayer.h"
 #include "GameFramework/Character.h"
 #include "MainCharacter.generated.h"
 
 UCLASS()
-class PROJECTREMASTER_API AMainCharacter : public ACharacter
+class PROJECTREMASTER_API AMainCharacter : public ACharacter, public IMainPlayer
 {
 	GENERATED_BODY()
 
@@ -19,6 +20,7 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	class UVRCameraComponent* VRCameraComp;
 
+	// Hand Components - Visuals, Gesture Recognizers and tracking
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	class UMotionControllerComponent* LeftMotionControllerComp;
 
@@ -26,10 +28,11 @@ public:
 	class UMotionControllerComponent* RightMotionControllerComp;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	class UOculusXRHandComponent* LeftXRHandComp;
+	class UCustomXRHandComponent* LeftXRHandComp;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	class UOculusXRHandComponent* RightXRHandComp;
+	class UCustomXRHandComponent* RightXRHandComp;
+
 
 	// Hand Pose Recognizers
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
@@ -39,17 +42,29 @@ public:
 	class UHandPoseRecognizer* RightPoseRecognizer;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	class UHandPoseRecognizer* FistPoseRecognizerLeft;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	class UHandPoseRecognizer* FistPoseRecognizerRight;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	USceneComponent* VROrigin;
 
 	// Actor Components
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	class ULocomotionComponent* LocomotionComp;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	class UTraceComponent* TraceComp;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:	
+
+	virtual TArray<class UCustomXRHandComponent*> GetHandComponents() override;
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 

@@ -5,7 +5,8 @@
 #include "Camera/CameraComponent.h"
 #include "MotionControllerComponent.h"
 #include "HandPoseRecognizer.h"
-#include "OculusXRHandComponent.h"
+#include "CharacterComponents/CustomXRHandComponent.h"
+#include "CharacterComponents/TraceComponent.h"
 #include "CharacterComponents/VRCameraComponent.h"
 #include "CharacterComponents/LocomotionComponent.h"
 
@@ -21,27 +22,37 @@ AMainCharacter::AMainCharacter()
 	VRCameraComp = CreateDefaultSubobject<UVRCameraComponent>(TEXT("Camera Component"));
 	VRCameraComp->SetupAttachment(RootComponent);
 
+	// Hand Components - Visuals, Gesture Recognizers and tracking
 	LeftMotionControllerComp = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("Left Motion Controller Component"));
 	LeftMotionControllerComp->SetupAttachment(VROrigin);
 
 	RightMotionControllerComp = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("Right Motion Controller Component"));
 	RightMotionControllerComp->SetupAttachment(VROrigin);
 
-	LeftXRHandComp = CreateDefaultSubobject<UOculusXRHandComponent>(TEXT("Left Oculus XR Hand Component"));
+	LeftXRHandComp = CreateDefaultSubobject<UCustomXRHandComponent>(TEXT("Left Oculus XR Hand Component"));
 	LeftXRHandComp->SetupAttachment(LeftMotionControllerComp);
 
-	RightXRHandComp = CreateDefaultSubobject<UOculusXRHandComponent>(TEXT("Right Oculus XR Hand Component"));
+	RightXRHandComp = CreateDefaultSubobject<UCustomXRHandComponent>(TEXT("Right Oculus XR Hand Component"));
 	RightXRHandComp->SetupAttachment(RightMotionControllerComp);
 
+	// Left Hand Pose Recognizers
 	LeftPoseRecognizer = CreateDefaultSubobject<UHandPoseRecognizer>(TEXT("Left Hand Pose Recognizer"));
 	LeftPoseRecognizer->SetupAttachment(LeftMotionControllerComp);
 
+	FistPoseRecognizerLeft = CreateDefaultSubobject<UHandPoseRecognizer>(TEXT("Left Fist Pose Recognizer"));
+	FistPoseRecognizerLeft->SetupAttachment(LeftMotionControllerComp);
+
+	// Right Hand Pose Recognizers
 	RightPoseRecognizer = CreateDefaultSubobject<UHandPoseRecognizer>(TEXT("Right Hand Pose Recognizer"));
 	RightPoseRecognizer->SetupAttachment(RightMotionControllerComp);
+
+	FistPoseRecognizerRight = CreateDefaultSubobject<UHandPoseRecognizer>(TEXT("Right Fist Pose Recognizer"));
+	FistPoseRecognizerRight->SetupAttachment(RightMotionControllerComp);
 
 	// Actor Components
 	LocomotionComp = CreateDefaultSubobject<ULocomotionComponent>(TEXT("Locomotion Component"));
 
+	TraceComp = CreateDefaultSubobject<UTraceComponent>(TEXT("Trace Component"));
 }
 
 // Called when the game starts or when spawned
@@ -49,6 +60,16 @@ void AMainCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
+}
+
+TArray<class UCustomXRHandComponent*> AMainCharacter::GetHandComponents()
+{
+	TArray<UCustomXRHandComponent*> HandComponents;
+
+	HandComponents.Add(LeftXRHandComp);
+	HandComponents.Add(RightXRHandComp);
+
+	return HandComponents;
 }
 
 // Called every frame

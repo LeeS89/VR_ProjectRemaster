@@ -11,6 +11,11 @@ ATestGrabActor::ATestGrabActor()
 
 }
 
+void ATestGrabActor::OnGrabbed(FName SocketName)
+{
+
+}
+
 // Called when the game starts or when spawned
 void ATestGrabActor::BeginPlay()
 {

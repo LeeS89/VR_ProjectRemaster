@@ -16,6 +16,8 @@ public:
 	// Sets default values for this actor's properties
 	ATestGrabActor();
 
+	virtual void OnGrabbed(FName SocketName) override;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

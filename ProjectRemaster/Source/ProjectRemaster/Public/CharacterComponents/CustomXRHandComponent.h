@@ -20,5 +20,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hand")
 	TEnumAsByte<EHand> GrabHandSide;
+
+
 	
 };

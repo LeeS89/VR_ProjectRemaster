@@ -4,11 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
-#include "GrabbableObject.generated.h"
+#include "MainPlayer.generated.h"
+//#include <CharacterComponents/CustomXRHandComponent.h>
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
-class UGrabbableObject : public UInterface
+class UMainPlayer : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -16,15 +17,15 @@ class UGrabbableObject : public UInterface
 /**
  * 
  */
-class PROJECTREMASTER_API IGrabbableObject
+class PROJECTREMASTER_API IMainPlayer
 {
 	GENERATED_BODY()
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 
-	virtual void OnGrabbed(FName SocketName){}
-
-	virtual void OnReleased(){}
+	virtual TArray<class UCustomXRHandComponent*> GetHandComponents(){
+		return TArray<UCustomXRHandComponent*>();
+	}
 
 };

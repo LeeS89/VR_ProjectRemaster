@@ -24,5 +24,19 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-		
+private:
+
+	//UPROPERTY(VisibleAnywhere)
+	class UCustomXRHandComponent* LeftHandComp;
+
+	//UPROPERTY(VisibleAnywhere)
+	class UCustomXRHandComponent* RightHandComp;
+
+	UPROPERTY(VisibleAnywhere)
+	USkeletalMesh* LeftHandMesh;
+
+	UPROPERTY(VisibleAnywhere)
+	USkeletalMesh* RightHandMesh;
+
+	class IMainPlayer* IPlayerRef;
 };

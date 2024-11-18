@@ -1,6 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
+#include "GameFramework/Character.h"
+#include "Interfaces/MainPlayer.h"
+#include "Enums/EHand.h"
+#include "CharacterComponents/CustomXRHandComponent.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "CharacterComponents/TraceComponent.h"
 
 // Sets default values for this component's properties
@@ -19,7 +24,32 @@ void UTraceComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
+	ACharacter* CharacterRef{ GetOwner<ACharacter>() };
+
+	if (!IsValid(CharacterRef)) { return; }
+
+	if (!CharacterRef->Implements<UMainPlayer>()) { return; }
+
+	IPlayerRef = Cast<IMainPlayer>(CharacterRef);
+
+	TArray<UCustomXRHandComponent*> HandComponents = IPlayerRef->GetHandComponents();
+
+	for (UCustomXRHandComponent* HandComponent : HandComponents)
+	{
+		if (HandComponent)
+		{
+			EHand CurrentHandType = HandComponent->GrabHandSide;
+
+			if (CurrentHandType == EHand::Left)
+			{
+				LeftHandMesh = HandComponent->SkeletalMesh;
+			}
+			else if (CurrentHandType == EHand::Right)
+			{
+				RightHandMesh = HandComponent->SkeletalMesh;
+			}
+		}
+	}
 	
 }
 
