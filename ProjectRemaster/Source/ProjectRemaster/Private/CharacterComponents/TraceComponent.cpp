@@ -96,6 +96,8 @@ void UTraceComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 			IgnoreParams
 		) };
 
+		if (!bDebugMode) { return; }
+
 		FVector CenterPoint{
 				UKismetMathLibrary::VLerp(
 					SocketLocation, SocketLocation, 0.5f

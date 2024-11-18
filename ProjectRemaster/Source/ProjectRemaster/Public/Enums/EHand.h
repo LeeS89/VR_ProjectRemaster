@@ -8,7 +8,7 @@
  * 
  */
 UENUM(BlueprintType)
-enum EHand : uint8
+enum EHand
 {
 	None UMETA(DisplayName = "None Selected"),
 	Left UMETA(DisplayName = "Left Hand"),

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Enums/EHandInControl.h"
 #include "LocomotionComponent.generated.h"
 
 
@@ -24,6 +25,8 @@ class PROJECTREMASTER_API ULocomotionComponent : public UActorComponent
 
 	class APlayerController* PlayerController;
 
+	
+
 public:	
 	// Sets default values for this component's properties
 	ULocomotionComponent();
@@ -31,8 +34,17 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Movement")
 	void MoveForward(float ScaleValue);
 
+	UFUNCTION(BlueprintCallable, Category = "Movement")
+	bool CanMoveForward(TEnumAsByte<EHandInControl> HandInControl) const;
+
+	UFUNCTION(BlueprintCallable, Category = "Movement")
+	void ResetHandInControl();
+
 	UFUNCTION(BlueprintCallable, Category = "Rotation")
 	void HandleRotation(float Direction);
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = ( Tooltip = "'Hand In Control', refers to the hand currently being used to trigger movement "))
+	TEnumAsByte<EHandInControl> CurrentHandInControl;
 
 protected:
 	// Called when the game starts

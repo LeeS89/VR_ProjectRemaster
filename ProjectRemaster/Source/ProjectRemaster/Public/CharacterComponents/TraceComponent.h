@@ -22,6 +22,9 @@ class PROJECTREMASTER_API UTraceComponent : public UActorComponent
 
 	class IMainPlayer* IPlayerRef;
 
+	UPROPERTY(EditAnywhere)
+	bool bDebugMode{ false };
+
 public:	
 	// Sets default values for this component's properties
 	UTraceComponent();
@@ -31,6 +34,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float CapsuleRadius{ 4.0f };
+
 
 protected:
 	// Called when the game starts

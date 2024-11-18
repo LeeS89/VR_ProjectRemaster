@@ -13,7 +13,7 @@ ULocomotionComponent::ULocomotionComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
-	// ...
+	CurrentHandInControl = EHandInControl::Neither;
 }
 
 
@@ -40,6 +40,16 @@ void ULocomotionComponent::MoveForward(float ScaleValue)
 	FVector CharacterForwardVector{ CharacterRef->GetActorForwardVector() };
 
 	CharacterRef->AddMovementInput(CharacterForwardVector * ScaleValue);
+}
+
+bool ULocomotionComponent::CanMoveForward(TEnumAsByte<EHandInControl> HandInControl) const
+{
+	return CurrentHandInControl == EHandInControl::Neither || CurrentHandInControl == HandInControl;
+}
+
+void ULocomotionComponent::ResetHandInControl()
+{
+	CurrentHandInControl = EHandInControl::Neither;
 }
 
 void ULocomotionComponent::HandleRotation(float Direction)
