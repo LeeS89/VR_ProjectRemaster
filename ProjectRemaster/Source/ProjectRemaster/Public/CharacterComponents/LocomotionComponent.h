@@ -46,6 +46,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = ( Tooltip = "'Hand In Control', refers to the hand currently being used to trigger movement "))
 	TEnumAsByte<EHandInControl> CurrentHandInControl;
 
+	UFUNCTION(BlueprintCallable)
+	void SetCurrentHandInControl(TEnumAsByte<EHandInControl> HandInControl);
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
