@@ -5,8 +5,14 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Structs/FTraceSockets.h"
+#include "Enums/EHand.h"
 #include "TraceComponent.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_OneParam(
+	FOnGrabSignature,
+	UTraceComponent, OnGrabDelegate,
+	TEnumAsByte<EHand>, GrabbingHand
+);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class PROJECTREMASTER_API UTraceComponent : public UActorComponent
@@ -14,11 +20,15 @@ class PROJECTREMASTER_API UTraceComponent : public UActorComponent
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere)
-	TArray<FTraceSockets> Sockets;
+	TArray<FTraceSockets> BoneSockets;
+
+	UPROPERTY(EditAnywhere)
+	TMap<TEnumAsByte<EHand>,FTraceSockets > HandSockets;
 
 	class UCustomXRHandComponent* LeftHandGrabComp;
 	class UCustomXRHandComponent* RightHandGrabComp;
 
+	class UCustomXRHandComponent* CurrentGrabComp;
 
 	class IMainPlayer* IPlayerRef;
 
@@ -35,7 +45,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float CapsuleRadius{ 4.0f };
 
+	UFUNCTION(BlueprintCallable)
+	void PerformGrabTrace(TEnumAsByte<EHand> HandToTrace);
 
+	UPROPERTY(BlueprintAssignable)
+	FOnGrabSignature OnGrabDelegate;
+	
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;

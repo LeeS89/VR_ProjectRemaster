@@ -5,6 +5,7 @@
 #include "Camera/CameraComponent.h"
 #include "MotionControllerComponent.h"
 #include "HandPoseRecognizer.h"
+#include "CharacterComponents/CustomHandPoseRecognizer.h"
 #include "CharacterComponents/CustomXRHandComponent.h"
 #include "CharacterComponents/TraceComponent.h"
 #include "CharacterComponents/VRCameraComponent.h"
@@ -42,12 +43,19 @@ AMainCharacter::AMainCharacter()
 	FistPoseRecognizerLeft = CreateDefaultSubobject<UHandPoseRecognizer>(TEXT("Left Fist Pose Recognizer"));
 	FistPoseRecognizerLeft->SetupAttachment(LeftMotionControllerComp);
 
+	MovePoseRecognizerLeft = CreateDefaultSubobject<UCustomHandPoseRecognizer>(TEXT("Fist Pose Recognizer Left"));
+	MovePoseRecognizerLeft->SetupAttachment(LeftMotionControllerComp);
+
+
 	// Right Hand Pose Recognizers
 	RightPoseRecognizer = CreateDefaultSubobject<UHandPoseRecognizer>(TEXT("Right Hand Pose Recognizer"));
 	RightPoseRecognizer->SetupAttachment(RightMotionControllerComp);
 
 	FistPoseRecognizerRight = CreateDefaultSubobject<UHandPoseRecognizer>(TEXT("Right Fist Pose Recognizer"));
 	FistPoseRecognizerRight->SetupAttachment(RightMotionControllerComp);
+
+	MovePoseRecognizerRight = CreateDefaultSubobject<UCustomHandPoseRecognizer>(TEXT("Fist Pose Recognizer Right"));
+	MovePoseRecognizerRight->SetupAttachment(RightMotionControllerComp);
 
 	// Actor Components
 	LocomotionComp = CreateDefaultSubobject<ULocomotionComponent>(TEXT("Locomotion Component"));

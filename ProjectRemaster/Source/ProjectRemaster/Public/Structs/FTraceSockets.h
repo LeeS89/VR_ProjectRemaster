@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Enums/EHand.h"
 #include "FTraceSockets.generated.h"
 
 /**
@@ -12,6 +13,9 @@ USTRUCT(BlueprintType)
 struct PROJECTREMASTER_API FTraceSockets
 {
 	GENERATED_BODY();
+
+	UPROPERTY(EditAnywhere)
+	TEnumAsByte<EHand> GrabbingHand;
 
 	UPROPERTY(EditAnywhere)
 	FName Start;

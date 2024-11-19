@@ -48,6 +48,12 @@ public:
 	class UHandPoseRecognizer* FistPoseRecognizerRight;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	class UCustomHandPoseRecognizer* MovePoseRecognizerLeft;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	class UCustomHandPoseRecognizer* MovePoseRecognizerRight;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	USceneComponent* VROrigin;
 
 	// Actor Components

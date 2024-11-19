@@ -4,6 +4,7 @@
 #include "GameFramework/Character.h"
 #include "Interfaces/MainPlayer.h"
 #include "Enums/EHand.h"
+#include "Structs/FTraceSockets.h"
 #include "CharacterComponents/CustomXRHandComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -61,18 +62,30 @@ void UTraceComponent::InitializeHands()
 }
 
 
-// Called every frame
-void UTraceComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UTraceComponent::PerformGrabTrace(TEnumAsByte<EHand> HandToTrace)
 {
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	//TArray<FHitResult> AllResults;
-
-	for (const FTraceSockets Socket : Sockets)
+	if (HandToTrace == EHand::Left)
 	{
-		FVector SocketLocation{ RightHandGrabComp->GetSocketLocation(Socket.Start) };
-		//FVector EndLocation = SocketLocation + RightHandGrabComp->GetForwardVector() * TraceDistance;
-		FQuat SocketRotation{ RightHandGrabComp->GetSocketQuaternion(Socket.Rotation) };
+		CurrentGrabComp = LeftHandGrabComp;
+	}
+	else if (HandToTrace == EHand::Right)
+	{
+		CurrentGrabComp = RightHandGrabComp;
+	}
+
+	if (!IsValid(CurrentGrabComp)) { return; }
+
+	for (const TPair<TEnumAsByte<EHand>, FTraceSockets>& Pair : HandSockets)
+	{
+		TEnumAsByte<EHand> Hand = Pair.Key;
+		FTraceSockets Sockets = Pair.Value;
+
+		if (Hand != HandToTrace)
+		{
+			continue;
+		}
+		FVector SocketLocation{ CurrentGrabComp->GetSocketLocation(Sockets.Start) };
+		FQuat SocketRotation{ CurrentGrabComp->GetSocketQuaternion(Sockets.Rotation) };
 
 		FCollisionShape Capsule{
 			FCollisionShape::MakeCapsule(CapsuleRadius,CapsuleHalfHeight)
@@ -85,7 +98,6 @@ void UTraceComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 		};
 		TArray<FHitResult> OutResults;
 
-		
 		bool bHasFoundTargets{ GetWorld()->SweepMultiByChannel(
 			OutResults,
 			SocketLocation,
@@ -95,6 +107,11 @@ void UTraceComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 			Capsule,
 			IgnoreParams
 		) };
+
+		if (bHasFoundTargets)
+		{
+			OnGrabDelegate.Broadcast(Hand);
+		}
 
 		if (!bDebugMode) { return; }
 
@@ -113,14 +130,134 @@ void UTraceComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 			bHasFoundTargets ? FLinearColor::Green : FLinearColor::Red,
 			0.5f,
 			2.0f
-			//bHasFoundTargets ? FLinearColor::Green : FLinearColor::Red,
+
+
 		);
 
-		/*if (bHasFoundTargets)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("GRABBALE OBJECT DETECTED!!!"));
-		}*/
+
+
 	}
+	CurrentGrabComp = nullptr;
+	//FVector SocketLocation{ RightHandGrabComp->GetSocketLocation(Socket.Start) };
+
+}
+
+
+// Called every frame
+void UTraceComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	//TArray<FHitResult> AllResults;
+
+	if (!IsValid(RightHandGrabComp) || !IsValid(LeftHandGrabComp)) { return; }
+
+
+
+	//for (const FTraceSockets Socket : Sockets)
+	//{
+	//	if (Socket.GrabbingHand == EHand::Right)
+	//	{
+	//		FVector SocketLocation{ RightHandGrabComp->GetSocketLocation(Socket.Start) };
+	//		//FVector EndLocation = SocketLocation + RightHandGrabComp->GetForwardVector() * TraceDistance;
+	//		FQuat SocketRotation{ RightHandGrabComp->GetSocketQuaternion(Socket.Rotation) };
+
+	//		FCollisionShape Capsule{
+	//			FCollisionShape::MakeCapsule(CapsuleRadius,CapsuleHalfHeight)
+	//		};
+
+	//		FCollisionQueryParams IgnoreParams{
+	//			FName{TEXT("Ignore Params")},
+	//			false,
+	//			GetOwner()
+	//		};
+	//		TArray<FHitResult> OutResults;
+
+
+	//		bool bHasFoundTargets{ GetWorld()->SweepMultiByChannel(
+	//			OutResults,
+	//			SocketLocation,
+	//			SocketLocation,
+	//			SocketRotation,
+	//			ECollisionChannel::ECC_GameTraceChannel1,
+	//			Capsule,
+	//			IgnoreParams
+	//		) };
+
+	//		if (!bDebugMode) { return; }
+
+	//		FVector CenterPoint{
+	//				UKismetMathLibrary::VLerp(
+	//					SocketLocation, SocketLocation, 0.5f
+	//				)
+	//		};
+
+	//		UKismetSystemLibrary::DrawDebugCapsule(
+	//			GetWorld(),
+	//			CenterPoint,
+	//			Capsule.GetCapsuleHalfHeight(),
+	//			Capsule.GetCapsuleRadius(),
+	//			SocketRotation.Rotator(),
+	//			bHasFoundTargets ? FLinearColor::Green : FLinearColor::Red,
+	//			0.5f,
+	//			2.0f
+	//			//bHasFoundTargets ? FLinearColor::Green : FLinearColor::Red,
+	//		);
+	//	}
+	//	else if (Socket.GrabbingHand == EHand::Left)
+	//	{
+	//		FVector SocketLocation{ LeftHandGrabComp->GetSocketLocation(Socket.Start) };
+	//		//FVector EndLocation = SocketLocation + RightHandGrabComp->GetForwardVector() * TraceDistance;
+	//		FQuat SocketRotation{ LeftHandGrabComp->GetSocketQuaternion(Socket.Rotation) };
+
+	//		FCollisionShape Capsule{
+	//			FCollisionShape::MakeCapsule(CapsuleRadius,CapsuleHalfHeight)
+	//		};
+
+	//		FCollisionQueryParams IgnoreParams{
+	//			FName{TEXT("Ignore Params")},
+	//			false,
+	//			GetOwner()
+	//		};
+	//		TArray<FHitResult> OutResults;
+
+
+	//		bool bHasFoundTargets{ GetWorld()->SweepMultiByChannel(
+	//			OutResults,
+	//			SocketLocation,
+	//			SocketLocation,
+	//			SocketRotation,
+	//			ECollisionChannel::ECC_GameTraceChannel1,
+	//			Capsule,
+	//			IgnoreParams
+	//		) };
+
+	//		if (!bDebugMode) { return; }
+
+	//		FVector CenterPoint{
+	//				UKismetMathLibrary::VLerp(
+	//					SocketLocation, SocketLocation, 0.5f
+	//				)
+	//		};
+
+	//		UKismetSystemLibrary::DrawDebugCapsule(
+	//			GetWorld(),
+	//			CenterPoint,
+	//			Capsule.GetCapsuleHalfHeight(),
+	//			Capsule.GetCapsuleRadius(),
+	//			SocketRotation.Rotator(),
+	//			bHasFoundTargets ? FLinearColor::Green : FLinearColor::Red,
+	//			0.5f,
+	//			2.0f
+	//			//bHasFoundTargets ? FLinearColor::Green : FLinearColor::Red,
+	//		);
+	//	}
+
+	//	/*if (bHasFoundTargets)
+	//	{
+	//		UE_LOG(LogTemp, Warning, TEXT("GRABBALE OBJECT DETECTED!!!"));
+	//	}*/
+	//}
 
 	
 }
