@@ -3,6 +3,7 @@
 
 #include "GameFramework/Character.h"
 #include "Interfaces/MainPlayer.h"
+#include "Interfaces/GrabbableObject.h"
 #include "Enums/EHand.h"
 #include "Structs/FTraceSockets.h"
 #include "CharacterComponents/CustomXRHandComponent.h"
@@ -96,10 +97,11 @@ void UTraceComponent::PerformGrabTrace(TEnumAsByte<EHand> HandToTrace)
 			false,
 			GetOwner()
 		};
-		TArray<FHitResult> OutResults;
+		//TArray<FHitResult> OutResults;
+		FHitResult OutResult;
 
-		bool bHasFoundTargets{ GetWorld()->SweepMultiByChannel(
-			OutResults,
+		bool bHasFoundTargets{ GetWorld()->SweepSingleByChannel(
+			OutResult,
 			SocketLocation,
 			SocketLocation,
 			SocketRotation,
@@ -111,6 +113,13 @@ void UTraceComponent::PerformGrabTrace(TEnumAsByte<EHand> HandToTrace)
 		if (bHasFoundTargets)
 		{
 			OnGrabDelegate.Broadcast(Hand);
+			
+
+			if (OutResult.GetActor()->Implements<UGrabbableObject>())
+			{
+				CurrentGrabbedActor = OutResult.GetActor();
+				IGrabbableObject::Execute_OnGrabbed(CurrentGrabbedActor, CurrentGrabComp, Sockets.Start);
+			}
 		}
 
 		if (!bDebugMode) { return; }
@@ -131,15 +140,21 @@ void UTraceComponent::PerformGrabTrace(TEnumAsByte<EHand> HandToTrace)
 			0.5f,
 			2.0f
 
-
 		);
-
-
 
 	}
 	CurrentGrabComp = nullptr;
 	//FVector SocketLocation{ RightHandGrabComp->GetSocketLocation(Socket.Start) };
 
+}
+
+void UTraceComponent::ReleaseGrabbedActor()
+{
+	if (CurrentGrabbedActor && CurrentGrabbedActor->Implements<UGrabbableObject>())
+	{
+		IGrabbableObject::Execute_OnReleased(CurrentGrabbedActor);
+		CurrentGrabbedActor = nullptr;
+	}
 }
 
 

@@ -23,8 +23,10 @@ class PROJECTREMASTER_API IGrabbableObject
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 
-	virtual void OnGrabbed(FName SocketName){}
+	UFUNCTION(BlueprintNativeEvent)
+	void OnGrabbed(class UCustomXRHandComponent* HandComponent, FName SocketName);
 
-	virtual void OnReleased(){}
+	UFUNCTION(BlueprintNativeEvent)
+	void OnReleased();
 
 };

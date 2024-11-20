@@ -16,7 +16,9 @@ public:
 	// Sets default values for this actor's properties
 	ATestGrabActor();
 
-	virtual void OnGrabbed(FName SocketName) override;
+	virtual void OnGrabbed_Implementation(class UCustomXRHandComponent* HandComponent, FName SocketName) override;
+
+	virtual void OnReleased_Implementation() override;
 
 protected:
 	// Called when the game starts or when spawned

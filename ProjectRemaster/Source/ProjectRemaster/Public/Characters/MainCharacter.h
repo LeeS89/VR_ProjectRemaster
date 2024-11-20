@@ -41,11 +41,6 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	class UHandPoseRecognizer* RightPoseRecognizer;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	class UHandPoseRecognizer* FistPoseRecognizerLeft;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	class UHandPoseRecognizer* FistPoseRecognizerRight;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	class UCustomHandPoseRecognizer* MovePoseRecognizerLeft;

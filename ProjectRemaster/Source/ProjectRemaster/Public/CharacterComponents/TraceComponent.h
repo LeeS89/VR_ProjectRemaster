@@ -39,6 +39,8 @@ public:
 	// Sets default values for this component's properties
 	UTraceComponent();
 
+	AActor* CurrentGrabbedActor;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float CapsuleHalfHeight{ 8.0f };
 
@@ -47,6 +49,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void PerformGrabTrace(TEnumAsByte<EHand> HandToTrace);
+
+	UFUNCTION(BlueprintCallable)
+	void ReleaseGrabbedActor();
 
 	UPROPERTY(BlueprintAssignable)
 	FOnGrabSignature OnGrabDelegate;

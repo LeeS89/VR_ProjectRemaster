@@ -40,8 +40,6 @@ AMainCharacter::AMainCharacter()
 	LeftPoseRecognizer = CreateDefaultSubobject<UHandPoseRecognizer>(TEXT("Left Hand Pose Recognizer"));
 	LeftPoseRecognizer->SetupAttachment(LeftMotionControllerComp);
 
-	FistPoseRecognizerLeft = CreateDefaultSubobject<UHandPoseRecognizer>(TEXT("Left Fist Pose Recognizer"));
-	FistPoseRecognizerLeft->SetupAttachment(LeftMotionControllerComp);
 
 	MovePoseRecognizerLeft = CreateDefaultSubobject<UCustomHandPoseRecognizer>(TEXT("Fist Pose Recognizer Left"));
 	MovePoseRecognizerLeft->SetupAttachment(LeftMotionControllerComp);
@@ -51,8 +49,6 @@ AMainCharacter::AMainCharacter()
 	RightPoseRecognizer = CreateDefaultSubobject<UHandPoseRecognizer>(TEXT("Right Hand Pose Recognizer"));
 	RightPoseRecognizer->SetupAttachment(RightMotionControllerComp);
 
-	FistPoseRecognizerRight = CreateDefaultSubobject<UHandPoseRecognizer>(TEXT("Right Fist Pose Recognizer"));
-	FistPoseRecognizerRight->SetupAttachment(RightMotionControllerComp);
 
 	MovePoseRecognizerRight = CreateDefaultSubobject<UCustomHandPoseRecognizer>(TEXT("Fist Pose Recognizer Right"));
 	MovePoseRecognizerRight->SetupAttachment(RightMotionControllerComp);
