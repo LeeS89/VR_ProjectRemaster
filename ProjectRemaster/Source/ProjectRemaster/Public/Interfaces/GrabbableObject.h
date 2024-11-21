@@ -29,4 +29,6 @@ public:
 	UFUNCTION(BlueprintNativeEvent)
 	void OnReleased();
 
+	virtual bool IsGrabbed() { return false; }
+
 };

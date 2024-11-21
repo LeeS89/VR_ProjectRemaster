@@ -14,12 +14,19 @@ ATestGrabActor::ATestGrabActor()
 
 void ATestGrabActor::OnGrabbed_Implementation(UCustomXRHandComponent* HandComponent, FName SocketName)
 {
+	bIsGrabbed = true;
 	AttachToComponent(HandComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale, SocketName);
 }
 
 void ATestGrabActor::OnReleased_Implementation()
 {
 	DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+	bIsGrabbed = false;
+}
+
+bool ATestGrabActor::IsGrabbed()
+{
+	return bIsGrabbed;
 }
 
 // Called when the game starts or when spawned

@@ -10,6 +10,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "OculusXRInputFunctionLibrary.h"
 #include "CharacterComponents/TraceComponent.h"
 
 // Sets default values for this component's properties
@@ -63,22 +64,22 @@ void UTraceComponent::InitializeHands()
 }
 
 
-void UTraceComponent::PerformGrabTrace(TEnumAsByte<EHand> HandToTrace)
+void UTraceComponent::PerformGrabTrace(EOculusXRHandType HandToTrace, UCustomHandPoseRecognizer* PoseClass)
 {
-	if (HandToTrace == EHand::Left)
+	if (HandToTrace == EOculusXRHandType::HandLeft)
 	{
 		CurrentGrabComp = LeftHandGrabComp;
 	}
-	else if (HandToTrace == EHand::Right)
+	else if (HandToTrace == EOculusXRHandType::HandRight)
 	{
 		CurrentGrabComp = RightHandGrabComp;
 	}
 
 	if (!IsValid(CurrentGrabComp)) { return; }
 
-	for (const TPair<TEnumAsByte<EHand>, FTraceSockets>& Pair : HandSockets)
+	for (const TPair<EOculusXRHandType, FTraceSockets>& Pair : HandSockets)
 	{
-		TEnumAsByte<EHand> Hand = Pair.Key;
+		EOculusXRHandType Hand = Pair.Key;
 		FTraceSockets Sockets = Pair.Value;
 
 		if (Hand != HandToTrace)
@@ -112,13 +113,18 @@ void UTraceComponent::PerformGrabTrace(TEnumAsByte<EHand> HandToTrace)
 
 		if (bHasFoundTargets)
 		{
-			OnGrabDelegate.Broadcast(Hand);
-			
-
+		
 			if (OutResult.GetActor()->Implements<UGrabbableObject>())
 			{
 				CurrentGrabbedActor = OutResult.GetActor();
-				IGrabbableObject::Execute_OnGrabbed(CurrentGrabbedActor, CurrentGrabComp, Sockets.Start);
+				IGrabbableObject* GrabbableInterface = Cast<IGrabbableObject>(CurrentGrabbedActor);
+
+				if (!GrabbableInterface->IsGrabbed())
+				{
+					OnGrabDelegate.Broadcast(PoseClass);
+
+					GrabbableInterface->Execute_OnGrabbed(CurrentGrabbedActor, CurrentGrabComp, Sockets.Start);
+				}
 			}
 		}
 

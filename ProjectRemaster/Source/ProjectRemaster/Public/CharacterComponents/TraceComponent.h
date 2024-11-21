@@ -5,13 +5,13 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Structs/FTraceSockets.h"
-#include "Enums/EHand.h"
+#include "OculusXRInputFunctionLibrary.h"
 #include "TraceComponent.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_OneParam(
 	FOnGrabSignature,
 	UTraceComponent, OnGrabDelegate,
-	TEnumAsByte<EHand>, GrabbingHand
+	class UCustomHandPoseRecognizer*, PoseClass
 );
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -23,7 +23,7 @@ class PROJECTREMASTER_API UTraceComponent : public UActorComponent
 	TArray<FTraceSockets> BoneSockets;
 
 	UPROPERTY(EditAnywhere)
-	TMap<TEnumAsByte<EHand>,FTraceSockets > HandSockets;
+	TMap<EOculusXRHandType,FTraceSockets > HandSockets;
 
 	class UCustomXRHandComponent* LeftHandGrabComp;
 	class UCustomXRHandComponent* RightHandGrabComp;
@@ -48,7 +48,7 @@ public:
 	float CapsuleRadius{ 4.0f };
 
 	UFUNCTION(BlueprintCallable)
-	void PerformGrabTrace(TEnumAsByte<EHand> HandToTrace);
+	void PerformGrabTrace(EOculusXRHandType HandToTrace, class UCustomHandPoseRecognizer* PoseClass);
 
 	UFUNCTION(BlueprintCallable)
 	void ReleaseGrabbedActor();

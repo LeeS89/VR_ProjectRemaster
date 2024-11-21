@@ -11,6 +11,8 @@ UCLASS()
 class PROJECTREMASTER_API ATestGrabActor : public AActor, public IGrabbableObject
 {
 	GENERATED_BODY()
+
+	bool bIsGrabbed{ false };
 	
 public:	
 	// Sets default values for this actor's properties
@@ -19,6 +21,8 @@ public:
 	virtual void OnGrabbed_Implementation(class UCustomXRHandComponent* HandComponent, FName SocketName) override;
 
 	virtual void OnReleased_Implementation() override;
+
+	virtual bool IsGrabbed() override;
 
 protected:
 	// Called when the game starts or when spawned

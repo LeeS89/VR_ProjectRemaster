@@ -3,6 +3,23 @@
 
 #include "CharacterComponents/CustomHandPoseRecognizer.h"
 
+
 UCustomHandPoseRecognizer::UCustomHandPoseRecognizer()
 {
+}
+
+bool UCustomHandPoseRecognizer::GetRecognizedPose(int& Index, FString& Name, float& Duration, float& Error, float& Confidence)
+{
+	bool bResult = UHandPoseRecognizer::GetRecognizedHandPose(Index, Name, Duration, Error, Confidence);
+	
+	if (bResult)
+	{
+		OnPoseRecognizedDelegate.Broadcast(Side, this);
+	}
+	else
+	{
+		OnPoseReleasedDelegate.Broadcast(this);
+	}
+
+	return bResult;
 }
