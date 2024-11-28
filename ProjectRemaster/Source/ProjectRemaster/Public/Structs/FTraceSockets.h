@@ -14,8 +14,8 @@ struct PROJECTREMASTER_API FTraceSockets
 {
 	GENERATED_BODY();
 
-	UPROPERTY(EditAnywhere)
-	TEnumAsByte<EHand> GrabbingHand;
+	/*UPROPERTY(EditAnywhere)
+	TEnumAsByte<EHand> GrabbingHand;*/
 
 	UPROPERTY(EditAnywhere)
 	FName Start;
@@ -25,4 +25,7 @@ struct PROJECTREMASTER_API FTraceSockets
 
 	UPROPERTY(EditAnywhere)
 	FName Rotation;
+
+	UPROPERTY(EditAnywhere)
+	FName WeaponSocket;
 };

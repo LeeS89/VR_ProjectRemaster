@@ -8,6 +8,25 @@ UCustomHandPoseRecognizer::UCustomHandPoseRecognizer()
 {
 }
 
+void UCustomHandPoseRecognizer::BeginPlay()
+{
+	Super::BeginPlay();
+
+	HandPoseConfidence = DefaultConfidenceFloor;
+}
+
+void UCustomHandPoseRecognizer::ResetHandPoseConfidenceFloor()
+{
+	DefaultConfidenceFloor = HandPoseConfidence;
+}
+
+void UCustomHandPoseRecognizer::ReduceHandPoseConfidenceFloor()
+{
+	DefaultConfidenceFloor = ReducedHandPoseConfidenceFloor;
+}
+
+
+
 bool UCustomHandPoseRecognizer::GetRecognizedPose(int& Index, FString& Name, float& Duration, float& Error, float& Confidence)
 {
 	bool bResult = UHandPoseRecognizer::GetRecognizedHandPose(Index, Name, Duration, Error, Confidence);
@@ -23,3 +42,5 @@ bool UCustomHandPoseRecognizer::GetRecognizedPose(int& Index, FString& Name, flo
 
 	return bResult;
 }
+
+

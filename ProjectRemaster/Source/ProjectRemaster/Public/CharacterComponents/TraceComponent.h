@@ -19,8 +19,8 @@ class PROJECTREMASTER_API UTraceComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere)
-	TArray<FTraceSockets> BoneSockets;
+	/*UPROPERTY(EditAnywhere)
+	TArray<FTraceSockets> BoneSockets;*/
 
 	UPROPERTY(EditAnywhere)
 	TMap<EOculusXRHandType,FTraceSockets > HandSockets;

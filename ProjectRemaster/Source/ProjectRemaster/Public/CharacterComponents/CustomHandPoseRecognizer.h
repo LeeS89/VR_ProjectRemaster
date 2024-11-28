@@ -45,4 +45,20 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnPoseReleasedSignature OnPoseReleasedDelegate;
+
+	UPROPERTY(VisibleAnywhere)
+	float HandPoseConfidence{ 0.0f };
+
+	UPROPERTY(EditAnywhere)
+	float ReducedHandPoseConfidenceFloor{ 0.25f };
+
+	UFUNCTION(BlueprintCallable)
+	void ResetHandPoseConfidenceFloor();
+
+	UFUNCTION(BlueprintCallable)
+	void ReduceHandPoseConfidenceFloor();
+
+protected:
+
+	virtual void BeginPlay() override;
 };

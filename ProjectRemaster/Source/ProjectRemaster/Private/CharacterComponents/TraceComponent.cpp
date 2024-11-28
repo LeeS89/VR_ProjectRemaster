@@ -123,7 +123,7 @@ void UTraceComponent::PerformGrabTrace(EOculusXRHandType HandToTrace, UCustomHan
 				{
 					OnGrabDelegate.Broadcast(PoseClass);
 
-					GrabbableInterface->Execute_OnGrabbed(CurrentGrabbedActor, CurrentGrabComp, Sockets.Start);
+					GrabbableInterface->Execute_OnGrabbed(CurrentGrabbedActor, CurrentGrabComp, Sockets.WeaponSocket);
 				}
 			}
 		}

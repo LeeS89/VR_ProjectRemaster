@@ -31,6 +31,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UStaticMeshComponent* StaticMeshComp;
 
+	UPROPERTY(EditAnywhere)
+	USceneComponent* RootComp;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
