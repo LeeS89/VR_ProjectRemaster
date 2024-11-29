@@ -20,6 +20,9 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	class UVRCameraComponent* VRCameraComp;
 
+	/*UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	class UBoxComponent* BoxCollisionComp;*/
+
 	// Hand Components - Visuals, Gesture Recognizers and tracking
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	class UMotionControllerComponent* LeftMotionControllerComp;

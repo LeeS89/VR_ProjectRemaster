@@ -9,6 +9,7 @@
 #include "CharacterComponents/CustomXRHandComponent.h"
 #include "CharacterComponents/TraceComponent.h"
 #include "CharacterComponents/VRCameraComponent.h"
+#include "Components/BoxComponent.h"
 #include "CharacterComponents/LocomotionComponent.h"
 
 // Sets default values
@@ -22,6 +23,9 @@ AMainCharacter::AMainCharacter()
 
 	VRCameraComp = CreateDefaultSubobject<UVRCameraComponent>(TEXT("Camera Component"));
 	VRCameraComp->SetupAttachment(RootComponent);
+
+	/*BoxCollisionComp = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Collision Component"));
+	BoxCollisionComp->SetupAttachment(VRCameraComp);*/
 
 	// Hand Components - Visuals, Gesture Recognizers and tracking
 	LeftMotionControllerComp = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("Left Motion Controller Component"));
