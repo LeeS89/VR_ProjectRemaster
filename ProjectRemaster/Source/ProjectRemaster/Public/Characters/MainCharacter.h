@@ -12,6 +12,15 @@ class PROJECTREMASTER_API AMainCharacter : public ACharacter, public IMainPlayer
 {
 	GENERATED_BODY()
 
+	UPROPERTY(EditAnywhere)
+	float PlayerCapsuleMinHeight{ 50.0f };
+
+	UPROPERTY(EditAnywhere)
+	float PlayerCapsuleMaxHeight{ 180.0f };
+
+	class UUserWidget* BlackoutWidgetInstance;
+
+
 public:
 	// Sets default values for this character's properties
 	AMainCharacter();
@@ -20,8 +29,8 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	class UVRCameraComponent* VRCameraComp;
 
-	/*UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	class UBoxComponent* BoxCollisionComp;*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UBoxComponent* BoxComp;
 
 	// Hand Components - Visuals, Gesture Recognizers and tracking
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
@@ -54,6 +63,7 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	USceneComponent* VROrigin;
 
+
 	// Actor Components
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	class ULocomotionComponent* LocomotionComp;
@@ -61,11 +71,27 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	class UTraceComponent* TraceComp;
 
+	//Player Widgets
+	/*UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<class UUserWidget> BlackoutWidgetClass;
+
+	UPROPERTY(BlueprintReadWrite)
+	class UUserWidget* BlackoutWidget;*/
+
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite, Category = "UI")
+	class UWidgetComponent* BlackoutWidgetComp;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TSubclassOf<class UUserWidget> BlackoutWidget;
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:	
+
+	UPROPERTY(BlueprintReadOnly)
+	UCapsuleComponent* PlayerCapsuleComp;
 
 	virtual TArray<class UCustomXRHandComponent*> GetHandComponents() override;
 
@@ -75,4 +101,10 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+private:
+
+	UFUNCTION()
+	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+						UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
+						bool bFromSweep, const FHitResult& SweepResult);
 };

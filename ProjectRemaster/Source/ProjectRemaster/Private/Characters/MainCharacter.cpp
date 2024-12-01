@@ -10,7 +10,11 @@
 #include "CharacterComponents/TraceComponent.h"
 #include "CharacterComponents/VRCameraComponent.h"
 #include "Components/BoxComponent.h"
+#include "Components/WidgetComponent.h"
+#include "Blueprint/UserWidget.h"
+
 #include "CharacterComponents/LocomotionComponent.h"
+#include <Components/Image.h>
 
 // Sets default values
 AMainCharacter::AMainCharacter()
@@ -18,14 +22,21 @@ AMainCharacter::AMainCharacter()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+
 	VROrigin = CreateDefaultSubobject<USceneComponent>(TEXT("Scene Component"));
 	VROrigin->SetupAttachment(RootComponent);
+
 
 	VRCameraComp = CreateDefaultSubobject<UVRCameraComponent>(TEXT("Camera Component"));
 	VRCameraComp->SetupAttachment(RootComponent);
 
-	/*BoxCollisionComp = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Collision Component"));
-	BoxCollisionComp->SetupAttachment(VRCameraComp);*/
+	BlackoutWidgetComp = CreateDefaultSubobject<UWidgetComponent>(TEXT("Blackout Widget Component"));
+	BlackoutWidgetComp->SetupAttachment(VRCameraComp);
+
+	///// Come back to later
+	BoxComp = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Component"));
+	BoxComp->SetupAttachment(VRCameraComp);
+
 
 	// Hand Components - Visuals, Gesture Recognizers and tracking
 	LeftMotionControllerComp = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("Left Motion Controller Component"));
@@ -67,6 +78,26 @@ AMainCharacter::AMainCharacter()
 void AMainCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	
+	/*if (BlackoutWidgetClass)
+	{
+
+		BlackoutWidget = CreateWidget<UUserWidget>(GetWorld(), BlackoutWidgetClass);
+
+		BlackoutWidget->AddToViewport();
+	}*/
+
+	if (BlackoutWidget)
+	{
+		BlackoutWidgetComp->SetWidgetClass(BlackoutWidget);
+
+		BlackoutWidgetInstance = BlackoutWidgetComp->GetUserWidgetObject();
+	}
+
+	BoxComp->SetCollisionObjectType(ECC_GameTraceChannel3);
+	//BoxComp->OnComponentBeginOverlap.AddDynamic(this, &AMainCharacter::OnOverlapBegin);
+
 	
 }
 
@@ -85,6 +116,11 @@ void AMainCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	/*float HeadHeight = VRCameraComp->GetComponentLocation().Z;
+
+	float NewHalfHeight{ FMath::Clamp(HeadHeight, PlayerCapsuleMinHeight, PlayerCapsuleMaxHeight) };
+
+	PlayerCapsuleComp->SetCapsuleHalfHeight(NewHalfHeight / 2.0f);*/
 }
 
 // Called to bind functionality to input
@@ -92,5 +128,36 @@ void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+
+void AMainCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (OtherActor && OtherActor != this)
+	{
+		//UE_LOG(LogTemp, Error, TEXT("Overlapping with: %s"), *OtherActor->GetName());
+		//if (OtherComp->GetCollisionObjectType() == ECC_GameTraceChannel3)
+		//{
+
+		if (BlackoutWidget)
+		{
+			
+			UImage* BlackoutImage = Cast<UImage>(BlackoutWidgetInstance->GetWidgetFromName(TEXT("BlackoutImage")));
+			if (BlackoutImage)
+			{
+				
+				FLinearColor NewColor = BlackoutImage->ColorAndOpacity;
+				NewColor.A = 1.0f; // Ensure Opacity is within valid range
+				BlackoutImage->SetColorAndOpacity(NewColor);
+				//BlackoutImage->SetRenderOpacity(1.0f); // Fully visible
+			}
+			else
+			{
+				UE_LOG(LogTemp, Error, TEXT("BLACKOUT SHOULD WORK!!!!!!!!!!!!!!!!!!!!!!"));
+			}
+		}
+		
+		//}
+
+	}
 }
 

@@ -35,6 +35,7 @@ class PROJECTREMASTER_API UVRCameraComponent : public UCameraComponent
 	FQuat TargetRotation;
 	float AngleDifference;
 
+	
 public:
 
 	UVRCameraComponent();
@@ -43,6 +44,8 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnRotateSignature OnRotateDelegate;
+
+	
 	
 private:
 
