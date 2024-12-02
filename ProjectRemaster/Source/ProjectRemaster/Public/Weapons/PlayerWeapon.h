@@ -23,6 +23,15 @@ class PROJECTREMASTER_API APlayerWeapon : public AActor, public IGrabbableObject
 	GENERATED_BODY()
 
 	bool bIsGrabbed{ false };
+
+	UPROPERTY(EditDefaultsOnly)
+	FName StartSocket;
+
+	UPROPERTY(EditDefaultsOnly)
+	FName EndSocket;
+
+	UPROPERTY(EditDefaultsOnly)
+	FName UseSocketRotation;
 	
 public:	
 	// Sets default values for this actor's properties
@@ -33,6 +42,12 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	USceneComponent* RootComp;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	float CapsuleHalfHeight{ 8.0f };
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	float CapsuleRadius{ 4.0f };
 
 protected:
 	// Called when the game starts or when spawned

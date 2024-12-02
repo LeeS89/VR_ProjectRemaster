@@ -2,6 +2,8 @@
 
 
 #include "Weapons/PlayerWeapon.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "CharacterComponents/CustomXRHandComponent.h"
 
 // Sets default values
@@ -30,6 +32,62 @@ void APlayerWeapon::BeginPlay()
 void APlayerWeapon::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (!bIsGrabbed) { return; }
+
+
+	FVector StartSocketLocation{ StaticMeshComp->GetSocketLocation(StartSocket) };
+	FVector EndSocketLocation{ StaticMeshComp->GetSocketLocation(EndSocket) };
+	FQuat SocketRotation{ StaticMeshComp->GetSocketQuaternion(UseSocketRotation) };
+
+	
+
+	FCollisionShape Capsule{
+		FCollisionShape::MakeCapsule(CapsuleRadius, CapsuleHalfHeight)
+	};
+
+	FCollisionQueryParams IgnoreParams{
+		FName{TEXT("Ignore Params")},
+		true,
+		this
+	};
+
+
+	FHitResult OutResult;
+
+	bool bHasFoundTarget{ GetWorld()->SweepSingleByChannel(
+		OutResult,
+		StartSocketLocation,
+		EndSocketLocation,
+		FQuat::Identity,
+		ECollisionChannel::ECC_GameTraceChannel2,
+		Capsule,
+		IgnoreParams
+	) };
+
+
+	///////////////////////////
+	// Trace Hit Logic Here
+	///////////////////////////
+
+	FVector CenterPoint{
+		UKismetMathLibrary::VLerp(
+			StartSocketLocation, EndSocketLocation, 0.5f
+)
+	};
+
+	UKismetSystemLibrary::DrawDebugCapsule(
+		GetWorld(),
+		CenterPoint,
+		Capsule.GetCapsuleHalfHeight(),
+		Capsule.GetCapsuleRadius(),
+		SocketRotation.Rotator(),
+		bHasFoundTarget ? FLinearColor::Green : FLinearColor::Red,
+		0.1f,
+		1.0f
+	);
+
+	
 
 }
 
