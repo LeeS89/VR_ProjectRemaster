@@ -32,6 +32,9 @@ class PROJECTREMASTER_API APlayerWeapon : public AActor, public IGrabbableObject
 
 	UPROPERTY(EditDefaultsOnly)
 	FName UseSocketRotation;
+
+	UPROPERTY(VisibleAnywhere)
+	class UParticleSystemComponent* ActiveParticleSystem;
 	
 public:	
 	// Sets default values for this actor's properties
@@ -48,6 +51,16 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	float CapsuleRadius{ 4.0f };
+
+	UPROPERTY(EditAnywhere)
+	class UParticleSystem* SparkParticles;
+
+	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Decals")
+	class UMaterialInterface* DecalMaterial;*/
+
+	UPROPERTY(EditAnywhere)
+	bool bIsDebugMode{ false };
+
 
 protected:
 	// Called when the game starts or when spawned

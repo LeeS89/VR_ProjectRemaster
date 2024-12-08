@@ -4,6 +4,8 @@
 #include "Weapons/PlayerWeapon.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Kismet/GameplayStatics.h"
+#include "Particles/ParticleSystemComponent.h"
 #include "CharacterComponents/CustomXRHandComponent.h"
 
 // Sets default values
@@ -48,7 +50,7 @@ void APlayerWeapon::Tick(float DeltaTime)
 
 	FCollisionQueryParams IgnoreParams{
 		FName{TEXT("Ignore Params")},
-		true,
+		false,
 		this
 	};
 
@@ -66,28 +68,51 @@ void APlayerWeapon::Tick(float DeltaTime)
 	) };
 
 
+	if (bHasFoundTarget)
+	{
+		if (!ActiveParticleSystem)
+		{
+			ActiveParticleSystem = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), SparkParticles, OutResult.ImpactPoint, OutResult.ImpactNormal.Rotation());
+		}
+	}
+	else
+	{
+		if (ActiveParticleSystem)
+		{
+			ActiveParticleSystem->DestroyComponent();
+			ActiveParticleSystem = nullptr;
+		}
+	}
+
+	if (ActiveParticleSystem)
+	{
+		ActiveParticleSystem->SetWorldLocation(OutResult.ImpactPoint);
+		ActiveParticleSystem->SetWorldRotation(OutResult.ImpactNormal.Rotation());
+	}
 	///////////////////////////
 	// Trace Hit Logic Here
 	///////////////////////////
+	if (bIsDebugMode)
+	{
 
-	FVector CenterPoint{
-		UKismetMathLibrary::VLerp(
-			StartSocketLocation, EndSocketLocation, 0.5f
-)
-	};
+		FVector CenterPoint{
+			UKismetMathLibrary::VLerp(
+				StartSocketLocation, EndSocketLocation, 0.5f
+	)
+		};
 
-	UKismetSystemLibrary::DrawDebugCapsule(
-		GetWorld(),
-		CenterPoint,
-		Capsule.GetCapsuleHalfHeight(),
-		Capsule.GetCapsuleRadius(),
-		SocketRotation.Rotator(),
-		bHasFoundTarget ? FLinearColor::Green : FLinearColor::Red,
-		0.1f,
-		1.0f
-	);
+		UKismetSystemLibrary::DrawDebugCapsule(
+			GetWorld(),
+			CenterPoint,
+			Capsule.GetCapsuleHalfHeight(),
+			Capsule.GetCapsuleRadius(),
+			SocketRotation.Rotator(),
+			bHasFoundTarget ? FLinearColor::Green : FLinearColor::Red,
+			0.1f,
+			1.0f
+		);
 
-	
+	}
 
 }
 
