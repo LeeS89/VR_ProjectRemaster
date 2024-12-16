@@ -20,6 +20,9 @@ APlayerWeapon::APlayerWeapon()
 	StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Static Mesh Component"));
 	StaticMeshComp->SetupAttachment(RootComponent);
 
+	/*CapsuleComp = CreateDefaultSubobject<ULightsaberCapsule>(TEXT("Capsule Component"));
+	CapsuleComp->SetupAttachment(StaticMeshComp);*/
+
 }
 
 // Called when the game starts or when spawned
@@ -50,7 +53,7 @@ void APlayerWeapon::Tick(float DeltaTime)
 
 	FCollisionQueryParams IgnoreParams{
 		FName{TEXT("Ignore Params")},
-		false,
+		true,
 		this
 	};
 
@@ -70,9 +73,10 @@ void APlayerWeapon::Tick(float DeltaTime)
 
 	if (bHasFoundTarget)
 	{
+		DrawDebugSphere(GetWorld(), OutResult.ImpactPoint, 10.0f, 12, FColor::Red, false);
 		if (!ActiveParticleSystem)
 		{
-			ActiveParticleSystem = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), SparkParticles, OutResult.ImpactPoint, OutResult.ImpactNormal.Rotation());
+			ActiveParticleSystem = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), SparkParticles, OutResult.Location, OutResult.ImpactNormal.Rotation());
 		}
 	}
 	else
@@ -86,7 +90,7 @@ void APlayerWeapon::Tick(float DeltaTime)
 
 	if (ActiveParticleSystem)
 	{
-		ActiveParticleSystem->SetWorldLocation(OutResult.ImpactPoint);
+		ActiveParticleSystem->SetWorldLocation(OutResult.Location);
 		ActiveParticleSystem->SetWorldRotation(OutResult.ImpactNormal.Rotation());
 	}
 	///////////////////////////
@@ -98,17 +102,20 @@ void APlayerWeapon::Tick(float DeltaTime)
 		FVector CenterPoint{
 			UKismetMathLibrary::VLerp(
 				StartSocketLocation, EndSocketLocation, 0.5f
-	)
+		)
 		};
+
+		//FVector CenterPoint{ (StartSocketLocation + EndSocketLocation) / 2.0f };
+		float CapsuleHeight = CenterPoint.Size() / 2.0f ;
 
 		UKismetSystemLibrary::DrawDebugCapsule(
 			GetWorld(),
 			CenterPoint,
-			Capsule.GetCapsuleHalfHeight(),
+			Capsule.GetCapsuleAxisHalfLength(),
 			Capsule.GetCapsuleRadius(),
 			SocketRotation.Rotator(),
 			bHasFoundTarget ? FLinearColor::Green : FLinearColor::Red,
-			0.1f,
+			0.0f,
 			1.0f
 		);
 

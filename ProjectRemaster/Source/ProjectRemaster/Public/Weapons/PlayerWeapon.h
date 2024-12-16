@@ -46,11 +46,13 @@ public:
 	UPROPERTY(EditAnywhere)
 	USceneComponent* RootComp;
 
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	float CapsuleHalfHeight{ 8.0f };
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	float CapsuleRadius{ 4.0f };
+
 
 	UPROPERTY(EditAnywhere)
 	class UParticleSystem* SparkParticles;
