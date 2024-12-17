@@ -5,12 +5,19 @@
 
 ALightsaber::ALightsaber()
 {
-
+	PrimaryActorTick.bCanEverTick = true;
 }
+
+
 
 void ALightsaber::BeginPlay()
 {
 	Super::BeginPlay();
+}
+
+void ALightsaber::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
 }
 
 

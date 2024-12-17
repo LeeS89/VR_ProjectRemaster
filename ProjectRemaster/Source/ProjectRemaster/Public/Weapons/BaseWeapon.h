@@ -5,20 +5,20 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Interfaces/GrabbableObject.h"
-#include "PlayerWeapon.generated.h"
+#include "BaseWeapon.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE(
 	FOnWeaponGrabbedSignature,
-	APlayerWeapon, OnWeaponGrabbedDelegate
+	ABaseWeapon, OnWeaponGrabbedDelegate
 );
 
 DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE(
 	FOnWeaponReleasedSignature,
-	APlayerWeapon, OnWeaponReleasedDelegate
+	ABaseWeapon, OnWeaponReleasedDelegate
 );
 
 UCLASS()
-class PROJECTREMASTER_API APlayerWeapon : public AActor, public IGrabbableObject
+class PROJECTREMASTER_API ABaseWeapon : public AActor, public IGrabbableObject
 {
 	GENERATED_BODY()
 
@@ -38,7 +38,7 @@ class PROJECTREMASTER_API APlayerWeapon : public AActor, public IGrabbableObject
 	
 public:	
 	// Sets default values for this actor's properties
-	APlayerWeapon();
+	ABaseWeapon();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UStaticMeshComponent* StaticMeshComp;

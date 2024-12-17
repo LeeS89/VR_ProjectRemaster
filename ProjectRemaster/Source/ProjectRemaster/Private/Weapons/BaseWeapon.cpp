@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Weapons/PlayerWeapon.h"
+#include "Weapons/BaseWeapon.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
@@ -9,7 +9,7 @@
 #include "CharacterComponents/CustomXRHandComponent.h"
 
 // Sets default values
-APlayerWeapon::APlayerWeapon()
+ABaseWeapon::ABaseWeapon()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -26,7 +26,7 @@ APlayerWeapon::APlayerWeapon()
 }
 
 // Called when the game starts or when spawned
-void APlayerWeapon::BeginPlay()
+void ABaseWeapon::BeginPlay()
 {
 	Super::BeginPlay();
 	
@@ -34,7 +34,7 @@ void APlayerWeapon::BeginPlay()
 }
 
 // Called every frame
-void APlayerWeapon::Tick(float DeltaTime)
+void ABaseWeapon::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
@@ -83,6 +83,7 @@ void APlayerWeapon::Tick(float DeltaTime)
 	{
 		if (ActiveParticleSystem)
 		{
+			
 			ActiveParticleSystem->DestroyComponent();
 			ActiveParticleSystem = nullptr;
 		}
@@ -123,21 +124,21 @@ void APlayerWeapon::Tick(float DeltaTime)
 
 }
 
-void APlayerWeapon::OnGrabbed_Implementation(UCustomXRHandComponent* HandComponent, FName SocketName)
+void ABaseWeapon::OnGrabbed_Implementation(UCustomXRHandComponent* HandComponent, FName SocketName)
 {
 	bIsGrabbed = true;
 	OnWeaponGrabbedDelegate.Broadcast();
 	AttachToComponent(HandComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale, SocketName);
 }
 
-void APlayerWeapon::OnReleased_Implementation()
+void ABaseWeapon::OnReleased_Implementation()
 {
 	DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 	OnWeaponReleasedDelegate.Broadcast();
 	bIsGrabbed = false;
 }
 
-bool APlayerWeapon::IsGrabbed()
+bool ABaseWeapon::IsGrabbed()
 {
 	return bIsGrabbed;
 }
