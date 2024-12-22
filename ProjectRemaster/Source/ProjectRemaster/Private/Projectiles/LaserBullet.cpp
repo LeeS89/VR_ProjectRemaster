@@ -19,4 +19,13 @@ void ALaserBullet::BeginPlay()
 void ALaserBullet::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (DestroyTime >= 0.0f)
+	{
+		DestroyTime -= DeltaTime;
+	}
+	else
+	{
+		Destroy();
+	}
 }
