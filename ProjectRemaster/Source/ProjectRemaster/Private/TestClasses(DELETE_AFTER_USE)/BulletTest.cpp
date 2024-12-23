@@ -2,6 +2,7 @@
 
 
 #include "TestClasses(DELETE_AFTER_USE)/BulletTest.h"
+#include "PooledActors/BulletPoolManager.h"
 #include "Projectiles/BulletBase.h"
 
 // Sets default values
@@ -33,18 +34,25 @@ void ABulletTest::BeginPlay()
 
 void ABulletTest::Fire()
 {
-	if (BulletClass)
-	{
-		FActorSpawnParameters SpawnParams;
-		SpawnParams.Owner = OwnerTest;
-		SpawnParams.Instigator = GetInstigator();
+	ABulletBase* Bullet{ BulletPoolManager->GetBulletFromPool() };
+	if (!Bullet) { return; }
 
-		ABulletBase* Bullet = GetWorld()->SpawnActor<ABulletBase>(BulletClass, SpawnPoint->GetComponentLocation(), SpawnPoint->GetComponentRotation(), SpawnParams);
-		if (!SpawnParams.Instigator)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("NO INSTIGATOR!!!"));
-		}
-	}
+	//Bullet->SetActorLocation(SpawnPoint->GetComponentLocation());
+	//Bullet->SetActorRotation(SpawnPoint->GetComponentRotation());
+	Bullet->SetOwner(OwnerTest);
+	Bullet->ToggleActiveState(true, SpawnPoint->GetComponentLocation(), SpawnPoint->GetComponentRotation());
+
+
+	/*FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = OwnerTest;
+	SpawnParams.Instigator = GetInstigator();*/
+
+	//ABulletBase* Bullet = GetWorld()->SpawnActor<ABulletBase>(BulletClass, SpawnPoint->GetComponentLocation(), SpawnPoint->GetComponentRotation(), SpawnParams);
+	/*if (!SpawnParams.Instigator)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("NO INSTIGATOR!!!"));
+	}*/
+
 }
 
 // Called every frame

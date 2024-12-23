@@ -30,6 +30,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	float FireRate = 3.f;
 
+	UPROPERTY(EditAnywhere)
+	class ABulletPoolManager* BulletPoolManager;
+
 private:
 	FTimerHandle FireRateTimerHandle;
 

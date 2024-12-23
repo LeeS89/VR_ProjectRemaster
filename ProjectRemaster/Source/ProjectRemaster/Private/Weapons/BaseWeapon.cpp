@@ -5,6 +5,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
+#include "Interfaces/BulletInterface.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "CharacterComponents/CustomXRHandComponent.h"
 
@@ -73,6 +74,12 @@ void ABaseWeapon::Tick(float DeltaTime)
 
 	if (bHasFoundTarget)
 	{
+		if (OutResult.GetActor()->Implements<UBulletInterface>())
+		{
+			BulletInterface = Cast<IBulletInterface>(OutResult.GetActor());
+
+			BulletInterface->Execute_OnDeflected(OutResult.GetActor());
+		}
 		DrawDebugSphere(GetWorld(), OutResult.ImpactPoint, 10.0f, 12, FColor::Red, false);
 		if (!ActiveParticleSystem)
 		{
