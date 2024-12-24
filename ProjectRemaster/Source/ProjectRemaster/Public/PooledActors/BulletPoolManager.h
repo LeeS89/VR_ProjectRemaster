@@ -38,6 +38,10 @@ protected:
 
 public:	
 
+	UFUNCTION(BlueprintCallable)
 	ABulletBase* GetBulletFromPool();
+
+	UFUNCTION(BlueprintCallable)
+	void ReturnBulletToPool(ABulletBase* Bullet);
 
 };

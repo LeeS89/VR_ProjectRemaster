@@ -34,7 +34,6 @@ void ABulletPoolManager::InitializePool()
 		{
 			Bullet->SetIsInUse(false);
 			Bullet->ToggleActiveState(false, GetActorLocation(), GetActorRotation());
-
 			BulletPool.Add(Bullet);
 		}
 	}
@@ -46,12 +45,22 @@ ABulletBase* ABulletPoolManager::GetBulletFromPool()
 	{
 		if (!Bullet->IsInUse())
 		{
+			Bullet->OnBulletExpired.AddDynamic(this, &ABulletPoolManager::ReturnBulletToPool);
 			Bullet->SetIsInUse(true);
 		
 			return Bullet;
 		}
 	}
 	return nullptr;
+}
+
+void ABulletPoolManager::ReturnBulletToPool(ABulletBase* Bullet)
+{
+	if (!Bullet) { return; }
+
+	Bullet->OnBulletExpired.RemoveDynamic(this, &ABulletPoolManager::ReturnBulletToPool);
+	Bullet->ToggleActiveState(false);
+	Bullet->SetIsInUse(false);
 }
 
 

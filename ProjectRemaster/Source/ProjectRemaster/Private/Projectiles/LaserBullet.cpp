@@ -2,6 +2,7 @@
 
 
 #include "Projectiles/LaserBullet.h"
+#include "PooledActors/BulletPoolManager.h"
 #include <GameFramework/ProjectileMovementComponent.h>
 
 ALaserBullet::ALaserBullet()
@@ -26,6 +27,17 @@ void ALaserBullet::Tick(float DeltaTime)
 	}
 	else
 	{
-		Destroy();
+		OnExpired_Implementation();
+		//Destroy();
+	}
+}
+
+void ALaserBullet::ToggleActiveState(bool bActive, const FVector& SpawnLocation, const FRotator& SpawnRotation)
+{
+	Super::ToggleActiveState(bActive, SpawnLocation, SpawnRotation);
+
+	if (bActive)
+	{
+		DestroyTime = 5.0f;
 	}
 }

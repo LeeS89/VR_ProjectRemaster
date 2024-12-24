@@ -47,23 +47,18 @@ void ABulletBase::ToggleActiveState(bool bActive, const FVector& SpawnLocation, 
 {
 	SetActorLocation(SpawnLocation);
 	SetActorRotation(SpawnRotation);
+	ProjectileMovementComp->SetActive(bActive);
 
 	if (bActive)
 	{
 		FVector NewVelocity{ SpawnRotation.Vector() * ProjectileMovementComp->InitialSpeed };
 		ProjectileMovementComp->Velocity = NewVelocity;
-		ProjectileMovementComp->SetActive(bActive);
 	}
-
+	
 	SetActorHiddenInGame(!bActive);
 	SetActorEnableCollision(bActive);
 	SetActorTickEnabled(bActive);
 
-	
-
-	//if (!bActive) { return; }
-
-	//ProjectileMovementComp->Velocity = StoredVelocity;
 }
 
 void ABulletBase::OnDeflected_Implementation()
@@ -84,5 +79,14 @@ void ABulletBase::OnDeflected_Implementation()
 	float VectorLength = CurrentVelocity.Length();
 
 	ProjectileMovementComp->Velocity = NormalizedReversedVelocity * VectorLength;*/
+}
+
+
+/// <summary>
+/// The bullet Pool Manager listens for this event which returns the bullet to the pool
+/// </summary>
+void ABulletBase::OnExpired_Implementation()
+{
+	OnBulletExpired.Broadcast(this);
 }
 

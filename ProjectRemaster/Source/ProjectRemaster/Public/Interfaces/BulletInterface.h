@@ -25,4 +25,7 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent)
 	void OnDeflected();
+
+	UFUNCTION(BlueprintNativeEvent)
+	void OnExpired();
 };

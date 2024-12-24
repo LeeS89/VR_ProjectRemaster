@@ -7,6 +7,8 @@
 #include "Interfaces/BulletInterface.h"
 #include "BulletBase.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBulletExpired, ABulletBase*, Bullet);
+
 UCLASS()
 class PROJECTREMASTER_API ABulletBase : public AActor, public IBulletInterface
 {
@@ -21,6 +23,9 @@ public:
 	// Sets default values for this actor's properties
 	ABulletBase();
 
+	UPROPERTY(BlueprintAssignable)
+	FOnBulletExpired OnBulletExpired;
+
 	UPROPERTY(EditAnywhere)
 	USceneComponent* RootComp;
 
@@ -34,9 +39,11 @@ public:
 
 	void SetIsInUse(bool InUse) { bIsInUse = InUse; }
 
-	void ToggleActiveState(bool bActive, const FVector& SpawnLocation, const FRotator& SpawnRotation);
+	virtual void ToggleActiveState(bool bActive, const FVector& SpawnLocation = FVector::ZeroVector, const FRotator& SpawnRotation = FRotator::ZeroRotator);
 
 	virtual void OnDeflected_Implementation() override;
+
+	virtual void OnExpired_Implementation() override;
 
 protected:
 	// Called when the game starts or when spawned
