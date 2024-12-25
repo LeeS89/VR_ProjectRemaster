@@ -3,7 +3,10 @@
 
 #include "TestClasses(DELETE_AFTER_USE)/BulletTest.h"
 #include "PooledActors/BulletPoolManager.h"
+#include "Characters/MainCharacter.h"
+#include "GameModes/MainGameMode.h"
 #include "Projectiles/BulletBase.h"
+#include <Kismet/GameplayStatics.h>
 
 // Sets default values
 ABulletTest::ABulletTest()
@@ -28,6 +31,19 @@ void ABulletTest::BeginPlay()
 {
 	Super::BeginPlay();
 
+	AMainGameMode* GameMode = Cast<AMainGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+
+	if (!GameMode) { return; }
+
+	ACharacter* PlayerCharacter = GameMode->GetPlayerCharacter();
+
+	PlayerRef = Cast<AMainCharacter>(PlayerCharacter);
+
+	/*if (!PlayerRef)
+	{
+		UE_LOG(LogTemp, Error, TEXT("WHY ME!!!!"));
+	}*/
+
 	GetWorldTimerManager().SetTimer(FireRateTimerHandle, this, &ABulletTest::Fire, FireRate, true);
 	
 }
@@ -39,9 +55,15 @@ void ABulletTest::Fire()
 
 	//Bullet->SetActorLocation(SpawnPoint->GetComponentLocation());
 	//Bullet->SetActorRotation(SpawnPoint->GetComponentRotation());
-	Bullet->SetOwner(OwnerTest);
-	Bullet->ToggleActiveState(true, SpawnPoint->GetComponentLocation(), SpawnPoint->GetComponentRotation());
+	FVector PlayerLocation = PlayerRef->GetActorLocation();
+	FVector CurrentLocation = SpawnPoint->GetComponentLocation();
+	FVector DirectionToPlayer = PlayerLocation - CurrentLocation;
+	FVector DirectionToPlayerNormalized = DirectionToPlayer.GetSafeNormal();
+	FRotator BulletRotation = DirectionToPlayerNormalized.Rotation();
 
+	Bullet->ToggleActiveState(true, SpawnPoint->GetComponentLocation(), BulletRotation);
+
+	
 
 	/*FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = OwnerTest;
