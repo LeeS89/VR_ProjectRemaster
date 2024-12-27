@@ -27,8 +27,7 @@ void ALaserBullet::Tick(float DeltaTime)
 	}
 	else
 	{
-		OnExpired_Implementation();
-		//Destroy();
+		OnExpired();
 	}
 }
 

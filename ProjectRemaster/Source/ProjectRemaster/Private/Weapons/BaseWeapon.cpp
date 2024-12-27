@@ -38,7 +38,7 @@ void ABaseWeapon::BeginPlay()
 void ABaseWeapon::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	if (!bIsDebugMode) { return; }
 	if (!bIsGrabbed) { return; }
 
 

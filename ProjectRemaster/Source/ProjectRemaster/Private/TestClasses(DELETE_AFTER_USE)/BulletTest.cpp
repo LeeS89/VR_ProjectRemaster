@@ -6,6 +6,7 @@
 #include "Characters/MainCharacter.h"
 #include "GameModes/MainGameMode.h"
 #include "Projectiles/BulletBase.h"
+#include "UtilityClasses/TargetingUtility.h"
 #include <Kismet/GameplayStatics.h>
 
 // Sets default values
@@ -52,16 +53,19 @@ void ABulletTest::Fire()
 {
 	ABulletBase* Bullet{ BulletPoolManager->GetBulletFromPool() };
 	if (!Bullet) { return; }
-
+	Bullet->SetOwner(OwnerTest);
 	//Bullet->SetActorLocation(SpawnPoint->GetComponentLocation());
 	//Bullet->SetActorRotation(SpawnPoint->GetComponentRotation());
-	FVector PlayerLocation = PlayerRef->GetActorLocation();
-	FVector CurrentLocation = SpawnPoint->GetComponentLocation();
+	/////////////////////////////////////////////////
+	//FVector PlayerLocation = PlayerRef->GetActorLocation();
+	/*FVector CurrentLocation = SpawnPoint->GetComponentLocation();
 	FVector DirectionToPlayer = PlayerLocation - CurrentLocation;
-	FVector DirectionToPlayerNormalized = DirectionToPlayer.GetSafeNormal();
-	FRotator BulletRotation = DirectionToPlayerNormalized.Rotation();
+	FVector DirectionToPlayerNormalized = DirectionToPlayer.GetSafeNormal();*/
+	///////////////////////////////////////////////////////
+	FRotator DirectionToPlayer = UTargetingUtility::GetDirectionToTarget(PlayerRef, SpawnPoint).Rotation();
+	//FRotator BulletRotation = DirectionToPlayer.Rotation();
 
-	Bullet->ToggleActiveState(true, SpawnPoint->GetComponentLocation(), BulletRotation);
+	Bullet->ToggleActiveState(true, SpawnPoint->GetComponentLocation(), DirectionToPlayer);
 
 	
 

@@ -23,5 +23,10 @@ public:
 	ALightsaber();
 
 	virtual void Tick(float DeltaTime) override;
+
+public:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UWeaponTraceComponent* WeaponTraceComp;
 	
 };

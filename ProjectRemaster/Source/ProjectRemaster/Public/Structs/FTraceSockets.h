@@ -14,8 +14,6 @@ struct PROJECTREMASTER_API FTraceSockets
 {
 	GENERATED_BODY();
 
-	/*UPROPERTY(EditAnywhere)
-	TEnumAsByte<EHand> GrabbingHand;*/
 
 	UPROPERTY(EditAnywhere)
 	FName Start;

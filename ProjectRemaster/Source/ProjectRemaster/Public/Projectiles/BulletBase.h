@@ -4,19 +4,20 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Interfaces/BulletInterface.h"
+#include "Interfaces/DeflectableInterface.h"
 #include "BulletBase.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBulletExpired, ABulletBase*, Bullet);
 
 UCLASS()
-class PROJECTREMASTER_API ABulletBase : public AActor, public IBulletInterface
+class PROJECTREMASTER_API ABulletBase : public AActor, public IDeflectableInterface
 {
 	GENERATED_BODY()
 
 private:
 
 	bool bIsInUse{ false };
+
 
 	
 public:	
@@ -43,13 +44,13 @@ public:
 
 	virtual void OnDeflected_Implementation() override;
 
-	virtual void OnExpired_Implementation() override;
+	/*virtual void OnExpired_Implementation() override;*/
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	
+	void OnExpired();
 
 
 public:	

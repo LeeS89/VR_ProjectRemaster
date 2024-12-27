@@ -2,10 +2,13 @@
 
 
 #include "Weapons/Lightsaber.h"
+#include "CharacterComponents/WeaponTraceComponent.h"
 
 ALightsaber::ALightsaber()
 {
 	PrimaryActorTick.bCanEverTick = true;
+
+	WeaponTraceComp = CreateDefaultSubobject<UWeaponTraceComponent>(TEXT("Weapon Trace Component"));
 }
 
 
