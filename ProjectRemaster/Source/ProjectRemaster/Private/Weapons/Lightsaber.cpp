@@ -3,12 +3,15 @@
 
 #include "Weapons/Lightsaber.h"
 #include "CharacterComponents/WeaponTraceComponent.h"
+#include "WeaponComponents/VFXComponent.h"
 
 ALightsaber::ALightsaber()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
 	WeaponTraceComp = CreateDefaultSubobject<UWeaponTraceComponent>(TEXT("Weapon Trace Component"));
+
+	VFXComp = CreateDefaultSubobject<UVFXComponent>(TEXT("VFX Component"));
 }
 
 

@@ -37,6 +37,9 @@ AMainCharacter::AMainCharacter()
 	BoxComp = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Component"));
 	BoxComp->SetupAttachment(VRCameraComp);
 
+	DamageCollider = CreateDefaultSubobject<UBoxComponent>(TEXT("Damage Collider Component"));
+	DamageCollider->SetupAttachment(VRCameraComp);
+
 
 	// Hand Components - Visuals, Gesture Recognizers and tracking
 	LeftMotionControllerComp = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("Left Motion Controller Component"));
@@ -128,6 +131,11 @@ void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+
+USceneComponent* AMainCharacter::GetTargetComponent()
+{
+	return DamageCollider;
 }
 
 void AMainCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

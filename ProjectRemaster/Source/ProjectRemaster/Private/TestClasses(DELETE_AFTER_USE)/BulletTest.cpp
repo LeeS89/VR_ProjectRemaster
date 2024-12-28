@@ -40,6 +40,16 @@ void ABulletTest::BeginPlay()
 
 	PlayerRef = Cast<AMainCharacter>(PlayerCharacter);
 
+	if (!PlayerRef) { return; }
+
+	if (!PlayerRef->Implements<UMainPlayer>()) { return; }
+
+	AimTargetComp = PlayerRef->GetTargetComponent();
+
+	if (AimTargetComp)
+	{
+		UE_LOG(LogTemp, Error, TEXT("DEFENCE COLLIDER FOUND!!!"));
+	}
 	/*if (!PlayerRef)
 	{
 		UE_LOG(LogTemp, Error, TEXT("WHY ME!!!!"));
@@ -54,16 +64,9 @@ void ABulletTest::Fire()
 	ABulletBase* Bullet{ BulletPoolManager->GetBulletFromPool() };
 	if (!Bullet) { return; }
 	Bullet->SetOwner(OwnerTest);
-	//Bullet->SetActorLocation(SpawnPoint->GetComponentLocation());
-	//Bullet->SetActorRotation(SpawnPoint->GetComponentRotation());
-	/////////////////////////////////////////////////
-	//FVector PlayerLocation = PlayerRef->GetActorLocation();
-	/*FVector CurrentLocation = SpawnPoint->GetComponentLocation();
-	FVector DirectionToPlayer = PlayerLocation - CurrentLocation;
-	FVector DirectionToPlayerNormalized = DirectionToPlayer.GetSafeNormal();*/
-	///////////////////////////////////////////////////////
-	FRotator DirectionToPlayer = UTargetingUtility::GetDirectionToTarget(PlayerRef, SpawnPoint).Rotation();
-	//FRotator BulletRotation = DirectionToPlayer.Rotation();
+	
+	FRotator DirectionToPlayer = UTargetingUtility::GetDirectionToTarget(AimTargetComp, SpawnPoint).Rotation();
+	
 
 	Bullet->ToggleActiveState(true, SpawnPoint->GetComponentLocation(), DirectionToPlayer);
 

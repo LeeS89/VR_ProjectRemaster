@@ -41,6 +41,9 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	class AMainCharacter* PlayerRef;
 
+	UPROPERTY(VisibleAnywhere)
+	class USceneComponent* AimTargetComp;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

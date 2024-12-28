@@ -81,13 +81,6 @@ void ABulletBase::OnDeflected_Implementation()
 }
 
 
-///// <summary>
-///// The bullet Pool Manager listens for this event which returns the bullet to the pool
-///// </summary>
-//void ABulletBase::OnExpired_Implementation()
-//{
-//	OnBulletExpired.Broadcast(this);
-//}
 
 /// <summary>
 /// The bullet Pool Manager listens for this event which returns the bullet to the pool

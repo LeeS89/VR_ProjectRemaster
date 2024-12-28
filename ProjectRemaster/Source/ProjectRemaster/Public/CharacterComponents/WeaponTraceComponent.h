@@ -7,9 +7,10 @@
 #include "Structs/FTraceSockets.h"
 #include "WeaponTraceComponent.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_TwoParams(
+DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_ThreeParams(
 	FOnOverlappingSignature,
 	UWeaponTraceComponent, OnOverlappingDelegate,
+	AActor*, HitActor,
 	const FVector&, HitLocation,
 	const FRotator&, HitRotation
 );
@@ -38,6 +39,12 @@ protected:
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	UFUNCTION(BlueprintCallable)
+	void PerformTrace();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
+	class USoundBase* DeflectSound;
 
 public:
 

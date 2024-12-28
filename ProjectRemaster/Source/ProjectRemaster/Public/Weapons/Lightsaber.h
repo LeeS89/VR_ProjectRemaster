@@ -28,5 +28,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UWeaponTraceComponent* WeaponTraceComp;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UVFXComponent* VFXComp;
 	
 };

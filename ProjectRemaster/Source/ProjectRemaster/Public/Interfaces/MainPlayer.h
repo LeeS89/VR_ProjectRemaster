@@ -28,4 +28,6 @@ public:
 		return TArray<UCustomXRHandComponent*>();
 	}
 
+	virtual USceneComponent* GetTargetComponent() = 0;
+
 };

@@ -83,6 +83,10 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TSubclassOf<class UUserWidget> BlackoutWidget;
+
+	//Damage Collider
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	class UBoxComponent* DamageCollider;
 	
 protected:
 	// Called when the game starts or when spawned
@@ -100,6 +104,8 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	virtual USceneComponent* GetTargetComponent() override;
 
 private:
 

@@ -8,12 +8,14 @@
 #include <Interfaces/DeflectableInterface.h>
 #include "Interfaces/OverlappableInterface.h"
 
+#include "Sound/SoundBase.h"
+
 // Sets default values for this component's properties
 UWeaponTraceComponent::UWeaponTraceComponent()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bCanEverTick = false;
 
 	// ...
 }
@@ -34,6 +36,10 @@ void UWeaponTraceComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+}
+
+void UWeaponTraceComponent::PerformTrace()
+{
 	FVector StartSocketLocation{ StaticMeshComp->GetSocketLocation(Sockets.Start) };
 	FVector EndSocketLocation{ StaticMeshComp->GetSocketLocation(Sockets.End) };
 	FQuat SocketRotation{ StaticMeshComp->GetSocketQuaternion(Sockets.Rotation) };
@@ -45,12 +51,10 @@ void UWeaponTraceComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 	};
 
 	FCollisionQueryParams IgnoreParams{
-		FName{TEXT("Ignore Params")},
+		FName{ TEXT("Ignore Params") },
 		true,
 		GetOwner()
 	};
-
-	
 
 
 	TArray<FHitResult> OutResults;
@@ -73,18 +77,20 @@ void UWeaponTraceComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 			AActor* HitActor = Hit.GetActor();
 			if (!HitActor)
 			{
-				continue; 
+				continue;
 			}
 
 			if (HitActor->Implements<UDeflectableInterface>())
 			{
+				UGameplayStatics::PlaySoundAtLocation(GetWorld(), DeflectSound, Hit.ImpactPoint);
+
 				DeflectInterface = Cast<IDeflectableInterface>(HitActor);
 
 				DeflectInterface->Execute_OnDeflected(HitActor);
 			}
 			else if (Hit.GetActor()->Implements<UOverlappableInterface>())
 			{
-				
+
 				OverlapInterface = Cast<IOverlappableInterface>(HitActor);
 
 				OverlapInterface->Execute_OnLightsaberOverlapping(HitActor);
@@ -92,12 +98,12 @@ void UWeaponTraceComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 			}
 			else
 			{
-				OnOverlappingDelegate.Broadcast(Hit.ImpactPoint, Hit.ImpactNormal.Rotation());
+				OnOverlappingDelegate.Broadcast(HitActor, Hit.ImpactPoint, Hit.ImpactNormal.Rotation());
 			}
 		}
 		/*if (!ActiveParticleSystem)
 		{
-			ActiveParticleSystem = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), SparkParticles, OutResult.Location, OutResult.ImpactNormal.Rotation());
+		ActiveParticleSystem = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), SparkParticles, OutResult.Location, OutResult.ImpactNormal.Rotation());
 		}*/
 	}
 	else
@@ -105,15 +111,15 @@ void UWeaponTraceComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 		/*if (ActiveParticleSystem)
 		{
 
-			ActiveParticleSystem->DestroyComponent();
-			ActiveParticleSystem = nullptr;
+		ActiveParticleSystem->DestroyComponent();
+		ActiveParticleSystem = nullptr;
 		}*/
 	}
 
 	/*if (ActiveParticleSystem)
 	{
-		ActiveParticleSystem->SetWorldLocation(OutResult.Location);
-		ActiveParticleSystem->SetWorldRotation(OutResult.ImpactNormal.Rotation());
+	ActiveParticleSystem->SetWorldLocation(OutResult.Location);
+	ActiveParticleSystem->SetWorldRotation(OutResult.ImpactNormal.Rotation());
 	}*/
 	///////////////////////////
 	// Trace Hit Logic Here
@@ -124,7 +130,7 @@ void UWeaponTraceComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 		FVector CenterPoint{
 			UKismetMathLibrary::VLerp(
 				StartSocketLocation, EndSocketLocation, 0.5f
-		)
+			)
 		};
 
 		//FVector CenterPoint{ (StartSocketLocation + EndSocketLocation) / 2.0f };
