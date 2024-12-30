@@ -2,8 +2,6 @@
 
 
 #include "CharacterComponents/WeaponTraceComponent.h"
-#include <Kismet/KismetMathLibrary.h>
-#include <Kismet/KismetSystemLibrary.h>
 #include <Kismet/GameplayStatics.h>
 #include <Interfaces/DeflectableInterface.h>
 #include "Interfaces/OverlappableInterface.h"
@@ -38,115 +36,157 @@ void UWeaponTraceComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 
 }
 
-void UWeaponTraceComponent::PerformTrace()
+void UWeaponTraceComponent::HandleTraceResults(const TArray<FHitResult>& HitResults)
 {
-	FVector StartSocketLocation{ StaticMeshComp->GetSocketLocation(Sockets.Start) };
-	FVector EndSocketLocation{ StaticMeshComp->GetSocketLocation(Sockets.End) };
-	FQuat SocketRotation{ StaticMeshComp->GetSocketQuaternion(Sockets.Rotation) };
+	if (HitResults.Num() <= 0) { return; }
 
-
-
-	FCollisionShape Capsule{
-		FCollisionShape::MakeCapsule(CapsuleRadius, CapsuleHalfHeight)
-	};
-
-	FCollisionQueryParams IgnoreParams{
-		FName{ TEXT("Ignore Params") },
-		true,
-		GetOwner()
-	};
-
-
-	TArray<FHitResult> OutResults;
-
-	bool bHasFoundTargets{ GetWorld()->SweepMultiByChannel(
-		OutResults,
-		StartSocketLocation,
-		EndSocketLocation,
-		FQuat::Identity,
-		TraceChannel,
-		Capsule,
-		IgnoreParams
-	) };
-
-
-	if (bHasFoundTargets)
+	for (const FHitResult& Hit : HitResults)
 	{
-		for (const FHitResult& Hit : OutResults)
+		AActor* HitActor = Hit.GetActor();
+		if (!HitActor)
 		{
-			AActor* HitActor = Hit.GetActor();
-			if (!HitActor)
-			{
-				continue;
-			}
-
-			if (HitActor->Implements<UDeflectableInterface>())
-			{
-				UGameplayStatics::PlaySoundAtLocation(GetWorld(), DeflectSound, Hit.ImpactPoint);
-
-				DeflectInterface = Cast<IDeflectableInterface>(HitActor);
-
-				DeflectInterface->Execute_OnDeflected(HitActor);
-			}
-			else if (Hit.GetActor()->Implements<UOverlappableInterface>())
-			{
-
-				OverlapInterface = Cast<IOverlappableInterface>(HitActor);
-
-				OverlapInterface->Execute_OnLightsaberOverlapping(HitActor);
-				DrawDebugSphere(GetWorld(), Hit.ImpactPoint, 10.0f, 12, FColor::Blue, false);
-			}
-			else
-			{
-				OnOverlappingDelegate.Broadcast(HitActor, Hit.ImpactPoint, Hit.ImpactNormal.Rotation());
-			}
+			continue;
 		}
-		/*if (!ActiveParticleSystem)
+
+		if (HitActor->Implements<UDeflectableInterface>())
 		{
-		ActiveParticleSystem = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), SparkParticles, OutResult.Location, OutResult.ImpactNormal.Rotation());
-		}*/
-	}
-	else
-	{
-		/*if (ActiveParticleSystem)
+			UGameplayStatics::PlaySoundAtLocation(GetWorld(), DeflectSound, Hit.ImpactPoint);
+
+			DeflectInterface = Cast<IDeflectableInterface>(HitActor);
+
+			DeflectInterface->Execute_OnDeflected(HitActor);
+		}
+		else if (Hit.GetActor()->Implements<UOverlappableInterface>())
 		{
 
-		ActiveParticleSystem->DestroyComponent();
-		ActiveParticleSystem = nullptr;
-		}*/
+			OverlapInterface = Cast<IOverlappableInterface>(HitActor);
+
+			OverlapInterface->Execute_OnLightsaberOverlapping(HitActor);
+			DrawDebugSphere(GetWorld(), Hit.ImpactPoint, 10.0f, 12, FColor::Blue, false);
+		}
+		else
+		{
+			OnOverlappingDelegate.Broadcast(HitActor, Hit.ImpactPoint, Hit.ImpactNormal.Rotation());
+		}
 	}
-
-	/*if (ActiveParticleSystem)
-	{
-	ActiveParticleSystem->SetWorldLocation(OutResult.Location);
-	ActiveParticleSystem->SetWorldRotation(OutResult.ImpactNormal.Rotation());
-	}*/
-	///////////////////////////
-	// Trace Hit Logic Here
-	///////////////////////////
-	if (bIsDebugMode)
-	{
-
-		FVector CenterPoint{
-			UKismetMathLibrary::VLerp(
-				StartSocketLocation, EndSocketLocation, 0.5f
-			)
-		};
-
-		//FVector CenterPoint{ (StartSocketLocation + EndSocketLocation) / 2.0f };
-		float CapsuleHeight = CenterPoint.Size() / 2.0f;
-
-		UKismetSystemLibrary::DrawDebugCapsule(
-			GetWorld(),
-			CenterPoint,
-			Capsule.GetCapsuleAxisHalfLength(),
-			Capsule.GetCapsuleRadius(),
-			SocketRotation.Rotator(),
-			bHasFoundTargets ? FLinearColor::Yellow : FLinearColor::Black,
-			0.0f,
-			1.0f
-		);
-
-	}
+	
 }
+	
 
+
+#pragma region Redundant
+
+
+
+//void UWeaponTraceComponent::PerformTrace()
+//{
+//	FVector StartSocketLocation{ StaticMeshComp->GetSocketLocation(Sockets.Start) };
+//	FVector EndSocketLocation{ StaticMeshComp->GetSocketLocation(Sockets.End) };
+//	FQuat SocketRotation{ StaticMeshComp->GetSocketQuaternion(Sockets.Rotation) };
+//
+//
+//
+//	FCollisionShape Capsule{
+//		FCollisionShape::MakeCapsule(CapsuleRadius, CapsuleHalfHeight)
+//	};
+//
+//	FCollisionQueryParams IgnoreParams{
+//		FName{ TEXT("Ignore Params") },
+//		true,
+//		GetOwner()
+//	};
+//
+//
+//	TArray<FHitResult> OutResults;
+//
+//	bool bHasFoundTargets{ GetWorld()->SweepMultiByChannel(
+//		OutResults,
+//		StartSocketLocation,
+//		EndSocketLocation,
+//		FQuat::Identity,
+//		TraceChannel,
+//		Capsule,
+//		IgnoreParams
+//	) };
+//
+//
+//	if (bHasFoundTargets)
+//	{
+//		for (const FHitResult& Hit : OutResults)
+//		{
+//			AActor* HitActor = Hit.GetActor();
+//			if (!HitActor)
+//			{
+//				continue;
+//			}
+//
+//			if (HitActor->Implements<UDeflectableInterface>())
+//			{
+//				UGameplayStatics::PlaySoundAtLocation(GetWorld(), DeflectSound, Hit.ImpactPoint);
+//
+//				DeflectInterface = Cast<IDeflectableInterface>(HitActor);
+//
+//				DeflectInterface->Execute_OnDeflected(HitActor);
+//			}
+//			else if (Hit.GetActor()->Implements<UOverlappableInterface>())
+//			{
+//
+//				OverlapInterface = Cast<IOverlappableInterface>(HitActor);
+//
+//				OverlapInterface->Execute_OnLightsaberOverlapping(HitActor);
+//				DrawDebugSphere(GetWorld(), Hit.ImpactPoint, 10.0f, 12, FColor::Blue, false);
+//			}
+//			else
+//			{
+//				OnOverlappingDelegate.Broadcast(HitActor, Hit.ImpactPoint, Hit.ImpactNormal.Rotation());
+//			}
+//		}
+//		/*if (!ActiveParticleSystem)
+//		{
+//		ActiveParticleSystem = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), SparkParticles, OutResult.Location, OutResult.ImpactNormal.Rotation());
+//		}*/
+//	}
+//	else
+//	{
+//		/*if (ActiveParticleSystem)
+//		{
+//
+//		ActiveParticleSystem->DestroyComponent();
+//		ActiveParticleSystem = nullptr;
+//		}*/
+//	}
+//
+//	/*if (ActiveParticleSystem)
+//	{
+//	ActiveParticleSystem->SetWorldLocation(OutResult.Location);
+//	ActiveParticleSystem->SetWorldRotation(OutResult.ImpactNormal.Rotation());
+//	}*/
+//	///////////////////////////
+//	// Trace Hit Logic Here
+//	///////////////////////////
+//	if (bIsDebugMode)
+//	{
+//
+//		FVector CenterPoint{
+//			UKismetMathLibrary::VLerp(
+//				StartSocketLocation, EndSocketLocation, 0.5f
+//			)
+//		};
+//
+//		//FVector CenterPoint{ (StartSocketLocation + EndSocketLocation) / 2.0f };
+//		float CapsuleHeight = CenterPoint.Size() / 2.0f;
+//
+//		UKismetSystemLibrary::DrawDebugCapsule(
+//			GetWorld(),
+//			CenterPoint,
+//			Capsule.GetCapsuleAxisHalfLength(),
+//			Capsule.GetCapsuleRadius(),
+//			SocketRotation.Rotator(),
+//			bHasFoundTargets ? FLinearColor::Yellow : FLinearColor::Black,
+//			0.0f,
+//			1.0f
+//		);
+//
+//	}
+//}
+#pragma endregion

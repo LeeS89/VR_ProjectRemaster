@@ -37,6 +37,6 @@ void ALaserBullet::ToggleActiveState(bool bActive, const FVector& SpawnLocation,
 
 	if (bActive)
 	{
-		DestroyTime = 5.0f;
+		DestroyTime = 20.0f;
 	}
 }

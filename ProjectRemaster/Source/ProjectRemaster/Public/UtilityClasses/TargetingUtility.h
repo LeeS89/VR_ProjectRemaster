@@ -17,9 +17,11 @@ class PROJECTREMASTER_API UTargetingUtility : public UObject
 public:
 
 	UFUNCTION(BlueprintCallable)
-	static FVector GetDirectionToTarget(const UObject* Target, const UObject* From);
+	static FVector GetDirectionToTarget(const UObject* Target, const UObject* From, bool bGetRandomOffset = false);
 
 private:
 
-	static FVector GetObjectLocation(const UObject* Object);
+	static FVector GetObjectLocation(const UObject* Object, bool bGetRandomOffset = false);
+
+	static void ApplyRandomOffset(const UObject* Target, FVector& LocationToOffset);
 };

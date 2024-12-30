@@ -36,6 +36,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	class UProjectileMovementComponent* ProjectileMovementComp;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	class UBulletTraceComponent* TraceComp;
+
 	bool IsInUse() const { return bIsInUse; }
 
 	void SetIsInUse(bool InUse) { bIsInUse = InUse; }
@@ -51,6 +54,9 @@ protected:
 	virtual void BeginPlay() override;
 
 	void OnExpired();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	bool bShouldPerformTrace{ false };
 
 
 public:	

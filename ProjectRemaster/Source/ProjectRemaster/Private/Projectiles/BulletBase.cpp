@@ -2,6 +2,7 @@
 
 
 #include "Projectiles/BulletBase.h"
+#include "WeaponComponents/BulletTraceComponent.h"
 #include <GameFramework/ProjectileMovementComponent.h>
 
 
@@ -19,7 +20,7 @@ ABulletBase::ABulletBase()
 
 	ProjectileMovementComp = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile Movement Component"));
 	
-
+	TraceComp = CreateDefaultSubobject<UBulletTraceComponent>(TEXT("Trace Component"));
 }
 
 
@@ -53,6 +54,7 @@ void ABulletBase::ToggleActiveState(bool bActive, const FVector& SpawnLocation, 
 		FVector NewVelocity{ SpawnRotation.Vector() * ProjectileMovementComp->InitialSpeed };
 		ProjectileMovementComp->Velocity = NewVelocity;
 	}
+	bShouldPerformTrace = bActive;
 	
 	SetActorHiddenInGame(!bActive);
 	SetActorEnableCollision(bActive);

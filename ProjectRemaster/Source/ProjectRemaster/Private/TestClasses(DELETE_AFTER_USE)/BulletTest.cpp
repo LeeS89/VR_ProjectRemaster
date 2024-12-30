@@ -31,7 +31,7 @@ ABulletTest::ABulletTest()
 void ABulletTest::BeginPlay()
 {
 	Super::BeginPlay();
-
+	GetWorldTimerManager().SetTimer(FireRateTimerHandle, this, &ABulletTest::Fire, FireRate, true);
 	AMainGameMode* GameMode = Cast<AMainGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 
 	if (!GameMode) { return; }
@@ -65,11 +65,17 @@ void ABulletTest::Fire()
 	if (!Bullet) { return; }
 	Bullet->SetOwner(OwnerTest);
 	
-	FRotator DirectionToPlayer = UTargetingUtility::GetDirectionToTarget(AimTargetComp, SpawnPoint).Rotation();
-	
+	if (AimTargetComp)
+	{
+		FRotator DirectionToTarget = UTargetingUtility::GetDirectionToTarget(AimTargetComp, SpawnPoint, true).Rotation();
 
-	Bullet->ToggleActiveState(true, SpawnPoint->GetComponentLocation(), DirectionToPlayer);
 
+		Bullet->ToggleActiveState(true, SpawnPoint->GetComponentLocation(), DirectionToTarget);
+	}
+	else
+	{
+		Bullet->ToggleActiveState(true, SpawnPoint->GetComponentLocation(), SpawnPoint->GetComponentRotation());
+	}
 	
 
 	/*FActorSpawnParameters SpawnParams;
