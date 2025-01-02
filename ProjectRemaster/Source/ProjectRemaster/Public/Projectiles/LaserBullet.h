@@ -28,7 +28,7 @@ public:
 
 	virtual void ToggleActiveState(bool bActive, const FVector& SpawnLocation = FVector::ZeroVector, const FRotator& SpawnRotation = FRotator::ZeroRotator) final override;
 
-	UPROPERTY(EditAnywhere)
-	float DestroyTime{ 1.5f };
+	/*UPROPERTY(EditAnywhere)
+	float DestroyTime{ 1.5f };*/
 	
 };

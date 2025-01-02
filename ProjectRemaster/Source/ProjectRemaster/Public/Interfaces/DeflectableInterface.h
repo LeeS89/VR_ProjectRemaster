@@ -25,4 +25,8 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent)
 	void OnDeflected();
+
+	virtual void OnExpired() = 0;
+
+	virtual void PlayHitParticle(bool bActive, const FVector& Location, const FRotator& Rotation) = 0;
 };

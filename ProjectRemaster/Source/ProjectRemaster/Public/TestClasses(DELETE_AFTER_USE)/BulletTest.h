@@ -18,7 +18,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* StaticMeshComp;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	USceneComponent* SpawnPoint;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -31,7 +31,7 @@ public:
 	float FireRate = 3.f;
 
 	UPROPERTY(EditAnywhere)
-	class ABulletPoolManager* BulletPoolManager;
+	class APoolManager* BulletPoolManager;
 
 private:
 	FTimerHandle FireRateTimerHandle;

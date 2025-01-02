@@ -21,22 +21,10 @@ void ALaserBullet::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (DestroyTime >= 0.0f)
-	{
-		DestroyTime -= DeltaTime;
-	}
-	else
-	{
-		OnExpired();
-	}
 }
 
 void ALaserBullet::ToggleActiveState(bool bActive, const FVector& SpawnLocation, const FRotator& SpawnRotation)
 {
 	Super::ToggleActiveState(bActive, SpawnLocation, SpawnRotation);
 
-	if (bActive)
-	{
-		DestroyTime = 20.0f;
-	}
 }

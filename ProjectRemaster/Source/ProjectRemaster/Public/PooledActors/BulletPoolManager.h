@@ -19,7 +19,7 @@ private:
 	TArray<ABulletBase*> BulletPool;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Pool types")
-	TSubclassOf<ABulletBase> LaserBullet;
+	TSubclassOf<ABulletBase> BulletType;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Pool sizes")
 	int32 PoolSize{ 10 };

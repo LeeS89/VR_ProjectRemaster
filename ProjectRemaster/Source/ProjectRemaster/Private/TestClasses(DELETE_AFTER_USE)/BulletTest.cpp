@@ -2,7 +2,7 @@
 
 
 #include "TestClasses(DELETE_AFTER_USE)/BulletTest.h"
-#include "PooledActors/BulletPoolManager.h"
+#include "PooledActors/PoolManager.h"
 #include "Characters/MainCharacter.h"
 #include "GameModes/MainGameMode.h"
 #include "Projectiles/BulletBase.h"
@@ -61,7 +61,7 @@ void ABulletTest::BeginPlay()
 
 void ABulletTest::Fire()
 {
-	ABulletBase* Bullet{ BulletPoolManager->GetBulletFromPool() };
+	ABulletBase* Bullet{ BulletPoolManager->GetBullet() };
 	if (!Bullet) { return; }
 	Bullet->SetOwner(OwnerTest);
 	

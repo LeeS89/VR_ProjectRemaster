@@ -14,12 +14,15 @@ class PROJECTREMASTER_API UBulletTraceComponent : public UBaseTraceComponent
 {
 	GENERATED_BODY()
 
+	UPROPERTY(VisibleAnywhere)
+	class ABulletBase* OwnerRef;
+
 protected:
 
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-	virtual void HandleTraceResults(const TArray<FHitResult>& hitResults) override;
+	virtual void HandleTraceResults(const TArray<FHitResult>& HitResults) override;
 	
 
 };

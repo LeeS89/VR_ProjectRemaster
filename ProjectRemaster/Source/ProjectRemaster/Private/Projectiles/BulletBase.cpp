@@ -3,7 +3,11 @@
 
 #include "Projectiles/BulletBase.h"
 #include "WeaponComponents/BulletTraceComponent.h"
+#include "UtilityClasses/TargetingUtility.h"
+#include "PooledActors/PoolManager.h"
+#include "PooledActors/PooledParticleEffect.h"
 #include <GameFramework/ProjectileMovementComponent.h>
+#include <Kismet/GameplayStatics.h>
 
 
 // Sets default values
@@ -29,15 +33,45 @@ ABulletBase::ABulletBase()
 void ABulletBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	
+	TArray<AActor*> FoundActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APoolManager::StaticClass(), FoundActors);
+
+	if (FoundActors.Num() > 0)
+	{
+		ParticlePoolManager = Cast<APoolManager>(FoundActors[0]); // Get the first found pool manager
+		UE_LOG(LogTemp, Log, TEXT("Pool Manager found: %s"), *ParticlePoolManager->GetName());
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No Pool Manager found in the scene!"));
+	}
+
+	//ParticlePoolManager = UGameplayStatics::
+
+	Timer = DestroyTime;
 }
+
+
 
 // Called every frame
 void ABulletBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	TimeOut(DeltaTime);
+
+}
+
+void ABulletBase::TimeOut(float DeltaTime)
+{
+	if (Timer > 0.0f)
+	{
+		Timer -= DeltaTime;
+	}
+	else
+	{
+		OnExpired();
+	}
 }
 
 
@@ -53,6 +87,9 @@ void ABulletBase::ToggleActiveState(bool bActive, const FVector& SpawnLocation, 
 	{
 		FVector NewVelocity{ SpawnRotation.Vector() * ProjectileMovementComp->InitialSpeed };
 		ProjectileMovementComp->Velocity = NewVelocity;
+
+		Timer = DestroyTime;
+
 	}
 	bShouldPerformTrace = bActive;
 	
@@ -64,22 +101,28 @@ void ABulletBase::ToggleActiveState(bool bActive, const FVector& SpawnLocation, 
 
 void ABulletBase::OnDeflected_Implementation()
 {
-	FVector OwnerLocation{ GetOwner()->GetActorLocation() };
-	FVector Location = GetActorLocation();
+	//FVector OwnerLocation{ GetOwner()->GetActorLocation() };
+	//FVector Location = GetActorLocation();
 
-	FVector NewNormal{ (OwnerLocation - Location).GetSafeNormal() };
+	//FVector NewNormal{ (OwnerLocation - Location).GetSafeNormal() };
+
+	FVector NewNormal = UTargetingUtility::GetDirectionToTarget(GetOwner(), this);
 
 	float VelocityLength = ProjectileMovementComp->Velocity.Length();
 
 	ProjectileMovementComp->Velocity = NewNormal * VelocityLength;
 
-	/*FVector CurrentVelocity{ ProjectileMovementComp->Velocity };
-	FVector ReversedVelocity{ CurrentVelocity * -1.0f };
-	FVector NormalizedReversedVelocity{ ReversedVelocity.GetSafeNormal() };
+	PlayHitParticle(true, GetActorLocation(), GetActorRotation());
 
-	float VectorLength = CurrentVelocity.Length();
+}
 
-	ProjectileMovementComp->Velocity = NormalizedReversedVelocity * VectorLength;*/
+void ABulletBase::PlayHitParticle(bool bActive, const FVector& Location, const FRotator& Rotation)
+{
+	APooledParticleEffect* HitParticle{ ParticlePoolManager->GetParticle() };
+
+	if (!HitParticle) { return; }
+
+	HitParticle->ToggleActiveState(bActive, Location, Rotation);
 }
 
 

@@ -19,7 +19,7 @@ void ABulletPoolManager::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (!IsValid(LaserBullet)) { return; }
+	if (!IsValid(BulletType)) { return; }
 
 	InitializePool();
 	
@@ -29,12 +29,12 @@ void ABulletPoolManager::InitializePool()
 {
 	for (int32 i = 0; i < PoolSize; ++i)
 	{
-		ABulletBase* Bullet = GetWorld()->SpawnActor<ABulletBase>(LaserBullet, FVector::ZeroVector, FRotator::ZeroRotator);
-		if (Bullet)
+		ABulletBase* BulletToSpawn = GetWorld()->SpawnActor<ABulletBase>(BulletType, FVector::ZeroVector, FRotator::ZeroRotator);
+		if (BulletType)
 		{
-			Bullet->SetIsInUse(false);
-			Bullet->ToggleActiveState(false, GetActorLocation(), GetActorRotation());
-			BulletPool.Add(Bullet);
+			BulletToSpawn->SetIsInUse(false);
+			BulletToSpawn->ToggleActiveState(false, GetActorLocation(), GetActorRotation());
+			BulletPool.Add(BulletToSpawn);
 		}
 	}
 }
