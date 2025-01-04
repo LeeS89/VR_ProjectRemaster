@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
+#include "CharacterComponents/TraceComponent.h"
 #include "GameFramework/Character.h"
 #include "Interfaces/MainPlayer.h"
 #include "Interfaces/GrabbableObject.h"
@@ -11,7 +12,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "OculusXRInputFunctionLibrary.h"
-#include "CharacterComponents/TraceComponent.h"
+
 
 // Sets default values for this component's properties
 UTraceComponent::UTraceComponent()

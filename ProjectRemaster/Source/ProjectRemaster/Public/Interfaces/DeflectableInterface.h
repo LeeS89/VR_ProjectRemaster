@@ -29,4 +29,8 @@ public:
 	virtual void OnExpired() = 0;
 
 	virtual void PlayHitParticle(bool bActive, const FVector& Location, const FRotator& Rotation) = 0;
+
+	virtual bool GetDeflectionHasBeenProcessed() const = 0;
+
+	virtual void SetDeflectionHasBeenProcessed(bool HasBeenProcessed) = 0;
 };

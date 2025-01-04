@@ -8,10 +8,11 @@ template <typename T>
 class TObjectPool
 {
 private:
-    TArray<T*> ObjectPool;
-    TSubclassOf<T> ObjectClass;
     int32 PoolSize;
+    TSubclassOf<T> ObjectClass;
     UWorld* World;
+
+    TArray<T*> ObjectPool;
 
 public:
     TObjectPool(int32 InPoolSize, TSubclassOf<T> InObjectClass, UWorld* InWorld)

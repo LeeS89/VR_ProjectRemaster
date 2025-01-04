@@ -45,7 +45,7 @@ ABulletBase* ABulletPoolManager::GetBulletFromPool()
 	{
 		if (!Bullet->IsInUse())
 		{
-			Bullet->OnBulletExpired.AddDynamic(this, &ABulletPoolManager::ReturnBulletToPool);
+			//Bullet->OnBulletExpired.AddDynamic(this, &ABulletPoolManager::ReturnBulletToPool);
 			Bullet->SetIsInUse(true);
 		
 			return Bullet;
@@ -58,7 +58,7 @@ void ABulletPoolManager::ReturnBulletToPool(ABulletBase* Bullet)
 {
 	if (!Bullet) { return; }
 
-	Bullet->OnBulletExpired.RemoveDynamic(this, &ABulletPoolManager::ReturnBulletToPool);
+	//Bullet->OnBulletExpired.RemoveDynamic(this, &ABulletPoolManager::ReturnBulletToPool);
 	Bullet->ToggleActiveState(false);
 	Bullet->SetIsInUse(false);
 }

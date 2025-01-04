@@ -50,11 +50,14 @@ void UWeaponTraceComponent::HandleTraceResults(const TArray<FHitResult>& HitResu
 
 		if (HitActor->Implements<UDeflectableInterface>())
 		{
-			UGameplayStatics::PlaySoundAtLocation(GetWorld(), DeflectSound, Hit.ImpactPoint);
-
 			DeflectInterface = Cast<IDeflectableInterface>(HitActor);
 
-			DeflectInterface->Execute_OnDeflected(HitActor);
+			if (DeflectInterface && !DeflectInterface->GetDeflectionHasBeenProcessed())
+			{
+				UGameplayStatics::PlaySoundAtLocation(GetWorld(), DeflectSound, Hit.ImpactPoint);
+				DeflectInterface->Execute_OnDeflected(HitActor);
+				DeflectInterface->SetDeflectionHasBeenProcessed(true);
+			}
 		}
 		else if (Hit.GetActor()->Implements<UOverlappableInterface>())
 		{

@@ -61,6 +61,7 @@ void APooledParticleEffect::ToggleActiveState(bool bActive, const FVector& Spawn
 		else
 		{
 			ParticleSystemComp->Deactivate();
+			ParticleSystemComp->SetActive(false, true);
 		}
 	}
 }

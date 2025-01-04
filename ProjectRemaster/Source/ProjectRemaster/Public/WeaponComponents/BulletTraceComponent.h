@@ -14,8 +14,13 @@ class PROJECTREMASTER_API UBulletTraceComponent : public UBaseTraceComponent
 {
 	GENERATED_BODY()
 
+private:
+
 	UPROPERTY(VisibleAnywhere)
 	class ABulletBase* OwnerRef;
+
+	// flag to check if the trace has already responded to a hit
+	bool bHasHit{ false };
 
 protected:
 
@@ -24,5 +29,8 @@ protected:
 
 	virtual void HandleTraceResults(const TArray<FHitResult>& HitResults) override;
 	
+public:
+
+	void ResetHitFlag() { bHasHit = false; }
 
 };

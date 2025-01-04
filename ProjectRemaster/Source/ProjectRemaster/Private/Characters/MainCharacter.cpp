@@ -152,8 +152,9 @@ void AMainCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor*
 			UImage* BlackoutImage = Cast<UImage>(BlackoutWidgetInstance->GetWidgetFromName(TEXT("BlackoutImage")));
 			if (BlackoutImage)
 			{
-				
-				FLinearColor NewColor = BlackoutImage->ColorAndOpacity;
+				//FLinearColor NewColors = BlackoutImage->GetColorAndOpacity().GetSpecifiedColor();
+
+				FLinearColor NewColor = BlackoutImage->GetColorAndOpacity();
 				NewColor.A = 1.0f; // Ensure Opacity is within valid range
 				BlackoutImage->SetColorAndOpacity(NewColor);
 				//BlackoutImage->SetRenderOpacity(1.0f); // Fully visible

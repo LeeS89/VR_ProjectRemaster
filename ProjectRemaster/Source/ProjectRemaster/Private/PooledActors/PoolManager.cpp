@@ -15,7 +15,7 @@ APoolManager::APoolManager()
 
 APoolManager::~APoolManager()
 {
-	UE_LOG(LogTemp, Error, TEXT("APoolManager is being destroyed"));
+	UE_LOG(LogTemp, Warning, TEXT("APoolManager is being destroyed"));
 }
 
 

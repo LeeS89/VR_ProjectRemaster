@@ -19,17 +19,12 @@ private:
 
 	bool bIsInUse{ false };
 
+	bool bDeflectionHasBeenProcessed{ false };
 
-	
-public:	
-	// Sets default values for this actor's properties
-	ABulletBase();
+protected:
 
 	UPROPERTY(EditAnywhere)
 	class APoolManager* ParticlePoolManager;
-
-	UPROPERTY(BlueprintAssignable)
-	FOnBulletExpired OnBulletExpired;
 
 	UPROPERTY(EditAnywhere)
 	USceneComponent* RootComp;
@@ -38,10 +33,22 @@ public:
 	UStaticMeshComponent* StaticMeshComp;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	class UPointLightComponent* PointLightComp;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	class UProjectileMovementComponent* ProjectileMovementComp;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	class UBulletTraceComponent* TraceComp;
+
+
+	
+public:	
+	// Sets default values for this actor's properties
+	ABulletBase();
+
+	UPROPERTY(BlueprintAssignable)
+	FOnBulletExpired OnBulletExpired;
 
 	// Interface functions
 	virtual bool IsInUse() const override { return bIsInUse; }
@@ -53,6 +60,10 @@ public:
 	virtual void OnDeflected_Implementation() override;
 
 	virtual void PlayHitParticle(bool bActive, const FVector& Location, const FRotator& Rotation) override;
+
+	virtual bool GetDeflectionHasBeenProcessed() const override;
+
+	virtual void SetDeflectionHasBeenProcessed(bool HasBeenProcessed) override { bDeflectionHasBeenProcessed = HasBeenProcessed; }
 
 	virtual void OnExpired() override;
 	/*virtual void OnExpired_Implementation() override;*/

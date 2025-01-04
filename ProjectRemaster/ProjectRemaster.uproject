@@ -12,8 +12,8 @@
 				"Engine",
 				"OculusXRInput",
 				"OculusHandPoseRecognition",
-				"CoreUObject",
-				"GameProjectGeneration"
+				"CoreUObject"
+				
 			]
 		}
 	],

@@ -6,6 +6,7 @@
 #include "UtilityClasses/TargetingUtility.h"
 #include "PooledActors/PoolManager.h"
 #include "PooledActors/PooledParticleEffect.h"
+#include "Components/PointLightComponent.h"
 #include <GameFramework/ProjectileMovementComponent.h>
 #include <Kismet/GameplayStatics.h>
 
@@ -22,6 +23,9 @@ ABulletBase::ABulletBase()
 	StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Static Mesh Component"));
 	StaticMeshComp->SetupAttachment(RootComponent);
 
+	PointLightComp = CreateDefaultSubobject<UPointLightComponent>(TEXT("Point Light Component"));
+	PointLightComp->SetupAttachment(StaticMeshComp);
+
 	ProjectileMovementComp = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile Movement Component"));
 	
 	TraceComp = CreateDefaultSubobject<UBulletTraceComponent>(TEXT("Trace Component"));
@@ -36,17 +40,16 @@ void ABulletBase::BeginPlay()
 	TArray<AActor*> FoundActors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APoolManager::StaticClass(), FoundActors);
 
-	if (FoundActors.Num() > 0)
-	{
-		ParticlePoolManager = Cast<APoolManager>(FoundActors[0]); // Get the first found pool manager
-		UE_LOG(LogTemp, Log, TEXT("Pool Manager found: %s"), *ParticlePoolManager->GetName());
-	}
-	else
+	if (FoundActors.Num() <= 0) { return; }
+
+	ParticlePoolManager = Cast<APoolManager>(FoundActors[0]); // Get the first found pool manager
+	//UE_LOG(LogTemp, Log, TEXT("Pool Manager found: %s"), *ParticlePoolManager->GetName());
+
+	/*else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("No Pool Manager found in the scene!"));
-	}
+	}*/
 
-	//ParticlePoolManager = UGameplayStatics::
 
 	Timer = DestroyTime;
 }
@@ -82,9 +85,13 @@ void ABulletBase::ToggleActiveState(bool bActive, const FVector& SpawnLocation, 
 	SetActorLocation(SpawnLocation);
 	SetActorRotation(SpawnRotation);
 	ProjectileMovementComp->SetActive(bActive);
+	PointLightComp->SetVisibility(bActive);
 
 	if (bActive)
 	{
+		TraceComp->ResetHitFlag();
+		SetDeflectionHasBeenProcessed(false);
+		
 		FVector NewVelocity{ SpawnRotation.Vector() * ProjectileMovementComp->InitialSpeed };
 		ProjectileMovementComp->Velocity = NewVelocity;
 
@@ -123,6 +130,11 @@ void ABulletBase::PlayHitParticle(bool bActive, const FVector& Location, const F
 	if (!HitParticle) { return; }
 
 	HitParticle->ToggleActiveState(bActive, Location, Rotation);
+}
+
+bool ABulletBase::GetDeflectionHasBeenProcessed() const
+{
+	return bDeflectionHasBeenProcessed;
 }
 
 

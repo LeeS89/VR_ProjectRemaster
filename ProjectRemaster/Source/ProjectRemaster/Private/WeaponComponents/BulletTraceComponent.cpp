@@ -15,8 +15,9 @@ void UBulletTraceComponent::BeginPlay()
 
 void UBulletTraceComponent::HandleTraceResults(const TArray<FHitResult>& HitResults)
 {
-	if (HitResults.Num() <= 0) { return; }
+	if (bHasHit || HitResults.Num() <= 0) { return; }
 
+	bHasHit = true;
 	FHitResult HitResult{ HitResults[0] };
 
 	if (!OwnerRef || !OwnerRef->Implements<UDeflectableInterface>()) { return; }
