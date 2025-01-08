@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "PooledActors/BulletPoolManager.h"
+#include "TestClasses(DELETE_AFTER_USE)/BulletPoolManager.h"
 #include "Projectiles/BulletBase.h"
 
 

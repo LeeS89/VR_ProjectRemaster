@@ -3,6 +3,7 @@
 
 #include "PooledActors/PoolManager.h"
 #include "Projectiles/BulletBase.h"
+#include "Projectiles/BaseBullet.h"
 #include "PooledActors/PooledParticleEffect.h"
 
 // Sets default values
@@ -27,8 +28,14 @@ void APoolManager::BeginPlay()
 
 	if (BulletClass)
 	{
-		BulletPool = new TObjectPool<ABulletBase>(BulletPoolsize, BulletClass, GetWorld());
+		BulletPool = new TObjectPool<ABulletBase>(BulletPoolSize, BulletClass, GetWorld());
 		BulletPool->InitializePool();
+	}
+
+	if (BulletTypeClass)
+	{
+		BulletToPool = new TObjectPool<ABaseBullet>(BulletPoolSize, BulletTypeClass, GetWorld());
+		BulletToPool->InitializePool();
 	}
 
 	if (ParticleClass)
@@ -47,6 +54,12 @@ void APoolManager::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	{
 		delete BulletPool;
 		BulletPool = nullptr;
+	}
+
+	if (BulletToPool)
+	{
+		delete BulletToPool;
+		BulletToPool = nullptr;
 	}
 
 	if (ParticlePool)
@@ -78,6 +91,18 @@ ABulletBase* APoolManager::GetBullet()
 	return Bullet;
 }
 
+ABaseBullet* APoolManager::GetBaseBullet()
+{
+	if (!BulletPool) { return nullptr; }
+
+	ABaseBullet* Bullet{ BulletToPool->GetObjectFromPool() };
+	if (Bullet)
+	{
+		Bullet->OnBulletHasExpired.AddDynamic(this, &APoolManager::ReturnBaseBulletToPool);
+	}
+	return Bullet;
+}
+
 
 
 void APoolManager::ReturnBulletToPool(ABulletBase* Bullet)
@@ -88,6 +113,14 @@ void APoolManager::ReturnBulletToPool(ABulletBase* Bullet)
 	BulletPool->ReturnObjectToPool(Bullet);
 	Bullet->OnBulletExpired.RemoveDynamic(this, &APoolManager::ReturnBulletToPool);
 
+}
+void APoolManager::ReturnBaseBulletToPool(ABaseBullet* Bullet)
+{
+	UE_LOG(LogTemp, Error, TEXT("BULLET SHOULD BE INVISIBLE NOW FROM HERE IN POOL"));
+	if (!BulletToPool || !Bullet) { return; }
+	
+	BulletToPool->ReturnObjectToPool(Bullet);
+	Bullet->OnBulletHasExpired.RemoveDynamic(this, &APoolManager::ReturnBaseBulletToPool);
 }
 #pragma endregion
 

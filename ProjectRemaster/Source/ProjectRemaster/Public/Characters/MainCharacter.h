@@ -87,6 +87,9 @@ public:
 	//Damage Collider
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	class UBoxComponent* DamageCollider;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UStatsComponent* StatsComp;
 	
 protected:
 	// Called when the game starts or when spawned

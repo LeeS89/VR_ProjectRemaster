@@ -4,11 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
-#include "OverlappableInterface.generated.h"
+#include "PlayerDamageInterface.generated.h"
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
-class UOverlappableInterface : public UInterface
+class UPlayerDamageInterface : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -16,13 +16,10 @@ class UOverlappableInterface : public UInterface
 /**
  * 
  */
-class PROJECTREMASTER_API IOverlappableInterface
+class PROJECTREMASTER_API IPlayerDamageInterface
 {
 	GENERATED_BODY()
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void OnLightsaberOverlapping();
 };

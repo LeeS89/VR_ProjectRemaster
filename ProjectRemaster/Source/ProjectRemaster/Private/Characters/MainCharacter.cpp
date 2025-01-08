@@ -12,7 +12,7 @@
 #include "Components/BoxComponent.h"
 #include "Components/WidgetComponent.h"
 #include "Blueprint/UserWidget.h"
-
+#include "CharacterComponents/StatsComponent.h"
 #include "CharacterComponents/LocomotionComponent.h"
 #include <Components/Image.h>
 
@@ -75,6 +75,8 @@ AMainCharacter::AMainCharacter()
 	LocomotionComp = CreateDefaultSubobject<ULocomotionComponent>(TEXT("Locomotion Component"));
 
 	TraceComp = CreateDefaultSubobject<UTraceComponent>(TEXT("Trace Component"));
+
+	StatsComp = CreateDefaultSubobject<UStatsComponent>(TEXT("Stats Component"));
 }
 
 // Called when the game starts or when spawned

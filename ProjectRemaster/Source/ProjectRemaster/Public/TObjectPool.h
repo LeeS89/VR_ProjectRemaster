@@ -34,7 +34,6 @@ public:
                 {
                     Interface->SetIsInUse(false);
                     Interface->ToggleActiveState(false);
-
                     ObjectPool.Add(NewObject);
                 }
             }
@@ -65,6 +64,7 @@ public:
             IPooledObjectInterface* Interface = Cast<IPooledObjectInterface>(Object);
             if (Interface)
             {
+                //UE_LOG(LogTemp, Error, TEXT("BULLET SHOULD BE INVISIBLE NOW"));
                 Interface->SetIsInUse(false);
                 Interface->ToggleActiveState(false);
             }

@@ -3,18 +3,18 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+#include "GameFramework/Pawn.h"
 #include "Interfaces/EnemyInterface.h"
-#include "BulletTest.generated.h"
+#include "BulletTesting.generated.h"
 
 UCLASS()
-class PROJECTREMASTER_API ABulletTest : public AActor, public IEnemyInterface
+class PROJECTREMASTER_API ABulletTesting : public APawn, public IEnemyInterface
 {
 	GENERATED_BODY()
-	
-public:	
-	// Sets default values for this actor's properties
-	ABulletTest();
+
+public:
+	// Sets default values for this pawn's properties
+	ABulletTesting();
 
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* StaticMeshComp;
@@ -25,8 +25,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	AActor* OwnerTest;
 
-	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<class ABulletBase> BulletClass;
+	/*UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<class ABulletBase> BulletClass;*/
 
 	UPROPERTY(EditAnywhere)
 	float FireRate = 3.f;
@@ -36,6 +36,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UStatsComponent* StatsComp;
+
+	
 
 private:
 	FTimerHandle FireRateTimerHandle;
@@ -48,6 +50,7 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	class USceneComponent* AimTargetComp;
 
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -55,5 +58,6 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
 
 };

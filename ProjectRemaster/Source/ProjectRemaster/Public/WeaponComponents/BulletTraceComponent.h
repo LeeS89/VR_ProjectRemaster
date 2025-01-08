@@ -22,12 +22,18 @@ private:
 	// flag to check if the trace has already responded to a hit
 	bool bHasHit{ false };
 
+	void DamageTarget(AActor* ActorToDamage);
+
+	FVector PreviousLocation{ FVector::ZeroVector };
+
 protected:
 
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
 	virtual void HandleTraceResults(const TArray<FHitResult>& HitResults) override;
+
+	virtual void SetTraceLocationAndRotation() final override;
 	
 public:
 

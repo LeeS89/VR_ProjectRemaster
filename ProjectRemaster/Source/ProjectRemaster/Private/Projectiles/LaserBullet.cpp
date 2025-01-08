@@ -2,14 +2,14 @@
 
 
 #include "Projectiles/LaserBullet.h"
-#include "PooledActors/BulletPoolManager.h"
 #include <GameFramework/ProjectileMovementComponent.h>
 
 ALaserBullet::ALaserBullet()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	ProjectileMovementComp->bRotationFollowsVelocity = true;
+	/*ProjectileMovementComp->bRotationFollowsVelocity = true;
+	ProjectileMovementComp->SetUpdatedComponent(StaticMeshComp);*/
 }
 
 void ALaserBullet::BeginPlay()

@@ -29,6 +29,9 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	UPROPERTY(VisibleAnywhere)
+	class APoolManager* ImpactParticlePoolManager;
+
 	UFUNCTION(BlueprintCallable)
 	void HandleOverlap(AActor* HitActor, const FVector& HitLocation, const FRotator& HitRotation);
 
@@ -40,4 +43,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	bool HasActiveParticles() const;
+
+	UFUNCTION(BlueprintCallable)
+	void PlayHitParticle(bool bActive, const FVector& Location, const FRotator& Rotation);
 };

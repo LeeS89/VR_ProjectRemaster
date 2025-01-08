@@ -43,6 +43,9 @@ protected:
 	UPROPERTY(BlueprintReadWrite)
 	bool bIsGrabbed{ false };
 
+	UPROPERTY(VisibleAnywhere)
+	class AMainCharacter* CharacterRef;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

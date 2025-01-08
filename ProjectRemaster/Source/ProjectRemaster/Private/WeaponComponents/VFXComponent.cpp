@@ -4,6 +4,8 @@
 #include "WeaponComponents/VFXComponent.h"
 #include "Particles/ParticleSystemComponent.h"
 #include <Kismet/GameplayStatics.h>
+#include "PooledActors/PoolManager.h"
+#include <PooledActors/PooledParticleEffect.h>
 
 // Sets default values for this component's properties
 UVFXComponent::UVFXComponent()
@@ -21,7 +23,12 @@ void UVFXComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
+	TArray<AActor*> FoundActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APoolManager::StaticClass(), FoundActors);
+
+	if (FoundActors.Num() <= 0) { return; }
+
+	ImpactParticlePoolManager = Cast<APoolManager>(FoundActors[0]);
 	
 }
 
@@ -83,5 +90,15 @@ void UVFXComponent::HandleEndOverlap(AActor* EndOverlapActor)
 bool UVFXComponent::HasActiveParticles() const
 {
 	return ActiveParticles.Num() > 0;
+}
+
+void UVFXComponent::PlayHitParticle(bool bActive, const FVector& Location, const FRotator& Rotation)
+{
+	
+	APooledParticleEffect* HitParticle{ ImpactParticlePoolManager->GetParticle() };
+
+	if (!HitParticle) { return; }
+
+	HitParticle->ToggleActiveState(bActive, Location, Rotation);
 }
 

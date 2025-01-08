@@ -35,11 +35,11 @@ void UBaseTraceComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 	// ...
 }
 
-void UBaseTraceComponent::PerformTrace()
+void UBaseTraceComponent::PerformTrace(const FVector& StartLocation, const FVector& EndLocation, const FQuat& Rotation)
 {
-	FVector StartSocketLocation{ StaticMeshComp->GetSocketLocation(Sockets.Start) };
+	/*FVector StartSocketLocation{ StaticMeshComp->GetSocketLocation(Sockets.Start) };
 	FVector EndSocketLocation{ StaticMeshComp->GetSocketLocation(Sockets.End) };
-	FQuat SocketRotation{ StaticMeshComp->GetSocketQuaternion(Sockets.Rotation) };
+	FQuat SocketRotation{ StaticMeshComp->GetSocketQuaternion(Sockets.Rotation) };*/
 
 
 
@@ -58,8 +58,8 @@ void UBaseTraceComponent::PerformTrace()
 
 	bool bHasFoundTargets{ GetWorld()->SweepMultiByChannel(
 		OutResults,
-		StartSocketLocation,
-		EndSocketLocation,
+		StartLocation,
+		EndLocation,
 		FQuat::Identity,
 		TraceChannel,
 		Capsule,
@@ -80,25 +80,36 @@ void UBaseTraceComponent::PerformTrace()
 
 		FVector CenterPoint{
 			UKismetMathLibrary::VLerp(
-				StartSocketLocation, EndSocketLocation, 0.5f
+				StartLocation, EndLocation, 0.5f
 			)
 		};
 
 		//FVector CenterPoint{ (StartSocketLocation + EndSocketLocation) / 2.0f };
-		float CapsuleHeight = CenterPoint.Size() / 2.0f;
+		//float CapsuleHeight = CenterPoint.Size() / 2.0f;
 
 		UKismetSystemLibrary::DrawDebugCapsule(
 			GetWorld(),
 			CenterPoint,
 			Capsule.GetCapsuleAxisHalfLength(),
 			Capsule.GetCapsuleRadius(),
-			SocketRotation.Rotator(),
+			Rotation.Rotator(),
 			bHasFoundTargets ? FLinearColor::Yellow : FLinearColor::Black,
 			0.0f,
 			1.0f
 		);
 
 	}
+}
+
+void UBaseTraceComponent::SetTraceLocationAndRotation()
+{
+	if (!StaticMeshComp) { return; }
+
+	FVector StartSocketLocation{ StaticMeshComp->GetSocketLocation(Sockets.Start) };
+	FVector EndSocketLocation{ StaticMeshComp->GetSocketLocation(Sockets.End) };
+	FQuat SocketRotation{ StaticMeshComp->GetSocketQuaternion(Sockets.Rotation) };
+
+	PerformTrace(StartSocketLocation, EndSocketLocation, SocketRotation);
 }
 
 void UBaseTraceComponent::HandleTraceResults(const TArray<FHitResult>& OutResults)

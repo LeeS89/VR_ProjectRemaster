@@ -9,6 +9,7 @@
 
 class ABulletBase;
 class APooledParticleEffect;
+class ABaseBullet;
 
 UCLASS()
 class PROJECTREMASTER_API APoolManager : public AActor
@@ -22,8 +23,13 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Object to Pool")
 	TSubclassOf<ABulletBase> BulletClass;
 
+	TObjectPool<ABaseBullet>* BulletToPool;
+
+	UPROPERTY(EditAnywhere, Category = "Object to Pool")
+	TSubclassOf<ABaseBullet> BulletTypeClass;
+
 	UPROPERTY(EditAnywhere, Category = "Pool Settings")
-	int32 BulletPoolsize{ 50 };
+	int32 BulletPoolSize{ 50 };
 
 	// Impact Particle Pool
 	TObjectPool<APooledParticleEffect>* ParticlePool;
@@ -51,6 +57,8 @@ public:
 
 	ABulletBase* GetBullet();
 
+	ABaseBullet* GetBaseBullet();
+
 	APooledParticleEffect* GetParticle();
 
 	UFUNCTION()
@@ -58,4 +66,7 @@ public:
 
 	UFUNCTION()
 	void ReturnBulletToPool(ABulletBase* Bullet);
+
+	UFUNCTION()
+	void ReturnBaseBulletToPool(ABaseBullet* Bullet);
 };

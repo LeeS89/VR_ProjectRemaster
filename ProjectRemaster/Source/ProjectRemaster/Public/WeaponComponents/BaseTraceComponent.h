@@ -46,7 +46,10 @@ protected:
 	bool bIsDebugMode{ false };
 
 	UFUNCTION(BlueprintCallable)
-	void PerformTrace();
+	virtual void PerformTrace(const FVector& StartLocation, const FVector& EndLocation, const FQuat& Rotation);
+
+	UFUNCTION(BlueprintCallable)
+	virtual void SetTraceLocationAndRotation();
 
 	UFUNCTION(BlueprintCallable)
 	virtual void HandleTraceResults(const TArray<FHitResult>& OutResults);

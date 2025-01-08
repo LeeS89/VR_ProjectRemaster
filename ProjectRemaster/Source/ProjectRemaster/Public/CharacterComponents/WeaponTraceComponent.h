@@ -40,10 +40,7 @@ public:
 
 public:
 
-
 	class IDeflectableInterface* DeflectInterface;
-	class IOverlappableInterface* OverlapInterface;
-
 
 	UPROPERTY(BlueprintAssignable)
 	FOnOverlappingSignature OnOverlappingDelegate;
@@ -52,5 +49,7 @@ public:
 protected:
 
 	virtual void HandleTraceResults(const TArray<FHitResult>& HitResults) override;
+
+	virtual void SetTraceLocationAndRotation() override;
 		
 };

@@ -4,7 +4,7 @@
 #include "CharacterComponents/WeaponTraceComponent.h"
 #include <Kismet/GameplayStatics.h>
 #include <Interfaces/DeflectableInterface.h>
-#include "Interfaces/OverlappableInterface.h"
+
 
 #include "Sound/SoundBase.h"
 
@@ -57,22 +57,28 @@ void UWeaponTraceComponent::HandleTraceResults(const TArray<FHitResult>& HitResu
 				UGameplayStatics::PlaySoundAtLocation(GetWorld(), DeflectSound, Hit.ImpactPoint);
 				DeflectInterface->Execute_OnDeflected(HitActor);
 				DeflectInterface->SetDeflectionHasBeenProcessed(true);
+				HitActor->SetInstigator(GetOwner()->GetInstigator());
 			}
 		}
-		else if (Hit.GetActor()->Implements<UOverlappableInterface>())
+	/*	else if (Hit.GetActor()->Implements<UOverlappableInterface>())
 		{
 
 			OverlapInterface = Cast<IOverlappableInterface>(HitActor);
 
 			OverlapInterface->Execute_OnLightsaberOverlapping(HitActor);
 			DrawDebugSphere(GetWorld(), Hit.ImpactPoint, 10.0f, 12, FColor::Blue, false);
-		}
+		}*/
 		else
 		{
 			OnOverlappingDelegate.Broadcast(HitActor, Hit.ImpactPoint, Hit.ImpactNormal.Rotation());
 		}
 	}
 	
+}
+
+void UWeaponTraceComponent::SetTraceLocationAndRotation()
+{
+	Super::SetTraceLocationAndRotation();
 }
 	
 

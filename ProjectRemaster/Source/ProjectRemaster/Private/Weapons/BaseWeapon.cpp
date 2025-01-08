@@ -4,6 +4,7 @@
 #include "Weapons/BaseWeapon.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Characters/MainCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include "Interfaces/BulletInterface.h"
 #include "Particles/ParticleSystemComponent.h"
@@ -47,6 +48,10 @@ void ABaseWeapon::OnGrabbed_Implementation(UCustomXRHandComponent* HandComponent
 	bIsGrabbed = true;
 	OnWeaponGrabbedDelegate.Broadcast();
 	AttachToComponent(HandComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale, SocketName);
+
+	CharacterRef = HandComponent->GetOwner<AMainCharacter>();
+	if (!CharacterRef) { return; }
+	SetInstigator(CharacterRef);
 }
 
 void ABaseWeapon::OnReleased_Implementation()
@@ -54,6 +59,7 @@ void ABaseWeapon::OnReleased_Implementation()
 	DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 	OnWeaponReleasedDelegate.Broadcast();
 	bIsGrabbed = false;
+	SetInstigator(nullptr);
 }
 
 bool ABaseWeapon::IsGrabbed()

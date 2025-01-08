@@ -1,19 +1,21 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "TestClasses(DELETE_AFTER_USE)/BulletTest.h"
+#include "TestClasses(DELETE_AFTER_USE)/BulletTesting.h"
 #include "PooledActors/PoolManager.h"
 #include "Characters/MainCharacter.h"
 #include "GameModes/MainGameMode.h"
 #include "Projectiles/BulletBase.h"
+#include "Projectiles/BaseBullet.h"
+
 #include "UtilityClasses/TargetingUtility.h"
 #include "CharacterComponents/StatsComponent.h"
 #include <Kismet/GameplayStatics.h>
 
 // Sets default values
-ABulletTest::ABulletTest()
+ABulletTesting::ABulletTesting()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+ 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Static Mesh Component"));
@@ -23,16 +25,16 @@ ABulletTest::ABulletTest()
 	SpawnPoint->SetupAttachment(StaticMeshComp);
 
 	StatsComp = CreateDefaultSubobject<UStatsComponent>(TEXT("Stats Component"));
-
 }
 
 
 
 // Called when the game starts or when spawned
-void ABulletTest::BeginPlay()
+void ABulletTesting::BeginPlay()
 {
 	Super::BeginPlay();
-	GetWorldTimerManager().SetTimer(FireRateTimerHandle, this, &ABulletTest::Fire, FireRate, true);
+
+	GetWorldTimerManager().SetTimer(FireRateTimerHandle, this, &ABulletTesting::Fire, FireRate, true);
 	AMainGameMode* GameMode = Cast<AMainGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 
 	if (!GameMode) { return; }
@@ -56,16 +58,32 @@ void ABulletTest::BeginPlay()
 		UE_LOG(LogTemp, Error, TEXT("WHY ME!!!!"));
 	}*/
 
-	GetWorldTimerManager().SetTimer(FireRateTimerHandle, this, &ABulletTest::Fire, FireRate, true);
+	GetWorldTimerManager().SetTimer(FireRateTimerHandle, this, &ABulletTesting::Fire, FireRate, true);
 	
 }
 
-void ABulletTest::Fire()
+// Called every frame
+void ABulletTesting::Tick(float DeltaTime)
 {
-	ABulletBase* Bullet{ BulletPoolManager->GetBullet() };
+	Super::Tick(DeltaTime);
+
+}
+
+
+
+void ABulletTesting::Fire()
+{
+
+	//ABulletBase* Bullet{ BulletPoolManager->GetBullet() };
+	ABaseBullet* Bullet{ BulletPoolManager->GetBaseBullet() };
 	if (!Bullet) { return; }
-	Bullet->SetOwner(OwnerTest);
-	//Bullet->SetInstigator(this);
+	Bullet->SetOwner(this);
+	Bullet->SetInstigator(this);
+	/*UE_LOG(LogTemp, Warning, TEXT("Instigator class %s has %d interfaces."),
+		*GetClass()->GetName(), GetClass()->Interfaces.Num());
+	UE_LOG(LogTemp, Log, TEXT("Bullet Owner: %s"), *Bullet->GetOwner()->GetName());
+	UE_LOG(LogTemp, Log, TEXT("Bullet Instigator: %s"), Bullet->GetInstigator() ? *Bullet->GetInstigator()->GetName() : TEXT("None"));*/
+
 	if (AimTargetComp)
 	{
 		FRotator DirectionToTarget = UTargetingUtility::GetDirectionToTarget(AimTargetComp, SpawnPoint, true).Rotation();
@@ -77,24 +95,6 @@ void ABulletTest::Fire()
 	{
 		Bullet->ToggleActiveState(true, SpawnPoint->GetComponentLocation(), SpawnPoint->GetComponentRotation());
 	}
-	
-
-	/*FActorSpawnParameters SpawnParams;
-	SpawnParams.Owner = OwnerTest;
-	SpawnParams.Instigator = GetInstigator();*/
-
-	//ABulletBase* Bullet = GetWorld()->SpawnActor<ABulletBase>(BulletClass, SpawnPoint->GetComponentLocation(), SpawnPoint->GetComponentRotation(), SpawnParams);
-	/*if (!SpawnParams.Instigator)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("NO INSTIGATOR!!!"));
-	}*/
-
-}
-
-// Called every frame
-void ABulletTest::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
 
 }
 

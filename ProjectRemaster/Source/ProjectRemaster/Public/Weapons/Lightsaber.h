@@ -31,5 +31,12 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UVFXComponent* VFXComp;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	class UCapsuleComponent* CapsuleComp;
+
+	virtual void OnGrabbed_Implementation(class UCustomXRHandComponent* HandComponent, FName SocketName) override;
+
+	virtual void OnReleased_Implementation() override;
 	
 };
