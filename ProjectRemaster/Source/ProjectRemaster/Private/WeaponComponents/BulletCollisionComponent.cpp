@@ -32,7 +32,7 @@ void UBulletCollisionComponent::BeginPlay()
 
 	if (!MeshComp) { return; }
 
-	MeshComp->OnComponentHit.AddDynamic(this, &UBulletCollisionComponent::HandleHit);
+	//MeshComp->OnComponentHit.AddDynamic(this, &UBulletCollisionComponent::HandleHit);
 	/*if (MeshComp->OnComponentHit.IsBound())
 	{
 		UE_LOG(LogTemp, Error, TEXT("HANDLEHIT IS BOUND YAAAAY"));

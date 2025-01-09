@@ -9,17 +9,21 @@
 #include <UtilityClasses/TargetingUtility.h>
 #include <Kismet/KismetSystemLibrary.h>
 
+
+
 // Sets default values
 ABaseBullet::ABaseBullet()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root Component"));
+	/*RootComp = CreateDefaultSubobject<USceneComponent>(TEXT("Root Component"));
+	RootComponent = RootComp;*/
 
 	StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Static Mesh Component"));
-	StaticMeshComp->SetupAttachment(RootComponent);
-	
+	RootComponent = StaticMeshComp;
+	//StaticMeshComp->SetupAttachment(RootComponent);
+
 
 	PointLightComp = CreateDefaultSubobject<UPointLightComponent>(TEXT("Point Light Component"));
 	PointLightComp->SetupAttachment(StaticMeshComp);
@@ -91,12 +95,21 @@ void ABaseBullet::ToggleActiveState(bool bActive, const FVector& SpawnLocation, 
 	SetActorTickEnabled(bActive);
 }
 
+void ABaseBullet::NotifyHit(UPrimitiveComponent* MyComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit)
+{
+	if (!CollisionComp) { return; }
+
+	UE_LOG(LogTemp, Error, TEXT("Notify hit is Working yaaaay"));
+
+	CollisionComp->HandleHit(MyComp, OtherActor, OtherComp, NormalImpulse, Hit);
+}
+
 void ABaseBullet::OnDeflected_Implementation(const FVector& DeflectionLocation, const FRotator& DeflectionRotation)
 {
 	
 	FVector NewNormal = UTargetingUtility::GetDirectionToTarget(GetOwner(), this);
 
-	UKismetSystemLibrary::DrawDebugLine(GetWorld(), DeflectionLocation, GetOwner()->GetActorLocation(), FLinearColor::Blue, 25.0f, 3);
+	//UKismetSystemLibrary::DrawDebugLine(GetWorld(), DeflectionLocation, GetOwner()->GetActorLocation(), FLinearColor::Blue, 25.0f, 3);
 	float VelocityLength = ProjectileMovementComp->Velocity.Size();
 	
 	float SpeedMultiplier = 3.0f;

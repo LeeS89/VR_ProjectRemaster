@@ -76,7 +76,7 @@ void ABulletTesting::Fire()
 	//ABulletBase* Bullet{ BulletPoolManager->GetBullet() };
 	ABaseBullet* Bullet{ BulletPoolManager->GetBullet() };
 	if (!Bullet) { return; }
-	Bullet->SetOwner(OwnerTest);
+	Bullet->SetOwner(this);
 	Bullet->SetInstigator(this);
 	
 
