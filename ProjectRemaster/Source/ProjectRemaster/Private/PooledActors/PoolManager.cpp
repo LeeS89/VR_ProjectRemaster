@@ -2,7 +2,6 @@
 
 
 #include "PooledActors/PoolManager.h"
-#include "Projectiles/BulletBase.h"
 #include "Projectiles/BaseBullet.h"
 #include "PooledActors/PooledParticleEffect.h"
 
@@ -28,14 +27,8 @@ void APoolManager::BeginPlay()
 
 	if (BulletClass)
 	{
-		BulletPool = new TObjectPool<ABulletBase>(BulletPoolSize, BulletClass, GetWorld());
+		BulletPool = new TObjectPool<ABaseBullet>(BulletPoolSize, BulletClass, GetWorld());
 		BulletPool->InitializePool();
-	}
-
-	if (BulletTypeClass)
-	{
-		BulletToPool = new TObjectPool<ABaseBullet>(BulletPoolSize, BulletTypeClass, GetWorld());
-		BulletToPool->InitializePool();
 	}
 
 	if (ParticleClass)
@@ -56,12 +49,6 @@ void APoolManager::EndPlay(const EEndPlayReason::Type EndPlayReason)
 		BulletPool = nullptr;
 	}
 
-	if (BulletToPool)
-	{
-		delete BulletToPool;
-		BulletToPool = nullptr;
-	}
-
 	if (ParticlePool)
 	{
 		delete ParticlePool;
@@ -79,49 +66,32 @@ void APoolManager::Tick(float DeltaTime)
 #pragma region Bullet Region
 
 
-ABulletBase* APoolManager::GetBullet()
+
+
+ABaseBullet* APoolManager::GetBullet()
 {
 	if (!BulletPool) { return nullptr; }
 
-	ABulletBase* Bullet{ BulletPool->GetObjectFromPool() };
+	ABaseBullet* Bullet{ BulletPool->GetObjectFromPool() };
 	if (Bullet)
 	{
-		Bullet->OnBulletExpired.AddDynamic(this, &APoolManager::ReturnBulletToPool);
-	}
-	return Bullet;
-}
-
-ABaseBullet* APoolManager::GetBaseBullet()
-{
-	if (!BulletPool) { return nullptr; }
-
-	ABaseBullet* Bullet{ BulletToPool->GetObjectFromPool() };
-	if (Bullet)
-	{
-		Bullet->OnBulletHasExpired.AddDynamic(this, &APoolManager::ReturnBaseBulletToPool);
+		Bullet->OnBulletHasExpired.AddDynamic(this, &APoolManager::ReturnBulletToPool);
 	}
 	return Bullet;
 }
 
 
 
-void APoolManager::ReturnBulletToPool(ABulletBase* Bullet)
+void APoolManager::ReturnBulletToPool(ABaseBullet* Bullet)
 {
 	
 	if (!BulletPool || !Bullet) { return; }
 
 	BulletPool->ReturnObjectToPool(Bullet);
-	Bullet->OnBulletExpired.RemoveDynamic(this, &APoolManager::ReturnBulletToPool);
+	Bullet->OnBulletHasExpired.RemoveDynamic(this, &APoolManager::ReturnBulletToPool);
 
 }
-void APoolManager::ReturnBaseBulletToPool(ABaseBullet* Bullet)
-{
-	UE_LOG(LogTemp, Error, TEXT("BULLET SHOULD BE INVISIBLE NOW FROM HERE IN POOL"));
-	if (!BulletToPool || !Bullet) { return; }
-	
-	BulletToPool->ReturnObjectToPool(Bullet);
-	Bullet->OnBulletHasExpired.RemoveDynamic(this, &APoolManager::ReturnBaseBulletToPool);
-}
+
 #pragma endregion
 
 APooledParticleEffect* APoolManager::GetParticle()

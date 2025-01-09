@@ -5,7 +5,6 @@
 #include "PooledActors/PoolManager.h"
 #include "Characters/MainCharacter.h"
 #include "GameModes/MainGameMode.h"
-#include "Projectiles/BulletBase.h"
 #include "Projectiles/BaseBullet.h"
 
 #include "UtilityClasses/TargetingUtility.h"
@@ -75,14 +74,11 @@ void ABulletTesting::Fire()
 {
 
 	//ABulletBase* Bullet{ BulletPoolManager->GetBullet() };
-	ABaseBullet* Bullet{ BulletPoolManager->GetBaseBullet() };
+	ABaseBullet* Bullet{ BulletPoolManager->GetBullet() };
 	if (!Bullet) { return; }
-	Bullet->SetOwner(this);
+	Bullet->SetOwner(OwnerTest);
 	Bullet->SetInstigator(this);
-	/*UE_LOG(LogTemp, Warning, TEXT("Instigator class %s has %d interfaces."),
-		*GetClass()->GetName(), GetClass()->Interfaces.Num());
-	UE_LOG(LogTemp, Log, TEXT("Bullet Owner: %s"), *Bullet->GetOwner()->GetName());
-	UE_LOG(LogTemp, Log, TEXT("Bullet Instigator: %s"), Bullet->GetInstigator() ? *Bullet->GetInstigator()->GetName() : TEXT("None"));*/
+	
 
 	if (AimTargetComp)
 	{

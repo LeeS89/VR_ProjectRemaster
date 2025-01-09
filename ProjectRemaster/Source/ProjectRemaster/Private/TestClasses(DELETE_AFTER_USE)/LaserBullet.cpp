@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Projectiles/LaserBullet.h"
+#include "TestClasses(DELETE_AFTER_USE)/LaserBullet.h"
 #include <GameFramework/ProjectileMovementComponent.h>
 
 ALaserBullet::ALaserBullet()

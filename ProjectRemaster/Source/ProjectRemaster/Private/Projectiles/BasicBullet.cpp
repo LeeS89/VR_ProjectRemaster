@@ -22,3 +22,11 @@ void ABasicBullet::ToggleActiveState(bool bActive, const FVector& SpawnLocation,
 {
 	Super::ToggleActiveState(bActive, SpawnLocation, SpawnRotation);
 }
+
+
+void ABasicBullet::OnDeflected_Implementation(const FVector& DeflectionLocation, const FRotator& DeflectionRotation)
+{
+	Super::OnDeflected_Implementation(DeflectionLocation, DeflectionRotation);
+
+	OnDeflectedDelegate.Broadcast(true, DeflectionLocation, DeflectionRotation);
+}

@@ -15,11 +15,6 @@ DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_ThreeParams(
 	const FRotator&, Rotation
 );
 
-DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE(
-	FOnHitTestSignature,
-	UBulletCollisionComponent, OnHitTestDelegate
-	
-);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class PROJECTREMASTER_API UBulletCollisionComponent : public UActorComponent
@@ -29,6 +24,10 @@ class PROJECTREMASTER_API UBulletCollisionComponent : public UActorComponent
 private:
 
 	AActor* OwnerRef;
+
+	bool ShouldRespondToHit(AActor* OtherActor, UPrimitiveComponent* OtherComp);
+
+	UStaticMeshComponent* MeshComp;
 
 public:	
 	// Sets default values for this component's properties
@@ -53,12 +52,11 @@ public:
 		FVector NormalImpulse,
 		const FHitResult& Hit);
 
+
 	UFUNCTION()
 	void DamageTarget(AActor* ActorToDamage);
 
 	UPROPERTY(BlueprintAssignable)
 	FOnHitSignature OnHitDelegate;
 
-	UPROPERTY(BlueprintAssignable)
-	FOnHitTestSignature OnHitTestDelegate;
 };

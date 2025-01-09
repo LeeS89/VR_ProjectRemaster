@@ -28,7 +28,7 @@ void UBulletCollisionComponent::BeginPlay()
 
 	if (!OwnerRef) { return; }
 
-	UStaticMeshComponent* MeshComp{ OwnerRef->FindComponentByClass<UStaticMeshComponent>() };
+	MeshComp = OwnerRef->FindComponentByClass<UStaticMeshComponent>();
 
 	if (!MeshComp) { return; }
 
@@ -58,13 +58,9 @@ void UBulletCollisionComponent::TickComponent(float DeltaTime, ELevelTick TickTy
 
 void UBulletCollisionComponent::HandleHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	//UE_LOG(LogTemp, Error, TEXT("Other Actor Name is: %s"), *OtherActor->GetName());
-	OnHitTestDelegate.Broadcast();
-	
-	if (!OtherActor || OtherActor == GetOwner()) { return; }
-	if (!BulletInterface) { return; }
+	if (!ShouldRespondToHit(OtherActor, OtherComp)) { return; }
 
-	//BulletInterface->SetHitHasBeenProcessed(true);
+	BulletInterface->SetHitHasBeenProcessed(true);
 
 	APawn* InstigatorPawn = OwnerRef->GetInstigator();
 	if (!InstigatorPawn) { return; }
@@ -77,6 +73,20 @@ void UBulletCollisionComponent::HandleHit(UPrimitiveComponent* HitComponent, AAc
 	OnHitDelegate.Broadcast(true, Hit.ImpactPoint, Hit.ImpactPoint.Rotation());
 	BulletInterface->OnExpired();
 
+}
+
+bool UBulletCollisionComponent::ShouldRespondToHit(AActor* OtherActor, UPrimitiveComponent* OtherComp)
+{
+	if (!OtherActor || OtherActor == GetOwner()) { return false; }
+	if (BulletInterface->GetHitHasBeenProcessed() || !BulletInterface) { return false; }
+	ECollisionResponse Response = OtherComp->GetCollisionResponseToChannel(MeshComp->GetCollisionObjectType());
+	if (MeshComp && Response == ECollisionResponse::ECR_Ignore)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Collision response ignored for %s"), *OtherActor->GetName());
+		return false;
+	}
+
+	return true;
 }
 
 void UBulletCollisionComponent::DamageTarget(AActor* ActorToDamage)

@@ -18,15 +18,10 @@ class PROJECTREMASTER_API APoolManager : public AActor
 
 private:
 	// Bullet Pool
-	TObjectPool<ABulletBase>* BulletPool;
+	TObjectPool<ABaseBullet>* BulletPool;
 
 	UPROPERTY(EditAnywhere, Category = "Object to Pool")
-	TSubclassOf<ABulletBase> BulletClass;
-
-	TObjectPool<ABaseBullet>* BulletToPool;
-
-	UPROPERTY(EditAnywhere, Category = "Object to Pool")
-	TSubclassOf<ABaseBullet> BulletTypeClass;
+	TSubclassOf<ABaseBullet> BulletClass;
 
 	UPROPERTY(EditAnywhere, Category = "Pool Settings")
 	int32 BulletPoolSize{ 50 };
@@ -55,9 +50,8 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	ABulletBase* GetBullet();
+	ABaseBullet* GetBullet();
 
-	ABaseBullet* GetBaseBullet();
 
 	APooledParticleEffect* GetParticle();
 
@@ -65,8 +59,6 @@ public:
 	void ReturnParticleToPool(APooledParticleEffect* Particle);
 
 	UFUNCTION()
-	void ReturnBulletToPool(ABulletBase* Bullet);
+	void ReturnBulletToPool(ABaseBullet* Bullet);
 
-	UFUNCTION()
-	void ReturnBaseBulletToPool(ABaseBullet* Bullet);
 };

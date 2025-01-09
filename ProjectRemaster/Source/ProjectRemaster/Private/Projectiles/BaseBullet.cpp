@@ -7,6 +7,7 @@
 #include <GameFramework/ProjectileMovementComponent.h>
 #include "WeaponComponents/VFXComponent.h"
 #include <UtilityClasses/TargetingUtility.h>
+#include <Kismet/KismetSystemLibrary.h>
 
 // Sets default values
 ABaseBullet::ABaseBullet()
@@ -18,6 +19,7 @@ ABaseBullet::ABaseBullet()
 
 	StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Static Mesh Component"));
 	StaticMeshComp->SetupAttachment(RootComponent);
+	
 
 	PointLightComp = CreateDefaultSubobject<UPointLightComponent>(TEXT("Point Light Component"));
 	PointLightComp->SetupAttachment(StaticMeshComp);
@@ -28,7 +30,7 @@ ABaseBullet::ABaseBullet()
 
 	VFXComp = CreateDefaultSubobject<UVFXComponent>(TEXT("VFX Component"));
 
-	ProjectileMovementComp->bRotationFollowsVelocity = true;
+	//ProjectileMovementComp->bRotationFollowsVelocity = true;
 	ProjectileMovementComp->SetUpdatedComponent(StaticMeshComp);
 }
 
@@ -72,19 +74,16 @@ void ABaseBullet::ToggleActiveState(bool bActive, const FVector& SpawnLocation, 
 
 	if (bActive)
 	{
-		//TraceComp->ResetHitFlag();
-		SetDeflectionHasBeenProcessed(false);
-
 		FVector NewVelocity{ SpawnRotation.Vector() * ProjectileMovementComp->InitialSpeed };
 		ProjectileMovementComp->Velocity = NewVelocity;
 
 		Timer = DestroyTime;
-
 	}
 	else
 	{
 		StaticMeshComp->SetRelativeLocation(FVector::ZeroVector);
-		//SetHitHasBeenProcessed(false);
+		SetDeflectionHasBeenProcessed(false);
+		SetHitHasBeenProcessed(false);
 	}
 	
 	SetActorHiddenInGame(!bActive);
@@ -92,16 +91,19 @@ void ABaseBullet::ToggleActiveState(bool bActive, const FVector& SpawnLocation, 
 	SetActorTickEnabled(bActive);
 }
 
-void ABaseBullet::OnDeflected_Implementation()
+void ABaseBullet::OnDeflected_Implementation(const FVector& DeflectionLocation, const FRotator& DeflectionRotation)
 {
+	
 	FVector NewNormal = UTargetingUtility::GetDirectionToTarget(GetOwner(), this);
 
+	UKismetSystemLibrary::DrawDebugLine(GetWorld(), DeflectionLocation, GetOwner()->GetActorLocation(), FLinearColor::Blue, 25.0f, 3);
 	float VelocityLength = ProjectileMovementComp->Velocity.Size();
-
+	
 	float SpeedMultiplier = 3.0f;
 	float NewVelocityLength = VelocityLength * SpeedMultiplier;
 
 	ProjectileMovementComp->Velocity = NewNormal * NewVelocityLength;
+	SetDeflectionHasBeenProcessed(true);
 
 }
 

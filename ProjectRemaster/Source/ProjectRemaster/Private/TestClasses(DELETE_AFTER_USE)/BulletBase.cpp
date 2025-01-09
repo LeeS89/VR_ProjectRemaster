@@ -1,8 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Projectiles/BulletBase.h"
-#include "WeaponComponents/BulletTraceComponent.h"
+#include "TestClasses(DELETE_AFTER_USE)/BulletBase.h"
+#include "TestClasses(DELETE_AFTER_USE)/BulletTraceComponent.h"
 #include "UtilityClasses/TargetingUtility.h"
 #include "PooledActors/PoolManager.h"
 #include "PooledActors/PooledParticleEffect.h"
@@ -115,7 +115,7 @@ void ABulletBase::ToggleActiveState(bool bActive, const FVector& SpawnLocation, 
 
 
 
-void ABulletBase::OnDeflected_Implementation()
+void ABulletBase::OnDeflected_Implementation(const FVector& DeflectionLocation, const FRotator& DeflectionRotation)
 {
 	//FVector OwnerLocation{ GetOwner()->GetActorLocation() };
 	//FVector Location = GetActorLocation();

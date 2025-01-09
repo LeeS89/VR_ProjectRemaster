@@ -55,8 +55,7 @@ void UWeaponTraceComponent::HandleTraceResults(const TArray<FHitResult>& HitResu
 			if (DeflectInterface && !DeflectInterface->GetDeflectionHasBeenProcessed())
 			{
 				UGameplayStatics::PlaySoundAtLocation(GetWorld(), DeflectSound, Hit.ImpactPoint);
-				DeflectInterface->Execute_OnDeflected(HitActor);
-				DeflectInterface->SetDeflectionHasBeenProcessed(true);
+				DeflectInterface->Execute_OnDeflected(HitActor, Hit.ImpactPoint, Hit.ImpactNormal.Rotation());
 				HitActor->SetInstigator(GetOwner()->GetInstigator());
 			}
 		}

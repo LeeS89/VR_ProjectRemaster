@@ -1,12 +1,12 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "WeaponComponents/BulletTraceComponent.h"
+#include "TestClasses(DELETE_AFTER_USE)/BulletTraceComponent.h"
 #include "Engine/DamageEvents.h"
 //#include "Interfaces/EnemyInterface.h"
 //#include "Interfaces/MainPlayer.h"
 #include "UtilityClasses/DamageUtility.h"
-#include "Projectiles/BulletBase.h"
+#include "TestClasses(DELETE_AFTER_USE)/BulletBase.h"
 
 
 

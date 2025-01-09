@@ -24,7 +24,7 @@ class PROJECTREMASTER_API IDeflectableInterface
 public:
 
 	UFUNCTION(BlueprintNativeEvent)
-	void OnDeflected();
+	void OnDeflected(const FVector& DeflectionLocation, const FRotator& DeflectionRotation);
 
 	virtual void OnExpired() = 0;
 
@@ -34,9 +34,9 @@ public:
 
 	virtual void SetDeflectionHasBeenProcessed(bool HasBeenProcessed) = 0;
 
-	/*virtual bool GetHitHasBeenProcessed() const = 0;
+	virtual bool GetHitHasBeenProcessed() const = 0;
 
-	virtual void SetHitHasBeenProcessed(bool HasBeenProcessed) = 0;*/
+	virtual void SetHitHasBeenProcessed(bool HasBeenProcessed) = 0;
 
 	virtual float GetDamage() { return 0.0f; }
 };

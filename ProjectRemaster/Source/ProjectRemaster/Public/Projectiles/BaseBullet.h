@@ -21,9 +21,20 @@ private:
 
 	bool bDeflectionHasBeenProcessed{ false };
 
+	UPROPERTY(VisibleAnywhere)
 	bool bHasHitBeenProcesed{ false };
 
 protected:
+
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(
+		FOnDeflectedSignature,
+		bool, SetActive,
+		const FVector&, Location,
+		const FRotator&, Rotation
+	);
+
+	UPROPERTY(BlueprintAssignable)
+	FOnDeflectedSignature OnDeflectedDelegate;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	USceneComponent* RootComp;
@@ -58,15 +69,15 @@ public:
 
 	virtual void ToggleActiveState(bool bActive, const FVector& SpawnLocation = FVector::ZeroVector, const FRotator& SpawnRotation = FRotator::ZeroRotator) override;
 
-	virtual void OnDeflected_Implementation() override;
+	virtual void OnDeflected_Implementation(const FVector& DeflectionLocation, const FRotator& DeflectionRotation) override;
 
 	virtual bool GetDeflectionHasBeenProcessed() const override;
 
 	virtual void SetDeflectionHasBeenProcessed(bool HasBeenProcessed) override { bDeflectionHasBeenProcessed = HasBeenProcessed; }
 
-	/*virtual bool GetHitHasBeenProcessed() const override { return bHasHitBeenProcesed; }
+	virtual bool GetHitHasBeenProcessed() const override { return bHasHitBeenProcesed; }
 
-	virtual void SetHitHasBeenProcessed(bool HasBeenProcessed) override { bHasHitBeenProcesed = HasBeenProcessed; }*/
+	virtual void SetHitHasBeenProcessed(bool HasBeenProcessed) override { bHasHitBeenProcesed = HasBeenProcessed; }
 
 	UFUNCTION(BlueprintCallable)
 	virtual void OnExpired() override;

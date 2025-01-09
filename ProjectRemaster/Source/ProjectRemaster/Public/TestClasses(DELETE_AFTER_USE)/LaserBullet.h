@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Projectiles/BulletBase.h"
+#include "TestClasses(DELETE_AFTER_USE)/BulletBase.h"
 #include "LaserBullet.generated.h"
 
 /**

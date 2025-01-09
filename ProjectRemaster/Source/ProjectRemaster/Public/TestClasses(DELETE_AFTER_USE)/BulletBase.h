@@ -65,7 +65,7 @@ public:
 
 	virtual void ToggleActiveState(bool bActive, const FVector& SpawnLocation = FVector::ZeroVector, const FRotator& SpawnRotation = FRotator::ZeroRotator) override;
 
-	virtual void OnDeflected_Implementation() override;
+	virtual void OnDeflected_Implementation(const FVector& DeflectionLocation, const FRotator& DeflectionRotation) override;
 
 	virtual void PlayHitParticle(bool bActive, const FVector& Location, const FRotator& Rotation) override;
 
@@ -77,9 +77,9 @@ public:
 
 	virtual float GetDamage() override;
 
-	/*virtual bool GetHitHasBeenProcessed() const override { return bHasHitBeenProcesed; }
+	virtual bool GetHitHasBeenProcessed() const override { return bHasHitBeenProcesed; }
 
-	virtual void SetHitHasBeenProcessed(bool HasBeenProcessed) override { bHasHitBeenProcesed = HasBeenProcessed; }*/
+	virtual void SetHitHasBeenProcessed(bool HasBeenProcessed) override { bHasHitBeenProcesed = HasBeenProcessed; }
 	/*virtual void OnExpired_Implementation() override;*/
 
 protected:

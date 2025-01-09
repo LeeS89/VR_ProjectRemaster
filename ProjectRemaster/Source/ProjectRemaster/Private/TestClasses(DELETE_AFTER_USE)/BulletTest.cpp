@@ -5,7 +5,7 @@
 #include "PooledActors/PoolManager.h"
 #include "Characters/MainCharacter.h"
 #include "GameModes/MainGameMode.h"
-#include "Projectiles/BulletBase.h"
+#include "TestClasses(DELETE_AFTER_USE)/BulletBase.h"
 #include "UtilityClasses/TargetingUtility.h"
 #include "CharacterComponents/StatsComponent.h"
 #include <Kismet/GameplayStatics.h>
@@ -62,21 +62,21 @@ void ABulletTest::BeginPlay()
 
 void ABulletTest::Fire()
 {
-	ABulletBase* Bullet{ BulletPoolManager->GetBullet() };
-	if (!Bullet) { return; }
-	Bullet->SetOwner(OwnerTest);
-	//Bullet->SetInstigator(this);
-	if (AimTargetComp)
-	{
-		FRotator DirectionToTarget = UTargetingUtility::GetDirectionToTarget(AimTargetComp, SpawnPoint, true).Rotation();
+	//ABulletBase* Bullet{ BulletPoolManager->GetBullet() };
+	//if (!Bullet) { return; }
+	//Bullet->SetOwner(OwnerTest);
+	////Bullet->SetInstigator(this);
+	//if (AimTargetComp)
+	//{
+	//	FRotator DirectionToTarget = UTargetingUtility::GetDirectionToTarget(AimTargetComp, SpawnPoint, true).Rotation();
 
 
-		Bullet->ToggleActiveState(true, SpawnPoint->GetComponentLocation(), DirectionToTarget);
-	}
-	else
-	{
-		Bullet->ToggleActiveState(true, SpawnPoint->GetComponentLocation(), SpawnPoint->GetComponentRotation());
-	}
+	//	Bullet->ToggleActiveState(true, SpawnPoint->GetComponentLocation(), DirectionToTarget);
+	//}
+	//else
+	//{
+	//	Bullet->ToggleActiveState(true, SpawnPoint->GetComponentLocation(), SpawnPoint->GetComponentRotation());
+	//}
 	
 
 	/*FActorSpawnParameters SpawnParams;
