@@ -59,4 +59,25 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnHitSignature OnHitDelegate;
 
+protected:
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Damage")
+	UDataTable* DamageDataTable;
+
+	UPROPERTY()
+	float Damage;
+
+	UPROPERTY()
+	float DamageOverTime;
+
+	UPROPERTY()
+	float DoTDuration;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UDamageType> DamageTypeClass;
+
+public:
+
+	void InitializeDamageType(const FString& DamageTypeName);
+
 };

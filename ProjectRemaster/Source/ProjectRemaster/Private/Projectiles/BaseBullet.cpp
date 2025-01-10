@@ -111,7 +111,6 @@ void ABaseBullet::OnDeflected_Implementation(const FVector& DeflectionLocation, 
 
 	//UKismetSystemLibrary::DrawDebugLine(GetWorld(), DeflectionLocation, GetOwner()->GetActorLocation(), FLinearColor::Blue, 25.0f, 3);
 	float VelocityLength = ProjectileMovementComp->Velocity.Size();
-	
 	float SpeedMultiplier = 3.0f;
 	float NewVelocityLength = VelocityLength * SpeedMultiplier;
 

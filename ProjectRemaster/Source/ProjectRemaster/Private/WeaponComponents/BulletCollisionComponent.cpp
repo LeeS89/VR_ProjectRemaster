@@ -7,6 +7,7 @@
 #include "Engine/DamageEvents.h"
 #include <Interfaces/DeflectableInterface.h>
 #include <CapsuleComponent.h>
+#include <Structs/FDamageTypeInfo.h>
 
 // Sets default values for this component's properties
 UBulletCollisionComponent::UBulletCollisionComponent()
@@ -25,7 +26,8 @@ void UBulletCollisionComponent::BeginPlay()
 	Super::BeginPlay();
 
 	OwnerRef = GetOwner();
-
+	//UE_LOG(LogTemp, Error, TEXT("Calling Initialize Damage type"));
+	InitializeDamageType(TEXT("Fire"));
 	if (!OwnerRef) { return; }
 
 	MeshComp = OwnerRef->FindComponentByClass<UStaticMeshComponent>();
@@ -91,19 +93,44 @@ bool UBulletCollisionComponent::ShouldRespondToHit(AActor* OtherActor, UPrimitiv
 
 void UBulletCollisionComponent::DamageTarget(AActor* ActorToDamage)
 {
-	FDamageEvent TargetAttackedEvent;
-	float Damage{ 0.0f };
+	if (!BulletInterface) { return; }
 
-	if (BulletInterface)
+	FDamageEvent TargetDamageEvent;
+	TargetDamageEvent.DamageTypeClass = DamageTypeClass;
+	//UE_LOG(LogTemp, Error, TEXT("Damage class type and damage amount: %s, %f"), *DamageTypeClass->GetName(), Damage);
+	//float Damage{ 0.0f };
+	//Damage = BulletInterface->GetDamage();
+
+	ActorToDamage->TakeDamage(
+		Damage,
+		TargetDamageEvent,
+		GetOwner()->GetInstigatorController(),
+		GetOwner()
+	);
+}
+
+void UBulletCollisionComponent::InitializeDamageType(const FString& DamageTypeName)
+{
+	
+	if (!DamageDataTable) { return; }
+
+	static const FString ContextString(TEXT("Damage Lookup"));
+	FDamageTypeInfo* DamageInfo = DamageDataTable->FindRow<FDamageTypeInfo>(FName(*DamageTypeName), ContextString);
+
+	if (DamageInfo)
 	{
-		Damage = BulletInterface->GetDamage();
-
-		ActorToDamage->TakeDamage(
-			Damage,
-			TargetAttackedEvent,
-			GetOwner()->GetInstigatorController(),
-			GetOwner()
-		);
+		Damage = DamageInfo->BaseDamage;
+		
+		DamageOverTime = DamageInfo->DamageOverTime;
+		
+		DoTDuration = DamageInfo->Duration;
+	
+		DamageTypeClass = DamageInfo->DamageTypeClass;
+	
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("NO DAMAGE INFO AWWWWW"));
 	}
 }
 
