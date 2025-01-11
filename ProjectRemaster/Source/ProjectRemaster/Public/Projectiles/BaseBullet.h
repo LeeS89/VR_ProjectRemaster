@@ -44,11 +44,10 @@ protected:
 		const FHitResult& Hit
 	) override;
 
+
+	// Actor Components
 	UPROPERTY(BlueprintAssignable)
 	FOnDeflectedSignature OnDeflectedDelegate;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	USceneComponent* RootComp;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	UStaticMeshComponent* StaticMeshComp;
@@ -56,8 +55,11 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	class UPointLightComponent* PointLightComp;
 
+	/*UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	class UProjectileMovementComponent* MovementComp;*/
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	class UProjectileMovementComponent* ProjectileMovementComp;
+	class UBulletMovementComponent* MovementComp;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	class UBulletCollisionComponent* CollisionComp;
@@ -73,13 +75,14 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnBulletHasExpired OnBulletHasExpired;
 
-	// Interface functions
+	// Pooled object Interface functions
 	virtual bool IsInUse() const override { return bIsInUse; }
 
 	virtual void SetIsInUse(bool InUse) override { bIsInUse = InUse; }
 
 	virtual void ToggleActiveState(bool bActive, const FVector& SpawnLocation = FVector::ZeroVector, const FRotator& SpawnRotation = FRotator::ZeroRotator) override;
 
+	// Deflectable Interface functions
 	virtual void OnDeflected_Implementation(const FVector& DeflectionLocation, const FRotator& DeflectionRotation) override;
 
 	virtual bool GetDeflectionHasBeenProcessed() const override;
@@ -89,6 +92,8 @@ public:
 	virtual bool GetHitHasBeenProcessed() const override { return bHasHitBeenProcesed; }
 
 	virtual void SetHitHasBeenProcessed(bool HasBeenProcessed) override { bHasHitBeenProcesed = HasBeenProcessed; }
+
+	virtual void InitializeDamageType(const FString& DamageTypeName) final override;
 
 	UFUNCTION(BlueprintCallable)
 	virtual void OnExpired() override;
@@ -101,13 +106,15 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
 	void TimeOut(float DeltaTime);
 
 	UPROPERTY(EditAnywhere)
 	float DestroyTime{ 1.5f };
 
 	UPROPERTY(VisibleAnywhere)
-	float Timer{ 0.0f };
+	float DestroyTimeCountdown{ 0.0f };
 
 	UPROPERTY(EditDefaultsOnly)
 	float DamageAmount{ 5.0f };

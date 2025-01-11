@@ -82,6 +82,8 @@ public:
 	virtual void SetHitHasBeenProcessed(bool HasBeenProcessed) override { bHasHitBeenProcesed = HasBeenProcessed; }
 	/*virtual void OnExpired_Implementation() override;*/
 
+	virtual void InitializeDamageType(const FString& DamageTypeName) final override;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

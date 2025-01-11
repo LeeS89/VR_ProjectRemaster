@@ -5,10 +5,11 @@
 #include "CoreMinimal.h"
 #include "Interfaces/MainPlayer.h"
 #include "GameFramework/Character.h"
+#include "Interfaces/DamageableInterface.h"
 #include "MainCharacter.generated.h"
 
 UCLASS()
-class PROJECTREMASTER_API AMainCharacter : public ACharacter, public IMainPlayer
+class PROJECTREMASTER_API AMainCharacter : public ACharacter, public IMainPlayer, public IDamageableInterface
 {
 	GENERATED_BODY()
 
@@ -71,12 +72,6 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	class UTraceComponent* TraceComp;
 
-	//Player Widgets
-	/*UPROPERTY(EditDefaultsOnly, Category = "UI")
-	TSubclassOf<class UUserWidget> BlackoutWidgetClass;
-
-	UPROPERTY(BlueprintReadWrite)
-	class UUserWidget* BlackoutWidget;*/
 
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite, Category = "UI")
 	class UWidgetComponent* BlackoutWidgetComp;
@@ -90,6 +85,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UStatsComponent* StatsComp;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UDamageHandler* DamageHandlerComp;
 	
 protected:
 	// Called when the game starts or when spawned
@@ -109,6 +107,26 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	virtual USceneComponent* GetTargetComponent() override;
+
+	//Damagable Interface functions
+	//virtual void ApplyDamageOverTime_Implementation() override;
+
+	// Set DoT Amount
+	virtual void SetDoT_Implementation(float InDamageOverTime) override;
+
+	// Set DoT Duration
+	void SetDoTDuration_Implementation(float InDoTDuration) override;
+
+	// Apply Instant Damage
+	//virtual void ApplyInstantDamage_Implementation(float DamageAmount) override;
+
+	//virtual void ApplyDoTEffect_Implementation() override;
+	virtual float TakeDamage(
+		float DamageAmount,
+		struct FDamageEvent const& DamageEvent,
+		class AController* EventInstigator,
+		AActor* DamageCauser
+	) override;
 
 private:
 

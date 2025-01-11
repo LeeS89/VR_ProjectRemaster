@@ -46,6 +46,10 @@ ABulletBase::ABulletBase()
 
 
 
+void ABulletBase::InitializeDamageType(const FString& DamageTypeName)
+{
+}
+
 // Called when the game starts or when spawned
 void ABulletBase::BeginPlay()
 {

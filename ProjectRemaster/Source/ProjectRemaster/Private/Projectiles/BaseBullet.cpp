@@ -4,7 +4,7 @@
 #include "Projectiles/BaseBullet.h"
 #include "Components/PointLightComponent.h"
 #include "WeaponComponents/BulletCollisionComponent.h"
-#include <GameFramework/ProjectileMovementComponent.h>
+#include "Projectiles/BulletMovementComponent.h"
 #include "WeaponComponents/VFXComponent.h"
 #include <UtilityClasses/TargetingUtility.h>
 #include <Kismet/KismetSystemLibrary.h>
@@ -17,25 +17,19 @@ ABaseBullet::ABaseBullet()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	/*RootComp = CreateDefaultSubobject<USceneComponent>(TEXT("Root Component"));
-	RootComponent = RootComp;*/
-
 	StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Static Mesh Component"));
 	RootComponent = StaticMeshComp;
-	//StaticMeshComp->SetupAttachment(RootComponent);
-
 
 	PointLightComp = CreateDefaultSubobject<UPointLightComponent>(TEXT("Point Light Component"));
 	PointLightComp->SetupAttachment(StaticMeshComp);
 
-	ProjectileMovementComp = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile Movement Component"));
+	MovementComp = CreateDefaultSubobject<UBulletMovementComponent>(TEXT("Projectile Movement Component"));
 
 	CollisionComp = CreateDefaultSubobject<UBulletCollisionComponent>(TEXT("Collision Component"));
 
 	VFXComp = CreateDefaultSubobject<UVFXComponent>(TEXT("VFX Component"));
 
-	//ProjectileMovementComp->bRotationFollowsVelocity = true;
-	ProjectileMovementComp->SetUpdatedComponent(StaticMeshComp);
+	MovementComp->SetUpdatedComponent(StaticMeshComp);
 }
 
 
@@ -43,9 +37,17 @@ ABaseBullet::ABaseBullet()
 void ABaseBullet::BeginPlay()
 {
 	Super::BeginPlay();
-	Timer = DestroyTime;
+	DestroyTimeCountdown = DestroyTime;
 }
 
+void ABaseBullet::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	if (OnDeflectedDelegate.IsBound())
+	{
+		OnDeflectedDelegate.Clear();
+	}
+	
+}
 
 
 // Called every frame
@@ -58,9 +60,9 @@ void ABaseBullet::Tick(float DeltaTime)
 
 void ABaseBullet::TimeOut(float DeltaTime)
 {
-	if (Timer > 0.0f)
+	if (DestroyTimeCountdown > 0.0f)
 	{
-		Timer -= DeltaTime;
+		DestroyTimeCountdown -= DeltaTime;
 	}
 	else
 	{
@@ -71,17 +73,17 @@ void ABaseBullet::TimeOut(float DeltaTime)
 
 void ABaseBullet::ToggleActiveState(bool bActive, const FVector& SpawnLocation, const FRotator& SpawnRotation)
 {
+	if (!MovementComp || !PointLightComp) { return; }
 	SetActorLocation(SpawnLocation);
 	SetActorRotation(SpawnRotation);
-	ProjectileMovementComp->SetActive(bActive);
+
+	MovementComp->SetActive(bActive);
 	PointLightComp->SetVisibility(bActive);
 
 	if (bActive)
 	{
-		FVector NewVelocity{ SpawnRotation.Vector() * ProjectileMovementComp->InitialSpeed };
-		ProjectileMovementComp->Velocity = NewVelocity;
-
-		Timer = DestroyTime;
+		MovementComp->InitializeMovement(SpawnRotation);
+		DestroyTimeCountdown = DestroyTime;
 	}
 	else
 	{
@@ -99,8 +101,6 @@ void ABaseBullet::NotifyHit(UPrimitiveComponent* MyComp, AActor* OtherActor, UPr
 {
 	if (!CollisionComp) { return; }
 
-	UE_LOG(LogTemp, Error, TEXT("Notify hit is Working yaaaay"));
-
 	CollisionComp->HandleHit(MyComp, OtherActor, OtherComp, NormalImpulse, Hit);
 }
 
@@ -108,13 +108,9 @@ void ABaseBullet::OnDeflected_Implementation(const FVector& DeflectionLocation, 
 {
 	
 	FVector NewNormal = UTargetingUtility::GetDirectionToTarget(GetOwner(), this);
-
-	//UKismetSystemLibrary::DrawDebugLine(GetWorld(), DeflectionLocation, GetOwner()->GetActorLocation(), FLinearColor::Blue, 25.0f, 3);
-	float VelocityLength = ProjectileMovementComp->Velocity.Size();
-	float SpeedMultiplier = 3.0f;
-	float NewVelocityLength = VelocityLength * SpeedMultiplier;
-
-	ProjectileMovementComp->Velocity = NewNormal * NewVelocityLength;
+	MovementComp->DeflectBullet(NewNormal);
+	
+	OnDeflectedDelegate.Broadcast(true, DeflectionLocation, DeflectionRotation);
 	SetDeflectionHasBeenProcessed(true);
 
 }
@@ -125,10 +121,12 @@ bool ABaseBullet::GetDeflectionHasBeenProcessed() const
 	return bDeflectionHasBeenProcessed;
 }
 
+void ABaseBullet::InitializeDamageType(const FString& DamageTypeName)
+{
+}
+
 void ABaseBullet::OnExpired()
 {
-	//UE_LOG(LogTemp, Error, TEXT("EXPIRED SHOULD BE CALLED HERE -  INTERFACE FOUND"));
-	//UE_LOG(LogTemp, Error, TEXT("BULLET SHOULD BE INVISIBLE NOW FROM HERE"));
 	OnBulletHasExpired.Broadcast(this);
 }
 

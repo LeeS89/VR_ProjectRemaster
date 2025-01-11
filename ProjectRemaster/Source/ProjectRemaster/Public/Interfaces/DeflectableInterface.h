@@ -28,7 +28,7 @@ public:
 
 	virtual void OnExpired() = 0;
 
-	virtual void PlayHitParticle(bool bActive, const FVector& Location, const FRotator& Rotation);
+	virtual void PlayHitParticle(bool bActive, const FVector& Location, const FRotator& Rotation); // Come back to
 
 	virtual bool GetDeflectionHasBeenProcessed() const = 0;
 
@@ -37,6 +37,8 @@ public:
 	virtual bool GetHitHasBeenProcessed() const = 0;
 
 	virtual void SetHitHasBeenProcessed(bool HasBeenProcessed) = 0;
+
+	virtual void InitializeDamageType(const FString& DamageTypeName) = 0;
 
 	virtual float GetDamage() { return 0.0f; }
 };

@@ -15,6 +15,7 @@
 #include "CharacterComponents/StatsComponent.h"
 #include "CharacterComponents/LocomotionComponent.h"
 #include <Components/Image.h>
+#include "CharacterComponents/DamageHandler.h"
 
 // Sets default values
 AMainCharacter::AMainCharacter()
@@ -77,6 +78,8 @@ AMainCharacter::AMainCharacter()
 	TraceComp = CreateDefaultSubobject<UTraceComponent>(TEXT("Trace Component"));
 
 	StatsComp = CreateDefaultSubobject<UStatsComponent>(TEXT("Stats Component"));
+
+	DamageHandlerComp = CreateDefaultSubobject<UDamageHandler>(TEXT("Damage Handler Component"));
 }
 
 // Called when the game starts or when spawned
@@ -140,6 +143,13 @@ USceneComponent* AMainCharacter::GetTargetComponent()
 	return DamageCollider;
 }
 
+
+float AMainCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	DamageHandlerComp->HandleDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	return DamageAmount;
+}
+
 void AMainCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (OtherActor && OtherActor != this)
@@ -170,5 +180,32 @@ void AMainCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor*
 		//}
 
 	}
+
+	
 }
+
+// Delegating Damage Handling functions To Damage Handler
+
+//void AMainCharacter::ApplyDamageOverTime_Implementation()
+//{
+//
+//}
+
+void AMainCharacter::SetDoT_Implementation(float InDamageOverTime)
+{
+	DamageHandlerComp->SetDoT(InDamageOverTime);
+}
+
+void AMainCharacter::SetDoTDuration_Implementation(float InDoTDuration)
+{
+	DamageHandlerComp->SetDoTDuration(InDoTDuration);
+}
+
+//void AMainCharacter::ApplyInstantDamage_Implementation(float DamageAmount)
+//{
+//}
+//
+//void AMainCharacter::ApplyDoTEffect_Implementation()
+//{
+//}
 

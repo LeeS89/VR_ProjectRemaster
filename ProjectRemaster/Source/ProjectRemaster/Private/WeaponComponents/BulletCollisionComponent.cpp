@@ -8,6 +8,7 @@
 #include <Interfaces/DeflectableInterface.h>
 #include <CapsuleComponent.h>
 #include <Structs/FDamageTypeInfo.h>
+#include <Interfaces/DamageableInterface.h>
 
 // Sets default values for this component's properties
 UBulletCollisionComponent::UBulletCollisionComponent()
@@ -43,10 +44,6 @@ void UBulletCollisionComponent::BeginPlay()
 
 	BulletInterface = Cast<IDeflectableInterface>(OwnerRef);
 
-	//UE_LOG(LogTemp, Error, TEXT("Collision Enabled: %d"), MeshComp->GetCollisionEnabled());
-	//UE_LOG(LogTemp, Error, TEXT("Generate Hit Events: %d"), MeshComp->GetGenerateOverlapEvents());
-
-	
 }
 
 
@@ -65,7 +62,7 @@ void UBulletCollisionComponent::HandleHit(UPrimitiveComponent* HitComponent, AAc
 	BulletInterface->SetHitHasBeenProcessed(true);
 
 	APawn* InstigatorPawn = OwnerRef->GetInstigator();
-	if (!InstigatorPawn) { return; }
+	if (!InstigatorPawn) { return; } // Need to modify here for situations where Instigstor is destroyed before a hit
 
 	if (UDamageUtility::ShouldDamageActor(InstigatorPawn, OtherActor))
 	{
@@ -81,12 +78,12 @@ bool UBulletCollisionComponent::ShouldRespondToHit(AActor* OtherActor, UPrimitiv
 {
 	if (!OtherActor || OtherActor == GetOwner()) { return false; }
 	if (BulletInterface->GetHitHasBeenProcessed() || !BulletInterface) { return false; }
-	ECollisionResponse Response = OtherComp->GetCollisionResponseToChannel(MeshComp->GetCollisionObjectType());
+	/*ECollisionResponse Response = OtherComp->GetCollisionResponseToChannel(MeshComp->GetCollisionObjectType());
 	if (MeshComp && Response == ECollisionResponse::ECR_Ignore)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Collision response ignored for %s"), *OtherActor->GetName());
 		return false;
-	}
+	}*/
 
 	return true;
 }
@@ -100,6 +97,13 @@ void UBulletCollisionComponent::DamageTarget(AActor* ActorToDamage)
 	//UE_LOG(LogTemp, Error, TEXT("Damage class type and damage amount: %s, %f"), *DamageTypeClass->GetName(), Damage);
 	//float Damage{ 0.0f };
 	//Damage = BulletInterface->GetDamage();
+	
+	if (ActorToDamage->Implements<UDamageableInterface>())
+	{
+		IDamageableInterface* DamageInterface = Cast<IDamageableInterface>(ActorToDamage);
+		DamageInterface->Execute_SetDoT(ActorToDamage, DamageOverTime);
+		DamageInterface->Execute_SetDoTDuration(ActorToDamage, DoTDuration);
+	}
 
 	ActorToDamage->TakeDamage(
 		Damage,
