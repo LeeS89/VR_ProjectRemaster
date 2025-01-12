@@ -24,6 +24,23 @@ private:
     FTimerHandle DoTTimerHandle;
     float RemainingDoTTicks;
 
+    UFUNCTION()
+    void SetDoTEffect(float InDamageOverTime, float InDoTDuration);
+
+    UFUNCTION(BlueprintCallable, Category = "Damage", meta = (AllowPrivateAccess = "true"))
+    void ApplyInstantDamage(float DamageAmount);
+
+    UFUNCTION(BlueprintCallable, Category = "Damage", meta = (AllowPrivateAccess = "true"))
+    void ApplyDoTEffect();
+
+    void HandleFireDamage(float DamageAmount, AController* EventInstigator, AActor* DamageCauser);
+
+    void HandleDoT();
+
+    UFUNCTION(BlueprintCallable, Category = "Damage")
+    void ApplyDamageOverTime();
+
+
 public:	
 	// Sets default values for this component's properties
 	UDamageHandler();
@@ -39,28 +56,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void HandleDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
 
-    UFUNCTION(BlueprintCallable, Category = "Damage")
-    void ApplyDamageOverTime();
-
-    // Set DoT Amount
-    UFUNCTION(BlueprintCallable, Category = "Damage")
-    void SetDoT(float InDamageOverTime);
-
-    // Set DoT Duration
-    UFUNCTION(BlueprintCallable, Category = "Damage")
-    void SetDoTDuration(float InDoTDuration);
-
-    // Apply Instant Damage
-    UFUNCTION(BlueprintCallable, Category = "Damage")
-    void ApplyInstantDamage(float DamageAmount);
-
-    UFUNCTION(BlueprintCallable, Category = "Damage")
-    void ApplyDoTEffect();
-
-    void HandleFireDamage(float DamageAmount, AController* EventInstigator, AActor* DamageCauser);
-
-    void HandleDoT();
-
+   
+  
     UPROPERTY(BlueprintAssignable)
     FOnDamageSignature OnDamageDelegate;
 };

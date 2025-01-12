@@ -46,10 +46,6 @@ ABulletBase::ABulletBase()
 
 
 
-void ABulletBase::InitializeDamageType(const FString& DamageTypeName)
-{
-}
-
 // Called when the game starts or when spawned
 void ABulletBase::BeginPlay()
 {
@@ -83,7 +79,7 @@ void ABulletBase::TimeOut(float DeltaTime)
 	}
 	else
 	{
-		OnExpired();
+		
 	}
 }
 
@@ -100,7 +96,7 @@ void ABulletBase::ToggleActiveState(bool bActive, const FVector& SpawnLocation, 
 	if (bActive)
 	{
 		TraceComp->ResetHitFlag();
-		SetDeflectionHasBeenProcessed(false);
+		//SetDeflectionHasBeenProcessed(false);
 		
 		FVector NewVelocity{ SpawnRotation.Vector() * ProjectileMovementComp->InitialSpeed };
 		ProjectileMovementComp->Velocity = NewVelocity;
@@ -119,52 +115,52 @@ void ABulletBase::ToggleActiveState(bool bActive, const FVector& SpawnLocation, 
 
 
 
-void ABulletBase::OnDeflected_Implementation(const FVector& DeflectionLocation, const FRotator& DeflectionRotation)
-{
-	//FVector OwnerLocation{ GetOwner()->GetActorLocation() };
-	//FVector Location = GetActorLocation();
+//void ABulletBase::OnDeflected_Implementation(const FVector& DeflectionLocation, const FRotator& DeflectionRotation)
+//{
+//	//FVector OwnerLocation{ GetOwner()->GetActorLocation() };
+//	//FVector Location = GetActorLocation();
+//
+//	//FVector NewNormal{ (OwnerLocation - Location).GetSafeNormal() };
+//
+//	FVector NewNormal = UTargetingUtility::GetDirectionToTarget(GetOwner(), this);
+//
+//	float VelocityLength = ProjectileMovementComp->Velocity.Size();
+//
+//	float SpeedMultiplier = 3.0f; 
+//	float NewVelocityLength = VelocityLength * SpeedMultiplier;
+//
+//	ProjectileMovementComp->Velocity = NewNormal * NewVelocityLength;
+//
+//	PlayHitParticle(true, GetActorLocation(), GetActorRotation());
+//
+//}
 
-	//FVector NewNormal{ (OwnerLocation - Location).GetSafeNormal() };
+//void ABulletBase::PlayHitParticle(bool bActive, const FVector& Location, const FRotator& Rotation)
+//{
+//	APooledParticleEffect* HitParticle{ ParticlePoolManager->GetParticle() };
+//
+//	if (!HitParticle) { return; }
+//
+//	HitParticle->ToggleActiveState(bActive, Location, Rotation);
+//}
 
-	FVector NewNormal = UTargetingUtility::GetDirectionToTarget(GetOwner(), this);
-
-	float VelocityLength = ProjectileMovementComp->Velocity.Size();
-
-	float SpeedMultiplier = 3.0f; 
-	float NewVelocityLength = VelocityLength * SpeedMultiplier;
-
-	ProjectileMovementComp->Velocity = NewNormal * NewVelocityLength;
-
-	PlayHitParticle(true, GetActorLocation(), GetActorRotation());
-
-}
-
-void ABulletBase::PlayHitParticle(bool bActive, const FVector& Location, const FRotator& Rotation)
-{
-	APooledParticleEffect* HitParticle{ ParticlePoolManager->GetParticle() };
-
-	if (!HitParticle) { return; }
-
-	HitParticle->ToggleActiveState(bActive, Location, Rotation);
-}
-
-bool ABulletBase::GetDeflectionHasBeenProcessed() const
-{
-	return bDeflectionHasBeenProcessed;
-}
-
-float ABulletBase::GetDamage()
-{
-	return DamageAmount;
-}
+//bool ABulletBase::GetDeflectionHasBeenProcessed() const
+//{
+//	return bDeflectionHasBeenProcessed;
+//}
+//
+//float ABulletBase::GetDamage()
+//{
+//	return DamageAmount;
+//}
 
 /// <summary>
 /// The bullet Pool Manager listens for this event which returns the bullet to the pool
 /// </summary>
-void ABulletBase::OnExpired()
-{
-	OnBulletExpired.Broadcast(this);
-}
+//void ABulletBase::OnExpired()
+//{
+//	OnBulletExpired.Broadcast(this);
+//}
 
 
 

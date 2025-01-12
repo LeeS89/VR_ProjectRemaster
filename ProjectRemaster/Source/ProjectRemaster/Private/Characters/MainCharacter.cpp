@@ -184,28 +184,5 @@ void AMainCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor*
 	
 }
 
-// Delegating Damage Handling functions To Damage Handler
 
-//void AMainCharacter::ApplyDamageOverTime_Implementation()
-//{
-//
-//}
-
-void AMainCharacter::SetDoT_Implementation(float InDamageOverTime)
-{
-	DamageHandlerComp->SetDoT(InDamageOverTime);
-}
-
-void AMainCharacter::SetDoTDuration_Implementation(float InDoTDuration)
-{
-	DamageHandlerComp->SetDoTDuration(InDoTDuration);
-}
-
-//void AMainCharacter::ApplyInstantDamage_Implementation(float DamageAmount)
-//{
-//}
-//
-//void AMainCharacter::ApplyDoTEffect_Implementation()
-//{
-//}
 

@@ -5,6 +5,7 @@
 #include "GameFramework/DamageType.h"
 #include "Engine/DamageEvents.h"
 #include "DamageTypes/FireDamageType.h"
+#include <Interfaces/ElementalDamageInterface.h>
 
 
 // Sets default values for this component's properties
@@ -38,11 +39,26 @@ void UDamageHandler::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 
 void UDamageHandler::HandleDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	const UDamageType* DamageTypeInstance = DamageEvent.DamageTypeClass ? DamageEvent.DamageTypeClass->GetDefaultObject<UDamageType>() : nullptr;
-
-	if (DamageTypeInstance && DamageEvent.DamageTypeClass == UFireDamageType::StaticClass())
+	if (DamageCauser->Implements<UElementalDamageInterface>())
 	{
-		HandleFireDamage(DamageAmount, EventInstigator, DamageCauser);
+		IElementalDamageInterface* DamageInterface = Cast<IElementalDamageInterface>(DamageCauser);
+		const UDamageType* DamageTypeInstance = DamageEvent.DamageTypeClass ? DamageEvent.DamageTypeClass->GetDefaultObject<UDamageType>() : nullptr;
+		
+		if (!DamageInterface || !DamageTypeInstance) { return; }
+
+		float DoTPerTick = DamageInterface->GetDoTAmount();
+		float Duration = DamageInterface->GetDoTDuration();
+
+		SetDoTEffect(DoTPerTick, Duration);
+
+		if (DamageEvent.DamageTypeClass == UFireDamageType::StaticClass())
+		{
+			HandleFireDamage(DamageAmount, EventInstigator, DamageCauser);
+		}
+	}
+	else
+	{
+		ApplyInstantDamage(DamageAmount);
 	}
 }
 
@@ -57,6 +73,10 @@ void UDamageHandler::ApplyInstantDamage(float DamageAmount)
 	OnDamageDelegate.Broadcast(DamageAmount);
 }
 
+/// <summary>
+/// Damage received from elemental sources eg. fire, poison etc..
+/// Actor receives continuous damage for a short time
+/// </summary>
 void UDamageHandler::ApplyDamageOverTime()
 {
 	//DamagePerTick = InDamagePerTick;
@@ -71,12 +91,17 @@ void UDamageHandler::ApplyDamageOverTime()
 	);
 }
 
+void UDamageHandler::SetDoTEffect(float InDamageOverTime, float InDoTDuration)
+{
+	DamagePerTick = InDamageOverTime;
+	DoTDurationValue = InDoTDuration;
+}
+
 void UDamageHandler::HandleDoT()
 {
 	if (--RemainingDoTTicks > 0)
 	{
 		ApplyInstantDamage(DamagePerTick);
-		//StatsComp->ReduceHealth(DamagePerTick);
 	}
 	else
 	{
@@ -85,17 +110,6 @@ void UDamageHandler::HandleDoT()
 		DoTDurationValue = 0.0f;
 	}
 }
-
-void UDamageHandler::SetDoT(float InDamageOverTime)
-{
-	DamagePerTick = InDamageOverTime;
-}
-
-void UDamageHandler::SetDoTDuration(float InDoTDuration)
-{
-	DoTDurationValue = InDoTDuration;
-}
-
 
 
 void UDamageHandler::ApplyDoTEffect()

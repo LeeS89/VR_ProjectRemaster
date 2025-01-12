@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Interfaces/DeflectableInterface.h"
+#include "Enums/EDamageType.h"
 #include "BulletCollisionComponent.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_ThreeParams(
@@ -76,8 +77,11 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UDamageType> DamageTypeClass;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Damage")
+	TEnumAsByte<EDamageType> DamageType;
+
 public:
 
-	void InitializeDamageType(const FString& DamageTypeName);
+	void InitializeDamageType(EDamageType DamageTypeToInitialize);
 
 };

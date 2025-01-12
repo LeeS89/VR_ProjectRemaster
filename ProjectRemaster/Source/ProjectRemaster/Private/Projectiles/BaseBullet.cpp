@@ -121,19 +121,12 @@ bool ABaseBullet::GetDeflectionHasBeenProcessed() const
 	return bDeflectionHasBeenProcessed;
 }
 
-void ABaseBullet::InitializeDamageType(const FString& DamageTypeName)
-{
-}
 
 void ABaseBullet::OnExpired()
 {
 	OnBulletHasExpired.Broadcast(this);
 }
 
-float ABaseBullet::GetDamage()
-{
-	return DamageAmount;
-}
 
 
 

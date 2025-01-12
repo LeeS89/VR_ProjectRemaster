@@ -31,11 +31,11 @@ void UBulletTraceComponent::HandleTraceResults(const TArray<FHitResult>& HitResu
 	AActor* HitActor{ HitResult.GetActor() };
 
 	IDeflectableInterface* BulletInterface = Cast<IDeflectableInterface>(OwnerRef);
-	BulletInterface->PlayHitParticle(true, HitResult.ImpactPoint, HitResult.ImpactPoint.Rotation());
+	//BulletInterface->PlayHitParticle(true, HitResult.ImpactPoint, HitResult.ImpactPoint.Rotation());
 
 
 	APawn* InstigatorPawn = GetOwner()->GetInstigator();
-	if (!InstigatorPawn) { return; }
+	if (!InstigatorPawn || !BulletInterface) { return; }
 
 	
 
@@ -82,7 +82,7 @@ void UBulletTraceComponent::DamageTarget(AActor* ActorToDamage)
 	IDeflectableInterface* BulletRef = Cast<IDeflectableInterface>(OwnerRef);
 	if (BulletRef)
 	{
-		Damage = BulletRef->GetDamage();
+		//Damage = BulletRef->GetDamage();
 
 		ActorToDamage->TakeDamage(
 			Damage,

@@ -11,7 +11,7 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBulletExpired, ABulletBase*, Bullet);
 
 UCLASS()
-class PROJECTREMASTER_API ABulletBase : public AActor, public IDeflectableInterface, public IPooledObjectInterface
+class PROJECTREMASTER_API ABulletBase : public AActor,  public IPooledObjectInterface
 {
 	GENERATED_BODY()
 
@@ -65,7 +65,7 @@ public:
 
 	virtual void ToggleActiveState(bool bActive, const FVector& SpawnLocation = FVector::ZeroVector, const FRotator& SpawnRotation = FRotator::ZeroRotator) override;
 
-	virtual void OnDeflected_Implementation(const FVector& DeflectionLocation, const FRotator& DeflectionRotation) override;
+	/*virtual void OnDeflected_Implementation(const FVector& DeflectionLocation, const FRotator& DeflectionRotation) override;
 
 	virtual void PlayHitParticle(bool bActive, const FVector& Location, const FRotator& Rotation) override;
 
@@ -73,16 +73,16 @@ public:
 
 	virtual void SetDeflectionHasBeenProcessed(bool HasBeenProcessed) override { bDeflectionHasBeenProcessed = HasBeenProcessed; }
 
-	virtual void OnExpired() override;
+	virtual void OnExpired() override;*/
 
-	virtual float GetDamage() override;
+	
 
-	virtual bool GetHitHasBeenProcessed() const override { return bHasHitBeenProcesed; }
+	//virtual bool GetHitHasBeenProcessed() const override { return bHasHitBeenProcesed; }
 
-	virtual void SetHitHasBeenProcessed(bool HasBeenProcessed) override { bHasHitBeenProcesed = HasBeenProcessed; }
+	//virtual void SetHitHasBeenProcessed(bool HasBeenProcessed) override { bHasHitBeenProcesed = HasBeenProcessed; }
 	/*virtual void OnExpired_Implementation() override;*/
 
-	virtual void InitializeDamageType(const FString& DamageTypeName) final override;
+	
 
 protected:
 	// Called when the game starts or when spawned

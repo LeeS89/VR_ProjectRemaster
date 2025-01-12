@@ -3,7 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include <Enums/EDamageType.h>
 #include "FDamageTypeInfo.generated.h"
+
 
 /**
  * 
@@ -13,8 +15,11 @@ struct PROJECTREMASTER_API FDamageTypeInfo : public FTableRowBase
 {
 	GENERATED_BODY();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Damage")
-	FString Name;
+	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Damage")
+	FString Name;*/
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
+	TEnumAsByte<EDamageType> DamageType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
 	float BaseDamage;

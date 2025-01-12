@@ -5,11 +5,10 @@
 #include "CoreMinimal.h"
 #include "Interfaces/MainPlayer.h"
 #include "GameFramework/Character.h"
-#include "Interfaces/DamageableInterface.h"
 #include "MainCharacter.generated.h"
 
 UCLASS()
-class PROJECTREMASTER_API AMainCharacter : public ACharacter, public IMainPlayer, public IDamageableInterface
+class PROJECTREMASTER_API AMainCharacter : public ACharacter, public IMainPlayer
 {
 	GENERATED_BODY()
 
@@ -108,19 +107,6 @@ public:
 
 	virtual USceneComponent* GetTargetComponent() override;
 
-	//Damagable Interface functions
-	//virtual void ApplyDamageOverTime_Implementation() override;
-
-	// Set DoT Amount
-	virtual void SetDoT_Implementation(float InDamageOverTime) override;
-
-	// Set DoT Duration
-	void SetDoTDuration_Implementation(float InDoTDuration) override;
-
-	// Apply Instant Damage
-	//virtual void ApplyInstantDamage_Implementation(float DamageAmount) override;
-
-	//virtual void ApplyDoTEffect_Implementation() override;
 	virtual float TakeDamage(
 		float DamageAmount,
 		struct FDamageEvent const& DamageEvent,

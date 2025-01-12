@@ -55,9 +55,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	class UPointLightComponent* PointLightComp;
 
-	/*UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	class UProjectileMovementComponent* MovementComp;*/
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	class UBulletMovementComponent* MovementComp;
 
@@ -93,14 +90,10 @@ public:
 
 	virtual void SetHitHasBeenProcessed(bool HasBeenProcessed) override { bHasHitBeenProcesed = HasBeenProcessed; }
 
-	virtual void InitializeDamageType(const FString& DamageTypeName) final override;
 
 	UFUNCTION(BlueprintCallable)
 	virtual void OnExpired() override;
 
-	virtual float GetDamage() override;
-
-	
 
 protected:
 	// Called when the game starts or when spawned

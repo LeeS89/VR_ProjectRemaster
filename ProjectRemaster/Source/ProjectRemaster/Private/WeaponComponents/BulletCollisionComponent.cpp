@@ -8,7 +8,7 @@
 #include <Interfaces/DeflectableInterface.h>
 #include <CapsuleComponent.h>
 #include <Structs/FDamageTypeInfo.h>
-#include <Interfaces/DamageableInterface.h>
+#include <Interfaces/ElementalDamageInterface.h>
 
 // Sets default values for this component's properties
 UBulletCollisionComponent::UBulletCollisionComponent()
@@ -28,21 +28,19 @@ void UBulletCollisionComponent::BeginPlay()
 
 	OwnerRef = GetOwner();
 	//UE_LOG(LogTemp, Error, TEXT("Calling Initialize Damage type"));
-	InitializeDamageType(TEXT("Fire"));
+	
 	if (!OwnerRef) { return; }
 
 	MeshComp = OwnerRef->FindComponentByClass<UStaticMeshComponent>();
 
 	if (!MeshComp) { return; }
 
-	//MeshComp->OnComponentHit.AddDynamic(this, &UBulletCollisionComponent::HandleHit);
-	/*if (MeshComp->OnComponentHit.IsBound())
-	{
-		UE_LOG(LogTemp, Error, TEXT("HANDLEHIT IS BOUND YAAAAY"));
-	}*/
+	
 	if (!OwnerRef->Implements<UDeflectableInterface>()) { return; }
 
 	BulletInterface = Cast<IDeflectableInterface>(OwnerRef);
+
+	InitializeDamageType(DamageType);
 
 }
 
@@ -98,12 +96,12 @@ void UBulletCollisionComponent::DamageTarget(AActor* ActorToDamage)
 	//float Damage{ 0.0f };
 	//Damage = BulletInterface->GetDamage();
 	
-	if (ActorToDamage->Implements<UDamageableInterface>())
+	/*if (ActorToDamage->Implements<UDamageableInterface>())
 	{
 		IDamageableInterface* DamageInterface = Cast<IDamageableInterface>(ActorToDamage);
 		DamageInterface->Execute_SetDoT(ActorToDamage, DamageOverTime);
 		DamageInterface->Execute_SetDoTDuration(ActorToDamage, DoTDuration);
-	}
+	}*/
 
 	ActorToDamage->TakeDamage(
 		Damage,
@@ -113,28 +111,35 @@ void UBulletCollisionComponent::DamageTarget(AActor* ActorToDamage)
 	);
 }
 
-void UBulletCollisionComponent::InitializeDamageType(const FString& DamageTypeName)
+void UBulletCollisionComponent::InitializeDamageType(EDamageType DamageTypeToInitialize)
 {
-	
+
 	if (!DamageDataTable) { return; }
 
 	static const FString ContextString(TEXT("Damage Lookup"));
-	FDamageTypeInfo* DamageInfo = DamageDataTable->FindRow<FDamageTypeInfo>(FName(*DamageTypeName), ContextString);
+	//FDamageTypeInfo* DamageInfo = DamageDataTable->FindRow<FDamageTypeInfo>(FName(*DamageTypeName), ContextString);
+	FDamageTypeInfo* DamageInfo = DamageDataTable->FindRow<FDamageTypeInfo>(FName(*UEnum::GetValueAsString(DamageTypeToInitialize)), ContextString);
 
 	if (DamageInfo)
 	{
 		Damage = DamageInfo->BaseDamage;
-		
+
 		DamageOverTime = DamageInfo->DamageOverTime;
-		
+
 		DoTDuration = DamageInfo->Duration;
-	
+
 		DamageTypeClass = DamageInfo->DamageTypeClass;
-	
+
 	}
-	else
+
+	if (!GetOwner()->Implements<UElementalDamageInterface>()) { return; }
+
+	IElementalDamageInterface* DamageInterface = Cast<IElementalDamageInterface>(GetOwner());
+	if (DamageInterface)
 	{
-		UE_LOG(LogTemp, Error, TEXT("NO DAMAGE INFO AWWWWW"));
+		DamageInterface->SetDoTAmount(DamageOverTime);
+		DamageInterface->SetDoTDuration(DoTDuration);
 	}
+
 }
 

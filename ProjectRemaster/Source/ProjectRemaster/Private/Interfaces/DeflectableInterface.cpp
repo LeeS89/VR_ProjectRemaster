@@ -5,6 +5,4 @@
 
 // Add default functionality here for any IDeflectableInterface functions that are not pure virtual.
 
-void IDeflectableInterface::PlayHitParticle(bool bActive, const FVector& Location, const FRotator& Rotation)
-{
-}
+
