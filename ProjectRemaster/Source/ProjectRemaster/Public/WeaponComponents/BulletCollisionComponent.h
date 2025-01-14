@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Interfaces/DeflectableInterface.h"
+#include "Engine/DamageEvents.h"
 #include "Enums/EDamageType.h"
 #include "BulletCollisionComponent.generated.h"
 
@@ -16,6 +17,13 @@ DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_ThreeParams(
 	const FRotator&, Rotation
 );
 
+DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_FourParams(
+	FOnSetDoTParamsSignature,
+	UBulletCollisionComponent, OnSetDoTParamsDelegate,
+	AActor*, OtherActor, const class UElementalDamageType*, ElementDamageType, const float, OutDoTAmount, const float, OutDoTDuration
+);
+
+class UElementalDamageType;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class PROJECTREMASTER_API UBulletCollisionComponent : public UActorComponent
@@ -26,9 +34,21 @@ private:
 
 	AActor* OwnerRef;
 
+	UPROPERTY(EditAnywhere)
+	float DamageMultiplier{ 1.0f };
+
 	bool ShouldRespondToHit(AActor* OtherActor, UPrimitiveComponent* OtherComp);
 
 	UStaticMeshComponent* MeshComp;
+
+	UPROPERTY(VisibleAnywhere)
+	UElementalDamageType* DamageTypeInstance;
+
+	UPROPERTY()
+	FDamageEvent TargetDamageEvent;
+
+	UPROPERTY(VisibleAnywhere)
+	TSubclassOf<UElementalDamageType> DamageTypeClass;
 
 public:	
 	// Sets default values for this component's properties
@@ -60,22 +80,23 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnHitSignature OnHitDelegate;
 
+	UPROPERTY(BlueprintAssignable)
+	FOnSetDoTParamsSignature OnSetDoTParamsDelegate;
+
+
 protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Damage")
-	UDataTable* DamageDataTable;
+	class UDataTable* DamageDataTable;
 
 	UPROPERTY()
 	float Damage;
 
-	UPROPERTY()
+	/*UPROPERTY()
 	float DamageOverTime;
 
 	UPROPERTY()
-	float DoTDuration;
-
-	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<UDamageType> DamageTypeClass;
+	float DoTDuration;*/
 
 	UPROPERTY(EditDefaultsOnly, Category = "Damage")
 	TEnumAsByte<EDamageType> DamageType;
@@ -84,4 +105,9 @@ public:
 
 	void InitializeDamageType(EDamageType DamageTypeToInitialize);
 
+	UPROPERTY()
+	float DamageOverTime;
+
+	UPROPERTY()
+	float DoTDuration;
 };

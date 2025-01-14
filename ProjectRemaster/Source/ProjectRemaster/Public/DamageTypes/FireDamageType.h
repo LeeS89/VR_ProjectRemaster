@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/DamageType.h"
+#include "DamageTypes/ElementalDamageType.h"
 #include "FireDamageType.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PROJECTREMASTER_API UFireDamageType : public UDamageType
+class PROJECTREMASTER_API UFireDamageType : public UElementalDamageType
 {
 	GENERATED_BODY()
 	

@@ -23,16 +23,16 @@ class PROJECTREMASTER_API IDamageableInterface
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 
-   /* UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Damage")
-    void ApplyDamageOverTime();*/
-
-    // Set DoT Amount
     UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Damage")
-    void SetDoT(float InDamageOverTime);
+    void SetDamageOverTimeParams(const class UElementalDamageType* ElementDamageType, float InDamageOverTime, float InDoTDuration);
 
-    // Set DoT Duration
-    UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Damage")
-    void SetDoTDuration(float InDoTDuration);
+    //// Set DoT Amount
+    //UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Damage")
+    //void SetDoT(float InDamageOverTime);
+
+    //// Set DoT Duration
+    //UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Damage")
+    //void SetDoTDuration(float InDoTDuration);
 
     // Apply Instant Damage
     //UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Damage")

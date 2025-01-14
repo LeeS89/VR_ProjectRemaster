@@ -31,5 +31,5 @@ struct PROJECTREMASTER_API FDamageTypeInfo : public FTableRowBase
 	float Duration;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
-	TSubclassOf<UDamageType> DamageTypeClass;
+	TSubclassOf<class UElementalDamageType> DamageTypeClass;
 };

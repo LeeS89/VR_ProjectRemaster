@@ -5,10 +5,11 @@
 #include "CoreMinimal.h"
 #include "Interfaces/MainPlayer.h"
 #include "GameFramework/Character.h"
+#include "Interfaces/DamageableInterface.h"
 #include "MainCharacter.generated.h"
 
 UCLASS()
-class PROJECTREMASTER_API AMainCharacter : public ACharacter, public IMainPlayer
+class PROJECTREMASTER_API AMainCharacter : public ACharacter, public IMainPlayer, public IDamageableInterface
 {
 	GENERATED_BODY()
 
@@ -113,6 +114,12 @@ public:
 		class AController* EventInstigator,
 		AActor* DamageCauser
 	) override;
+
+	UFUNCTION()
+	virtual void OnReceiveAnyDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
+
+	UFUNCTION()
+	virtual void SetDamageOverTimeParams_Implementation(const class UElementalDamageType* ElementDamageType, float InDamageOverTime, float InDoTDuration) override;
 
 private:
 

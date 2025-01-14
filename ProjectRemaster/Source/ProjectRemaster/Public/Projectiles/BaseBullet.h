@@ -44,7 +44,6 @@ protected:
 		const FHitResult& Hit
 	) override;
 
-
 	// Actor Components
 	UPROPERTY(BlueprintAssignable)
 	FOnDeflectedSignature OnDeflectedDelegate;

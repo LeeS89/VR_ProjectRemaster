@@ -4,14 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Projectiles/BaseBullet.h"
-#include "Interfaces/ElementalDamageInterface.h"
 #include "ElementalBullet.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PROJECTREMASTER_API AElementalBullet : public ABaseBullet, public IElementalDamageInterface
+class PROJECTREMASTER_API AElementalBullet : public ABaseBullet
 {
 	GENERATED_BODY()
 
@@ -26,14 +25,4 @@ public:
 
 	AElementalBullet();
 
-public:
-
-	virtual void SetDoTAmount(float Amount) override { DoTAmount = Amount; };
-
-	virtual float GetDoTAmount() override { return DoTAmount; }
-
-	virtual void SetDoTDuration(float Duration) override { DoTDuration = Duration; }
-
-	virtual float GetDoTDuration() override { return DoTDuration; };
-	
 };

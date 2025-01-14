@@ -4,11 +4,13 @@
 #include "WeaponComponents/BulletCollisionComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include <UtilityClasses/DamageUtility.h>
-#include "Engine/DamageEvents.h"
 #include <Interfaces/DeflectableInterface.h>
 #include <CapsuleComponent.h>
 #include <Structs/FDamageTypeInfo.h>
-#include <Interfaces/ElementalDamageInterface.h>
+#include "DamageTypes/ElementalDamageType.h"
+#include "Engine/DataTable.h"
+#include <Kismet/GameplayStatics.h>
+
 
 // Sets default values for this component's properties
 UBulletCollisionComponent::UBulletCollisionComponent()
@@ -40,6 +42,8 @@ void UBulletCollisionComponent::BeginPlay()
 
 	BulletInterface = Cast<IDeflectableInterface>(OwnerRef);
 
+	if (!DamageDataTable || !BulletInterface) { return; }
+
 	InitializeDamageType(DamageType);
 
 }
@@ -56,7 +60,7 @@ void UBulletCollisionComponent::TickComponent(float DeltaTime, ELevelTick TickTy
 void UBulletCollisionComponent::HandleHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	if (!ShouldRespondToHit(OtherActor, OtherComp)) { return; }
-
+	
 	BulletInterface->SetHitHasBeenProcessed(true);
 
 	APawn* InstigatorPawn = OwnerRef->GetInstigator();
@@ -76,6 +80,7 @@ bool UBulletCollisionComponent::ShouldRespondToHit(AActor* OtherActor, UPrimitiv
 {
 	if (!OtherActor || OtherActor == GetOwner()) { return false; }
 	if (BulletInterface->GetHitHasBeenProcessed() || !BulletInterface) { return false; }
+	
 	/*ECollisionResponse Response = OtherComp->GetCollisionResponseToChannel(MeshComp->GetCollisionObjectType());
 	if (MeshComp && Response == ECollisionResponse::ECR_Ignore)
 	{
@@ -90,19 +95,8 @@ void UBulletCollisionComponent::DamageTarget(AActor* ActorToDamage)
 {
 	if (!BulletInterface) { return; }
 
-	FDamageEvent TargetDamageEvent;
-	TargetDamageEvent.DamageTypeClass = DamageTypeClass;
-	//UE_LOG(LogTemp, Error, TEXT("Damage class type and damage amount: %s, %f"), *DamageTypeClass->GetName(), Damage);
-	//float Damage{ 0.0f };
-	//Damage = BulletInterface->GetDamage();
+	OnSetDoTParamsDelegate.Broadcast(ActorToDamage, DamageTypeInstance, (DamageOverTime * DamageMultiplier), DoTDuration);
 	
-	/*if (ActorToDamage->Implements<UDamageableInterface>())
-	{
-		IDamageableInterface* DamageInterface = Cast<IDamageableInterface>(ActorToDamage);
-		DamageInterface->Execute_SetDoT(ActorToDamage, DamageOverTime);
-		DamageInterface->Execute_SetDoTDuration(ActorToDamage, DoTDuration);
-	}*/
-
 	ActorToDamage->TakeDamage(
 		Damage,
 		TargetDamageEvent,
@@ -114,32 +108,28 @@ void UBulletCollisionComponent::DamageTarget(AActor* ActorToDamage)
 void UBulletCollisionComponent::InitializeDamageType(EDamageType DamageTypeToInitialize)
 {
 
-	if (!DamageDataTable) { return; }
-
 	static const FString ContextString(TEXT("Damage Lookup"));
-	//FDamageTypeInfo* DamageInfo = DamageDataTable->FindRow<FDamageTypeInfo>(FName(*DamageTypeName), ContextString);
+
 	FDamageTypeInfo* DamageInfo = DamageDataTable->FindRow<FDamageTypeInfo>(FName(*UEnum::GetValueAsString(DamageTypeToInitialize)), ContextString);
 
-	if (DamageInfo)
+	if (!DamageInfo) { return; }
+
+	Damage = DamageInfo->BaseDamage;
+
+	DamageOverTime = DamageInfo->DamageOverTime;
+	
+	DoTDuration = DamageInfo->Duration;
+
+	DamageTypeClass = DamageInfo->DamageTypeClass;
+
+
+	if (DamageTypeClass)
 	{
-		Damage = DamageInfo->BaseDamage;
-
-		DamageOverTime = DamageInfo->DamageOverTime;
-
-		DoTDuration = DamageInfo->Duration;
-
-		DamageTypeClass = DamageInfo->DamageTypeClass;
-
+		DamageTypeInstance = NewObject<UElementalDamageType>(this, DamageTypeClass);
+		if (DamageTypeInstance)
+		{
+			TargetDamageEvent.DamageTypeClass = DamageTypeInstance->GetClass();
+		}
 	}
-
-	if (!GetOwner()->Implements<UElementalDamageInterface>()) { return; }
-
-	IElementalDamageInterface* DamageInterface = Cast<IElementalDamageInterface>(GetOwner());
-	if (DamageInterface)
-	{
-		DamageInterface->SetDoTAmount(DamageOverTime);
-		DamageInterface->SetDoTDuration(DoTDuration);
-	}
-
 }
 

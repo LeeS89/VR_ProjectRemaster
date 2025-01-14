@@ -100,7 +100,6 @@ void ABaseBullet::ToggleActiveState(bool bActive, const FVector& SpawnLocation, 
 void ABaseBullet::NotifyHit(UPrimitiveComponent* MyComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit)
 {
 	if (!CollisionComp) { return; }
-
 	CollisionComp->HandleHit(MyComp, OtherActor, OtherComp, NormalImpulse, Hit);
 }
 

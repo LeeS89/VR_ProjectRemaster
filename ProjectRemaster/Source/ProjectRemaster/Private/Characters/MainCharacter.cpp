@@ -95,6 +95,16 @@ void AMainCharacter::BeginPlay()
 
 		BlackoutWidget->AddToViewport();
 	}*/
+	OnTakeAnyDamage.AddDynamic(this, &AMainCharacter::OnReceiveAnyDamage);
+
+	if (OnTakeAnyDamage.IsBound())
+	{
+		UE_LOG(LogTemp, Error, TEXT("Take Damage is bound"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("No Take Damage bindings"));
+	}
 
 	if (BlackoutWidget)
 	{
@@ -146,9 +156,23 @@ USceneComponent* AMainCharacter::GetTargetComponent()
 
 float AMainCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
+	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	DamageHandlerComp->HandleDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	return DamageAmount;
 }
+
+void AMainCharacter::OnReceiveAnyDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser)
+{
+	UE_LOG(LogTemp, Error, TEXT("I got hurt"));
+}
+
+void AMainCharacter::SetDamageOverTimeParams_Implementation(const class UElementalDamageType* ElementDamageType, float InDamageOverTime, float InDoTDuration)
+{
+	if (!DamageHandlerComp) { return; }
+
+	DamageHandlerComp->SetDoTEffect(InDamageOverTime, InDoTDuration);
+}
+
 
 void AMainCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {

@@ -24,16 +24,13 @@ private:
     FTimerHandle DoTTimerHandle;
     float RemainingDoTTicks;
 
-    UFUNCTION()
-    void SetDoTEffect(float InDamageOverTime, float InDoTDuration);
-
     UFUNCTION(BlueprintCallable, Category = "Damage", meta = (AllowPrivateAccess = "true"))
     void ApplyInstantDamage(float DamageAmount);
 
     UFUNCTION(BlueprintCallable, Category = "Damage", meta = (AllowPrivateAccess = "true"))
     void ApplyDoTEffect();
 
-    void HandleFireDamage(float DamageAmount, AController* EventInstigator, AActor* DamageCauser);
+    void HandleElementalDamage(float DamageAmount, class UElementalDamageType* DamageType, AController* EventInstigator, AActor* DamageCauser);
 
     void HandleDoT();
 
@@ -57,6 +54,8 @@ public:
 	void HandleDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
 
    
+    UFUNCTION()
+    void SetDoTEffect(float InDamageOverTime, float InDoTDuration);
   
     UPROPERTY(BlueprintAssignable)
     FOnDamageSignature OnDamageDelegate;

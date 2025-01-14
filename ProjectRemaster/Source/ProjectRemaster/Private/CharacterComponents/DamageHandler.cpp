@@ -4,8 +4,11 @@
 #include "CharacterComponents/DamageHandler.h"
 #include "GameFramework/DamageType.h"
 #include "Engine/DamageEvents.h"
-#include "DamageTypes/FireDamageType.h"
-#include <Interfaces/ElementalDamageInterface.h>
+#include "Enums/EDamageType.h"
+#include "DamageTypes/ElementalDamageType.h"
+
+
+
 
 
 // Sets default values for this component's properties
@@ -39,33 +42,47 @@ void UDamageHandler::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 
 void UDamageHandler::HandleDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	if (DamageCauser->Implements<UElementalDamageInterface>())
-	{
-		IElementalDamageInterface* DamageInterface = Cast<IElementalDamageInterface>(DamageCauser);
-		const UDamageType* DamageTypeInstance = DamageEvent.DamageTypeClass ? DamageEvent.DamageTypeClass->GetDefaultObject<UDamageType>() : nullptr;
-		
-		if (!DamageInterface || !DamageTypeInstance) { return; }
+	ApplyInstantDamage(DamageAmount);
 
-		float DoTPerTick = DamageInterface->GetDoTAmount();
-		float Duration = DamageInterface->GetDoTDuration();
+	//if (DamageCauser->Implements<UElementalDamageInterface>())
+	//{
+	
+		UElementalDamageType* DamageTypeInstance = DamageEvent.DamageTypeClass
+			? Cast<UElementalDamageType>(DamageEvent.DamageTypeClass->GetDefaultObject())
+			: nullptr;
 
-		SetDoTEffect(DoTPerTick, Duration);
+		//if (!DamageTypeInterface || !DamageTypeInstance) { return; }
 
-		if (DamageEvent.DamageTypeClass == UFireDamageType::StaticClass())
-		{
-			HandleFireDamage(DamageAmount, EventInstigator, DamageCauser);
-		}
-	}
-	else
-	{
-		ApplyInstantDamage(DamageAmount);
-	}
+		HandleElementalDamage(DamageAmount, DamageTypeInstance, EventInstigator, DamageCauser);
+	
+	//}
+	
 }
 
-void UDamageHandler::HandleFireDamage(float DamageAmount, AController* EventInstigator, AActor* DamageCauser)
+void UDamageHandler::HandleElementalDamage(float DamageAmount, UElementalDamageType* DamageType, AController* EventInstigator, AActor* DamageCauser)
 {
-	ApplyInstantDamage(DamageAmount);
-	ApplyDamageOverTime();
+	if (!DamageType) { return; }
+	//float DoTPerTick = DamageType->GetAmoutOfDoT();
+	//float Duration = DamageType->GetDoTDuration();
+	
+	//SetDoTEffect(DoTPerTick, Duration);
+	//if(DamageType->bCausedByWorld)
+	switch (DamageType->GetElementType())
+	{
+	case EDamageType::Fire:
+		ApplyDamageOverTime();
+		break;
+	default:
+		UE_LOG(LogTemp, Error, TEXT("No Damage Type"));
+		break;
+	}
+	//if (DamageType && DamageType->IsA(UFireDamageType::StaticClass()))
+	//{
+		// Will eventually play a particle effect here
+	
+	//}
+	
+
 }
 
 void UDamageHandler::ApplyInstantDamage(float DamageAmount)
@@ -91,6 +108,12 @@ void UDamageHandler::ApplyDamageOverTime()
 	);
 }
 
+/// <summary>
+/// When the actor receives damage from elemental sources
+/// this function gets called with values taken from the damage type class
+/// </summary>
+/// <param name="InDamageOverTime">Amount of damage per tick</param>
+/// <param name="InDoTDuration">Number of ticks to apply damage for</param>
 void UDamageHandler::SetDoTEffect(float InDamageOverTime, float InDoTDuration)
 {
 	DamagePerTick = InDamageOverTime;

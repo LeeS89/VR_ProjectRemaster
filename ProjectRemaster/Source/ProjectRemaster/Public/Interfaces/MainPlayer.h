@@ -30,4 +30,5 @@ public:
 
 	virtual USceneComponent* GetTargetComponent() = 0;
 
+	
 };
