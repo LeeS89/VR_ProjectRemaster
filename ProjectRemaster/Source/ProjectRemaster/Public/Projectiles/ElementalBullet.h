@@ -25,4 +25,9 @@ public:
 
 	AElementalBullet();
 
+	UPROPERTY(EditDefaultsOnly, Category = "Particles")
+	class UParticleSystemComponent* Trail;
+
+	virtual void ToggleActiveState(bool bActive, const FVector& SpawnLocation = FVector::ZeroVector, const FRotator& SpawnRotation = FRotator::ZeroRotator) final override;
+
 };

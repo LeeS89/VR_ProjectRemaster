@@ -2,8 +2,25 @@
 
 
 #include "Projectiles/ElementalBullet.h"
+#include "Particles/ParticleSystemComponent.h"
 
 AElementalBullet::AElementalBullet()
 {
+	Trail = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Particle System Component"));
+	Trail->SetupAttachment(RootComponent);
+}
 
+void AElementalBullet::ToggleActiveState(bool bActive, const FVector& SpawnLocation, const FRotator& SpawnRotation)
+{
+	Super::ToggleActiveState(bActive, SpawnLocation, SpawnRotation);
+
+	Trail->SetVisibility(bActive);
+	if (bActive)
+	{	
+		Trail->Activate(true);
+	}
+	else
+	{
+		Trail->Deactivate();
+	}
 }
