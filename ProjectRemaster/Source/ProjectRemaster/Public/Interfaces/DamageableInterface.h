@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
+#include "Enums/EDamageType.h"
 #include "DamageableInterface.generated.h"
 
 // This class does not need to be modified.
@@ -24,20 +25,10 @@ class PROJECTREMASTER_API IDamageableInterface
 public:
 
     UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Damage")
-    void SetDamageOverTimeParams(const class UElementalDamageType* ElementDamageType, float InDamageOverTime, float InDoTDuration);
+    void SetElementalClass(const class UElementalDamageType* ElementDamageType);
 
-    //// Set DoT Amount
-    //UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Damage")
-    //void SetDoT(float InDamageOverTime);
+	virtual TEnumAsByte<EDamageType> GetCurrentStatus() const { return TEnumAsByte<EDamageType>(); }
+	
+	virtual	void UpdateStatusEffect(EDamageType NewStatus) = 0;
 
-    //// Set DoT Duration
-    //UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Damage")
-    //void SetDoTDuration(float InDoTDuration);
-
-    // Apply Instant Damage
-    //UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Damage")
-    //void ApplyInstantDamage(float DamageAmount);
-
-    //UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Damage")
-    //void ApplyDoTEffect();
 };

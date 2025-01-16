@@ -29,7 +29,6 @@ void UBulletCollisionComponent::BeginPlay()
 	Super::BeginPlay();
 
 	OwnerRef = GetOwner();
-	//UE_LOG(LogTemp, Error, TEXT("Calling Initialize Damage type"));
 	
 	if (!OwnerRef) { return; }
 
@@ -81,13 +80,6 @@ bool UBulletCollisionComponent::ShouldRespondToHit(AActor* OtherActor, UPrimitiv
 	if (!OtherActor || OtherActor == GetOwner()) { return false; }
 	if (BulletInterface->GetHitHasBeenProcessed() || !BulletInterface) { return false; }
 	
-	/*ECollisionResponse Response = OtherComp->GetCollisionResponseToChannel(MeshComp->GetCollisionObjectType());
-	if (MeshComp && Response == ECollisionResponse::ECR_Ignore)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Collision response ignored for %s"), *OtherActor->GetName());
-		return false;
-	}*/
-
 	return true;
 }
 
@@ -95,7 +87,7 @@ void UBulletCollisionComponent::DamageTarget(AActor* ActorToDamage)
 {
 	if (!BulletInterface) { return; }
 
-	OnSetDoTParamsDelegate.Broadcast(ActorToDamage, DamageTypeInstance, (DamageOverTime * DamageMultiplier), DoTDuration);
+	OnSetDoTParamsDelegate.Broadcast(ActorToDamage, DamageTypeInstance/*, (DamageOverTime * DamageMultiplier), DoTDuration*/ );
 	
 	ActorToDamage->TakeDamage(
 		Damage,
@@ -128,6 +120,10 @@ void UBulletCollisionComponent::InitializeDamageType(EDamageType DamageTypeToIni
 		DamageTypeInstance = NewObject<UElementalDamageType>(this, DamageTypeClass);
 		if (DamageTypeInstance)
 		{
+			DamageTypeInstance->StatusEffectChancePercentage = StatusEffectChancePercentage;
+			DamageTypeInstance->SetDamageOverTimeAmount(DamageOverTime * DamageMultiplier);
+			DamageTypeInstance->SetDoTDuration(DoTDuration);
+
 			TargetDamageEvent.DamageTypeClass = DamageTypeInstance->GetClass();
 		}
 	}

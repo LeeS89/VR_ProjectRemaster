@@ -9,6 +9,8 @@
 #include "Enums/EDamageType.h"
 #include "BulletCollisionComponent.generated.h"
 
+class UElementalDamageType;
+
 DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_ThreeParams(
 	FOnHitSignature,
 	UBulletCollisionComponent, OnHitDelegate,
@@ -17,13 +19,12 @@ DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_ThreeParams(
 	const FRotator&, Rotation
 );
 
-DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_FourParams(
+DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_TwoParams(
 	FOnSetDoTParamsSignature,
 	UBulletCollisionComponent, OnSetDoTParamsDelegate,
-	AActor*, OtherActor, const class UElementalDamageType*, ElementDamageType, const float, OutDoTAmount, const float, OutDoTDuration
+	AActor*, OtherActor, const UElementalDamageType*, ElementDamageType/*, const float, OutDoTAmount, const float, OutDoTDuration*/
 );
 
-class UElementalDamageType;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class PROJECTREMASTER_API UBulletCollisionComponent : public UActorComponent
@@ -36,6 +37,9 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	float DamageMultiplier{ 1.0f };
+
+	UPROPERTY(EditDefaultsOnly)
+	int32 StatusEffectChancePercentage{ 0 };
 
 	bool ShouldRespondToHit(AActor* OtherActor, UPrimitiveComponent* OtherComp);
 

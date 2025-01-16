@@ -15,12 +15,13 @@ UStatsComponent::UStatsComponent()
 }
 
 
-
 // Called when the game starts
 void UStatsComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+	StatusEffect = EDamageType::NoType;
+	//StatusEffect = EStatusEffect::Poisoned;
 	// ...
 	
 }
@@ -50,4 +51,5 @@ void UStatsComponent::ReduceHealth(float Amount)
 		OnZeroHealthDelegate.Broadcast();
 	}
 }
+
 

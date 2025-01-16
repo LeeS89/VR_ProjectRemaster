@@ -38,3 +38,14 @@ bool UDamageUtility::ShouldDamageActor(const APawn* Instigator, AActor* Target)
     
     return true; 
 }
+
+bool UDamageUtility::DoesChanceOfEffectSucceed(int32 ChancePercentage)
+{
+    ChancePercentage = FMath::Clamp(ChancePercentage, 0, 100);
+    UE_LOG(LogTemp, Error, TEXT("Chance of effect %i"), ChancePercentage);
+
+    int32 RandomRoll = FMath::RandRange(1, 100);
+    UE_LOG(LogTemp, Error, TEXT("Random Roll %i"), RandomRoll);
+    return RandomRoll <= ChancePercentage;
+    //return FMath::RandRange(1, 100) <= ChancePercentage;;
+}

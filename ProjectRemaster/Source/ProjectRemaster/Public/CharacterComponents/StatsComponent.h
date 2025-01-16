@@ -5,7 +5,10 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include <Enums/EStat.h>
+#include <Enums/EStatusEffect.h>
+#include "Enums/EDamageType.h"
 #include "StatsComponent.generated.h"
+
 
 DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE(
 	FOnZeroHealthSignature,
@@ -24,11 +27,18 @@ public:
 	UPROPERTY(EditAnywhere)
 	TMap<TEnumAsByte<EStat>, float> Stats;
 
+	/*UPROPERTY(VisibleAnywhere)
+	TEnumAsByte<EStatusEffect> StatusEffect;*/
+
+	UPROPERTY(VisibleAnywhere)
+	TEnumAsByte<EDamageType> StatusEffect;
+
 	UFUNCTION(BlueprintCallable)
 	void ReduceHealth(float Amount);
 
 	UPROPERTY(BlueprintAssignable)
 	FOnZeroHealthSignature OnZeroHealthDelegate;
+
 
 protected:
 	// Called when the game starts

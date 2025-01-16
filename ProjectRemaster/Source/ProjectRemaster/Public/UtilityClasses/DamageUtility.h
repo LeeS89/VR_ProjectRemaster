@@ -18,5 +18,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	static bool ShouldDamageActor(const APawn* Instigator, AActor* Target);
+
+	UFUNCTION(BlueprintCallable)
+	static bool DoesChanceOfEffectSucceed(int32 ChancePercentage);
 	
 };

@@ -6,8 +6,7 @@
 #include "Engine/DamageEvents.h"
 #include "Enums/EDamageType.h"
 #include "DamageTypes/ElementalDamageType.h"
-
-
+#include <UtilityClasses/DamageUtility.h>
 
 
 
@@ -27,7 +26,9 @@ void UDamageHandler::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
+	if (!GetOwner()->Implements<UDamageableInterface>()) { return; }
+
+	DamageInterface = Cast<IDamageableInterface>(GetOwner());
 	
 }
 
@@ -44,45 +45,46 @@ void UDamageHandler::HandleDamage(float DamageAmount, FDamageEvent const& Damage
 {
 	ApplyInstantDamage(DamageAmount);
 
-	//if (DamageCauser->Implements<UElementalDamageInterface>())
-	//{
-	
-		UElementalDamageType* DamageTypeInstance = DamageEvent.DamageTypeClass
-			? Cast<UElementalDamageType>(DamageEvent.DamageTypeClass->GetDefaultObject())
-			: nullptr;
-
-		//if (!DamageTypeInterface || !DamageTypeInstance) { return; }
-
-		HandleElementalDamage(DamageAmount, DamageTypeInstance, EventInstigator, DamageCauser);
-	
-	//}
-	
+	if (!ElementDamageTypeClass) { return; }
+	HandleElementalDamage(ElementDamageTypeClass, EventInstigator, DamageCauser);
 }
 
-void UDamageHandler::HandleElementalDamage(float DamageAmount, UElementalDamageType* DamageType, AController* EventInstigator, AActor* DamageCauser)
+/// <summary>
+/// If actor currently has a Buff effect, function exits immediately
+/// Otherwise, there will be a random chance of a buff effect being applied to the actor
+/// Based on the percentage chance of the buff being applied from the retrieved damage type class
+/// We then update the actors stats component through owners interface to update the current status effect
+/// The the damage over time params are retrieved and set and then DoT is appled
+/// And based on the type of elemental damage, we broadcaast this for the VFX component to play particles
+/// </summary>
+/// <param name="DamageType"></param>
+/// <param name="EventInstigator"></param>
+/// <param name="DamageCauser"></param>
+void UDamageHandler::HandleElementalDamage(const UElementalDamageType* DamageType, AController* EventInstigator, AActor* DamageCauser)
 {
-	if (!DamageType) { return; }
-	//float DoTPerTick = DamageType->GetAmoutOfDoT();
-	//float Duration = DamageType->GetDoTDuration();
+	if (!DamageType || !DamageInterface) { return; }
 	
-	//SetDoTEffect(DoTPerTick, Duration);
-	//if(DamageType->bCausedByWorld)
+	if (DamageInterface->GetCurrentStatus() != EDamageType::NoType) { return; }
+	if (!UDamageUtility::DoesChanceOfEffectSucceed(DamageType->StatusEffectChancePercentage))
+	{
+		return;
+	}
+	DamageInterface->UpdateStatusEffect(DamageType->GetElementType());
+	
+	DamagePerTick = DamageType->GetDamageOverTimeAmount();
+	DoTDurationValue = DamageType->GetDoTDuration();
+
 	switch (DamageType->GetElementType())
 	{
 	case EDamageType::Fire:
+
 		ApplyDamageOverTime();
 		break;
 	default:
-		UE_LOG(LogTemp, Error, TEXT("No Damage Type"));
+		UE_LOG(LogTemp, Warning, TEXT("No Damage Type"));
 		break;
 	}
-	//if (DamageType && DamageType->IsA(UFireDamageType::StaticClass()))
-	//{
-		// Will eventually play a particle effect here
 	
-	//}
-	
-
 }
 
 void UDamageHandler::ApplyInstantDamage(float DamageAmount)
@@ -110,14 +112,16 @@ void UDamageHandler::ApplyDamageOverTime()
 
 /// <summary>
 /// When the actor receives damage from elemental sources
-/// this function gets called with values taken from the damage type class
+/// this function gets called through the Owners interface to set the damage type class
+/// from which we can then retrieve damage over time and dot duration values
 /// </summary>
 /// <param name="InDamageOverTime">Amount of damage per tick</param>
 /// <param name="InDoTDuration">Number of ticks to apply damage for</param>
-void UDamageHandler::SetDoTEffect(float InDamageOverTime, float InDoTDuration)
+void UDamageHandler::SetElementalEffectClass(const UElementalDamageType* ElementDamageType/*, float InDamageOverTime, float InDoTDuration*/ )
 {
-	DamagePerTick = InDamageOverTime;
-	DoTDurationValue = InDoTDuration;
+	//if (ElementDamageTypeClass) { return; } // Come back to if decide to allow stacked effects
+	ElementDamageTypeClass = ElementDamageType;
+	
 }
 
 void UDamageHandler::HandleDoT()
@@ -128,9 +132,19 @@ void UDamageHandler::HandleDoT()
 	}
 	else
 	{
-		GetWorld()->GetTimerManager().ClearTimer(DoTTimerHandle);
-		DamagePerTick = 0.0f;
-		DoTDurationValue = 0.0f;
+		ClearDoTEffect();
+	}
+}
+
+void UDamageHandler::ClearDoTEffect()
+{
+	GetWorld()->GetTimerManager().ClearTimer(DoTTimerHandle);
+	DamagePerTick = 0.0f;
+	DoTDurationValue = 0.0f;
+	DamageInterface->UpdateStatusEffect(EDamageType::NoType);
+	if (ElementDamageTypeClass)
+	{
+		ElementDamageTypeClass = nullptr;
 	}
 }
 

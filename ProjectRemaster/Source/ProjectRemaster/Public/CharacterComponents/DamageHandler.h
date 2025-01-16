@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include <Interfaces/DamageableInterface.h>
 #include "DamageHandler.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_OneParam(
@@ -24,15 +25,21 @@ private:
     FTimerHandle DoTTimerHandle;
     float RemainingDoTTicks;
 
+    
+    UPROPERTY(VisibleAnywhere)
+    const class UElementalDamageType* ElementDamageTypeClass{ nullptr };
+
     UFUNCTION(BlueprintCallable, Category = "Damage", meta = (AllowPrivateAccess = "true"))
     void ApplyInstantDamage(float DamageAmount);
 
     UFUNCTION(BlueprintCallable, Category = "Damage", meta = (AllowPrivateAccess = "true"))
     void ApplyDoTEffect();
 
-    void HandleElementalDamage(float DamageAmount, class UElementalDamageType* DamageType, AController* EventInstigator, AActor* DamageCauser);
+    void HandleElementalDamage(const class UElementalDamageType* DamageType, AController* EventInstigator, AActor* DamageCauser);
 
     void HandleDoT();
+
+    void ClearDoTEffect();
 
     UFUNCTION(BlueprintCallable, Category = "Damage")
     void ApplyDamageOverTime();
@@ -41,6 +48,8 @@ private:
 public:	
 	// Sets default values for this component's properties
 	UDamageHandler();
+
+    IDamageableInterface* DamageInterface;
 
 protected:
 	// Called when the game starts
@@ -55,7 +64,7 @@ public:
 
    
     UFUNCTION()
-    void SetDoTEffect(float InDamageOverTime, float InDoTDuration);
+    void SetElementalEffectClass(const class UElementalDamageType* ElementDamageType/*, float InDamageOverTime, float InDoTDuration*/);
   
     UPROPERTY(BlueprintAssignable)
     FOnDamageSignature OnDamageDelegate;

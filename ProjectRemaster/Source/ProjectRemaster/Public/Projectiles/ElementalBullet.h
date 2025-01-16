@@ -21,6 +21,7 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	float DoTDuration{ 0.0f };
 
+
 public:
 
 	AElementalBullet();

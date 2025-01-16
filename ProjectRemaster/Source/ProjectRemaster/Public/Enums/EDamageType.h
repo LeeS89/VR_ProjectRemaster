@@ -10,6 +10,7 @@
 UENUM(BlueprintType)
 enum EDamageType : uint8
 {
+    NoType    UMETA(DisplayName = "No Type"),
     Fire      UMETA(DisplayName = "Fire"),
     Ice       UMETA(DisplayName = "Ice"),
     Electric  UMETA(DisplayName = "Electric"),

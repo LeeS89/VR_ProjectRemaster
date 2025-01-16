@@ -119,7 +119,13 @@ public:
 	virtual void OnReceiveAnyDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 
 	UFUNCTION()
-	virtual void SetDamageOverTimeParams_Implementation(const class UElementalDamageType* ElementDamageType, float InDamageOverTime, float InDoTDuration) override;
+	virtual void SetElementalClass_Implementation(const class UElementalDamageType* ElementDamageType) override;
+
+	UFUNCTION()
+	virtual TEnumAsByte<EDamageType> GetCurrentStatus() const override;
+
+	UFUNCTION(BlueprintCallable)
+	virtual	void UpdateStatusEffect(EDamageType NewStatus) override;
 
 private:
 

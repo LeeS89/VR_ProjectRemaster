@@ -166,11 +166,21 @@ void AMainCharacter::OnReceiveAnyDamage(AActor* DamagedActor, float Damage, cons
 	UE_LOG(LogTemp, Error, TEXT("I got hurt"));
 }
 
-void AMainCharacter::SetDamageOverTimeParams_Implementation(const class UElementalDamageType* ElementDamageType, float InDamageOverTime, float InDoTDuration)
+void AMainCharacter::SetElementalClass_Implementation(const class UElementalDamageType* ElementDamageType)
 {
 	if (!DamageHandlerComp) { return; }
 
-	DamageHandlerComp->SetDoTEffect(InDamageOverTime, InDoTDuration);
+	DamageHandlerComp->SetElementalEffectClass(ElementDamageType);
+}
+
+TEnumAsByte<EDamageType> AMainCharacter::GetCurrentStatus() const
+{
+	return StatsComp->StatusEffect;
+}
+
+void AMainCharacter::UpdateStatusEffect(EDamageType NewStatus)
+{
+	StatsComp->StatusEffect = NewStatus; 
 }
 
 
