@@ -4,6 +4,7 @@
 #include "GameModes/MainGameMode.h"
 #include "GameFramework/Character.h"
 #include <Kismet/GameplayStatics.h>
+#include <Controllers/CustomPlayerController.h>
 
 void AMainGameMode::BeginPlay()
 {
@@ -30,20 +31,26 @@ ACharacter* AMainGameMode::GetPlayerCharacter()
 	return PlayerCharacter;
 }
 
+
 void AMainGameMode::StartPlay()
 {
 	Super::StartPlay();
 
 	PlayerCharacter = Cast<ACharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 
-	if (PlayerCharacter)
-	{
-		UE_LOG(LogTemp, Error, TEXT("PLAYER FOUND!!!!"));
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("PLAYER NOT FOUND!!!!"));
-	}
 }
 
 
+void AMainGameMode::PawnKilled(APawn* PawnKilled)
+{
+	if (!PawnKilled) { return; }
+
+	AController* Controller = PawnKilled->GetController();
+
+	if (!Controller) { return; }
+	if (ACustomPlayerController* PC = Cast<ACustomPlayerController>(Controller))
+	{
+		PC->DisablePlayerInput();
+		UE_LOG(LogTemp, Error, TEXT("Player Has been Killed!!!!!"));
+	}
+}

@@ -29,6 +29,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	ACharacter* GetPlayerCharacter();
 
+	UFUNCTION(BlueprintCallable)
+	void PawnKilled(APawn* PawnKilled);
+
 	virtual void StartPlay() override;
 	
 };
