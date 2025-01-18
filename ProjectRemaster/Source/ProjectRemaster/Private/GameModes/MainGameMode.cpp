@@ -40,6 +40,13 @@ void AMainGameMode::StartPlay()
 
 }
 
+void AMainGameMode::RestartPlayerAtPlayerStart(AController* NewPlayer, AActor* StartSpot)
+{
+	Super::RestartPlayerAtPlayerStart(NewPlayer, StartSpot);
+}
+
+
+
 
 void AMainGameMode::PawnKilled(APawn* PawnKilled)
 {
@@ -51,6 +58,16 @@ void AMainGameMode::PawnKilled(APawn* PawnKilled)
 	if (ACustomPlayerController* PC = Cast<ACustomPlayerController>(Controller))
 	{
 		PC->DisablePlayerInput();
+		/*APawn* OldPawn = PC->GetPawn();
+
+
+		PC->UnPossess();
+		if (OldPawn && !OldPawn->IsPendingKillPending())
+		{
+			OldPawn->Destroy();
+		}*/
+
+		//RestartPlayerAtPlayerStart(PC, FindPlayerStart(PC, TEXT("Main")));
 		UE_LOG(LogTemp, Error, TEXT("Player Has been Killed!!!!!"));
 	}
 }

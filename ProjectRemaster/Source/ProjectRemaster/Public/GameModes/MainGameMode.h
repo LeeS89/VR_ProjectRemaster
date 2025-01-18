@@ -33,5 +33,7 @@ public:
 	void PawnKilled(APawn* PawnKilled);
 
 	virtual void StartPlay() override;
+
+	virtual void RestartPlayerAtPlayerStart(AController* NewPlayer, AActor* StartSpot) override;
 	
 };
