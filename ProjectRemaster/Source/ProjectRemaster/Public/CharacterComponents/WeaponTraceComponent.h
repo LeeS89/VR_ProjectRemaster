@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "Structs/FTraceSockets.h"
 #include "WeaponComponents/BaseTraceComponent.h"
+#include "Interfaces/Sliceable.h"
 #include "WeaponTraceComponent.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_ThreeParams(
@@ -25,6 +26,13 @@ class PROJECTREMASTER_API UWeaponTraceComponent : public UBaseTraceComponent
 public:	
 	// Sets default values for this component's properties
 	UWeaponTraceComponent();
+	ISliceable* Sliceable;
+	FVector CurrentImpactPoint;
+	FVector CurrentImpactNormal;
+	// Tracks the current sliceable actor
+	AActor* CurrentSliceableActor;
+
+	void CheckSliceable(ISliceable* SlicedActor);
 
 protected:
 	// Called when the game starts

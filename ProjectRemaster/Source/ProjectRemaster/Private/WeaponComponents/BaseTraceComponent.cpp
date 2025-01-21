@@ -69,6 +69,7 @@ void UBaseTraceComponent::PerformTrace(const FVector& StartLocation, const FVect
 
 	if (bHasFoundTargets)
 	{
+		//OutResults[0].GetActor()->Destroy();
 		HandleTraceResults(OutResults);
 	}
 

@@ -38,5 +38,16 @@ public:
 	virtual void OnGrabbed_Implementation(class UCustomXRHandComponent* HandComponent, FName SocketName) override;
 
 	virtual void OnReleased_Implementation() override;
-	
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UStaticMeshComponent* SlicingPlane;
+
+	FVector GetSlicingPlanePoint() const;
+	FVector GetSlicingPlaneNormal() const;
+
+	FVector PreviousLocation; // Tracks the saber's previous location
+	FVector MovementDirection;
+
+	void UpdateSlicingPlaneRotation();
+	FRotator StartRotation;
 };
