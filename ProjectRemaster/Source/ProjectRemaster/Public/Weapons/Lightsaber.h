@@ -14,6 +14,10 @@ class PROJECTREMASTER_API ALightsaber : public ABaseWeapon
 {
 	GENERATED_BODY()
 
+private:
+
+	FVector CurrentLocation;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -27,7 +31,7 @@ public:
 public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class UWeaponTraceComponent* WeaponTraceComp;
+	class UWeaponTraceComponent* TraceComp;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UVFXComponent* VFXComp;
@@ -42,10 +46,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UStaticMeshComponent* SlicingPlane;
 
-	FVector GetSlicingPlanePoint() const;
-	FVector GetSlicingPlaneNormal() const;
 
-	FVector PreviousLocation; // Tracks the saber's previous location
+	FVector PreviousLocation; 
 	FVector MovementDirection;
 
 	void UpdateSlicingPlaneRotation();

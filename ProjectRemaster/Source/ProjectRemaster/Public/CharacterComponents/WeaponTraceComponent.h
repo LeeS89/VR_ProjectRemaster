@@ -26,13 +26,13 @@ class PROJECTREMASTER_API UWeaponTraceComponent : public UBaseTraceComponent
 public:	
 	// Sets default values for this component's properties
 	UWeaponTraceComponent();
-	ISliceable* Sliceable;
-	FVector CurrentImpactPoint;
-	FVector CurrentImpactNormal;
+	//ISliceable* Sliceable;
+	//FVector CurrentImpactPoint;
+	//FVector CurrentImpactNormal;
 	// Tracks the current sliceable actor
-	AActor* CurrentSliceableActor;
+	///AActor* CurrentSliceableActor;
 
-	void CheckSliceable(ISliceable* SlicedActor);
+	//void CheckSliceable(ISliceable* SlicedActor);
 
 protected:
 	// Called when the game starts

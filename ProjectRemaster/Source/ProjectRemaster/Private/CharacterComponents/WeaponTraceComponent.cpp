@@ -14,7 +14,7 @@ UWeaponTraceComponent::UWeaponTraceComponent()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bCanEverTick = false;
 
 	// ...
 }
@@ -37,31 +37,9 @@ void UWeaponTraceComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if (Sliceable)
-	{
-		CheckSliceable(Sliceable);
-	}
-
 }
 
-void UWeaponTraceComponent::CheckSliceable(ISliceable* SlicedActor)
-{
-	DrawDebugSphere(
-		GetWorld(),
-		CurrentImpactPoint,
-		1.0f,
-		12,
-		FColor::Red,
-		false,
-		0.1f
-	);
-	if (!Sliceable->GetIsOverlapping())
-	{
-		Sliceable->RegisterPointOfExit(GetOwner()->GetActorLocation(), GetOwner()->GetActorUpVector());
-		CurrentSliceableActor = nullptr;
-		Sliceable = nullptr;
-	}
-}
+
 
 void UWeaponTraceComponent::HandleTraceResults(const TArray<FHitResult>& HitResults)
 {
@@ -87,25 +65,7 @@ void UWeaponTraceComponent::HandleTraceResults(const TArray<FHitResult>& HitResu
 				HitActor->SetInstigator(GetOwner()->GetInstigator());
 			}
 		}
-		else if (HitActor->Implements<USliceable>())
-		{
-			//HitActor->Destroy();
-			if (HitActor != CurrentSliceableActor)
-			{
-				Sliceable = Cast<ISliceable>(HitActor);
-				if (Sliceable)
-				{
-					
-					Sliceable->RegisterPointOfEntry(Hit.ImpactPoint, GetOwner()->FindComponentByClass<UStaticMeshComponent>()->GetRightVector().GetSafeNormal());
-					CurrentSliceableActor = HitActor;
-				}
-			}
-			if (Sliceable->GetIsOverlapping())
-			{
-				CurrentImpactPoint = Hit.ImpactPoint;
-				CurrentImpactNormal = /*GetOwner()->FindComponentByClass<UStaticMeshComponent>()->GetStaticMesh()->Normal */ Hit.ImpactNormal;
-			}
-		}
+		
 	/*	else if (Hit.GetActor()->Implements<UOverlappableInterface>())
 		{
 

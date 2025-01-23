@@ -23,10 +23,8 @@ class PROJECTREMASTER_API ISliceable
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 
-	UFUNCTION()
-	virtual void RegisterPointOfEntry(const FVector& ImpactPoint, const FVector& ImpactNormal) { return; };
-
-	virtual void RegisterPointOfExit(const FVector& ExitPoint, const FVector& ExitNormal) { return; };
-
 	virtual bool GetIsOverlapping() { return false; }
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void SliceMesh(const FVector& PlaneLocation, const FVector& PlaneNormal, const float ImpulseStrength, class UMaterialInstance* SliceMaterial);
 };

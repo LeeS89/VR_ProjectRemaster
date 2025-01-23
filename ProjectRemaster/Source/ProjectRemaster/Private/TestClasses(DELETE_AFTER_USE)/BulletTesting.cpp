@@ -16,7 +16,7 @@
 ABulletTesting::ABulletTesting()
 {
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Static Mesh Component"));
 	StaticMeshComp->SetupAttachment(RootComponent);
@@ -73,57 +73,32 @@ void ABulletTesting::Tick(float DeltaTime)
 
 }
 
-void ABulletTesting::RegisterPointOfEntry(const FVector& ImpactPoint, const FVector& ImpactNormal)
+
+void ABulletTesting::SliceMesh_Implementation(const FVector& PlaneLocation, const FVector& PlaneNormal, const float ImpulseStrength, UMaterialInstance* SliceMaterial)
 {
-	PointOfEntry = ImpactPoint;
-	POINormal = ImpactNormal;
-}
+	UProceduralMeshComponent* OutOtherHalfProcMesh;
 
-void ABulletTesting::RegisterPointOfExit(const FVector& ExitPoint, const FVector& ExitNormal)
-{
-	PointOfExit = ExitPoint;
-	POENormal = ExitNormal;
-	//float DirectionCheck = FVector::DotProduct(POINormal, POENormal);
-	//UE_LOG(LogTemp, Error, TEXT("Direction Check Value: %f"), DirectionCheck);
-	
-	FVector MeshCenter = ProcMesh->Bounds.Origin;  // Center of the mesh
-	FVector MeshExtent = ProcMesh->Bounds.BoxExtent;  // Half-size of the mesh along each axis
+	UKismetProceduralMeshLibrary::SliceProceduralMesh(
+		ProcMesh,
+		PlaneLocation,
+		PlaneNormal,
+		true,
+		OutOtherHalfProcMesh,
+		EProcMeshSliceCapOption::CreateNewSectionForCap,
+		SliceMaterial
+	);
 
-	// Calculate the slicing plane position
-	FVector PlanePosition = MeshCenter;  // Start at the center of the mesh
+	//ProcMesh->SetSimulatePhysics(true);
+	//ProcMesh->SetEnableGravity(true);
+	if (OutOtherHalfProcMesh)
+	{
+		OutOtherHalfProcMesh->SetSimulatePhysics(true);
+		OutOtherHalfProcMesh->SetEnableGravity(true);
 
-	// Use the X and Y coordinates of the impact point, keeping Z at the center
-	PlanePosition.X = PointOfEntry.X;  // Align X with the impact point
-	PlanePosition.Y = PointOfEntry.Y;  // Align Y with the impact point
+		OutOtherHalfProcMesh->AddImpulse(-(PlaneNormal * ImpulseStrength), NAME_None, true);
 
-	// Use the provided ImpactNormal for slicing direction
-	FVector PlaneNormal = PointOfEntry.GetSafeNormal();
-
-
-		FVector PlanePoint = PointOfEntry;// + PointOfExit) / 2;
-		//FVector PlaneNormal = ExitNormal.GetSafeNormal();//(PointOfExit - PointOfEntry).GetSafeNormal();
-		UProceduralMeshComponent* OutOtherHalfProcMesh;
-
-		UKismetProceduralMeshLibrary::SliceProceduralMesh(
-			ProcMesh,
-			PlanePosition,
-			PlaneNormal,
-			true,
-			OutOtherHalfProcMesh,
-			EProcMeshSliceCapOption::CreateNewSectionForCap,
-			nullptr
-		);
-
-		ProcMesh->SetSimulatePhysics(true);
-		ProcMesh->SetEnableGravity(true);
-		if (OutOtherHalfProcMesh)
-		{
-			OutOtherHalfProcMesh->SetSimulatePhysics(true);
-			OutOtherHalfProcMesh->SetEnableGravity(true);
-		}
-
-	//Destroy();
-	//UKismetSystemLibrary::Sl
+		//OutOtherHalfProcMesh->DestroyComponent();
+	}
 }
 
 

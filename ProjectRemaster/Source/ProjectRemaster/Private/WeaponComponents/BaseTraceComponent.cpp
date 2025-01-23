@@ -4,6 +4,7 @@
 #include "WeaponComponents/BaseTraceComponent.h"
 #include <Kismet/KismetSystemLibrary.h>
 #include <Kismet/KismetMathLibrary.h>
+#include "Components/CapsuleComponent.h"
 #include <Kismet/GameplayStatics.h>
 
 // Sets default values for this component's properties
@@ -22,6 +23,13 @@ void UBaseTraceComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+	/*CapsuleComp = GetOwner()->FindComponentByClass<UCapsuleComponent>();
+
+	if (CapsuleComp)
+	{
+		CapHalfHeight = CapsuleComp->GetScaledCapsuleHalfHeight();
+		UE_LOG(LogTemp, Error, TEXT("Half Height is: %f"), CapHalfHeight);
+	}*/
 	// ...
 	
 }
@@ -44,7 +52,7 @@ void UBaseTraceComponent::PerformTrace(const FVector& StartLocation, const FVect
 
 
 	FCollisionShape Capsule{
-		FCollisionShape::MakeCapsule(CapsuleRadius, CapsuleHalfHeight)
+		FCollisionShape::MakeCapsule(CapsuleRadius, HalfHeight)
 	};
 
 	FCollisionQueryParams IgnoreParams{
@@ -105,7 +113,15 @@ void UBaseTraceComponent::PerformTrace(const FVector& StartLocation, const FVect
 void UBaseTraceComponent::SetTraceLocationAndRotation()
 {
 	if (!StaticMeshComp) { return; }
+	/*if (CapsuleComp)
+	{
+		CapCenter = CapsuleComp->GetComponentLocation();
+		CapHalfHeight = CapsuleComp->GetScaledCapsuleHalfHeight();
+		CapsuleUpVector = CapsuleComp->GetUpVector();
 
+		TraceStart = CapCenter - (CapsuleUpVector * CapHalfHeight);
+		TraceEnd = CapCenter + (CapsuleUpVector * CapHalfHeight);
+	}*/
 	FVector StartSocketLocation{ StaticMeshComp->GetSocketLocation(Sockets.Start) };
 	FVector EndSocketLocation{ StaticMeshComp->GetSocketLocation(Sockets.End) };
 	FQuat SocketRotation{ StaticMeshComp->GetSocketQuaternion(Sockets.Rotation) };

@@ -78,10 +78,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-
-	virtual void RegisterPointOfEntry(const FVector& ImpactPoint, const FVector& ImpactNormal) override;
-
-	virtual void RegisterPointOfExit(const FVector& ExitPoint, const FVector& ExitNormal) override;
-
 	virtual bool GetIsOverlapping() override { return bIsOverlapping; }
+
+	virtual void SliceMesh_Implementation(const FVector& PlaneLocation, const FVector& PlaneNormal, const float ImpulseStrength, class UMaterialInstance* SliceMaterial) override;
 };

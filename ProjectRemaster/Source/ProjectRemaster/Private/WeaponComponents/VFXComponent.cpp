@@ -71,7 +71,12 @@ void UVFXComponent::HandleOverlap(AActor* HitActor, const FVector& HitLocation, 
 
 void UVFXComponent::HandleEndOverlap(AActor* EndOverlapActor)
 {
-	if (!EndOverlapActor) { return; }
+	UE_LOG(LogTemp, Error, TEXT("HandleEnd is being Called"));
+	if (!EndOverlapActor) 
+	{
+		UE_LOG(LogTemp, Error, TEXT("EndActor Is Null"));
+		return; 
+	}
 
 	if (ActiveParticles.Contains(EndOverlapActor))
 	{
@@ -79,11 +84,20 @@ void UVFXComponent::HandleEndOverlap(AActor* EndOverlapActor)
 
 		if (ParticleComp)
 		{
+			
 			ParticleComp->Deactivate();
 			ParticleComp->DestroyComponent();
+			ActiveParticles.Remove(EndOverlapActor);
+
+			int numParts = ActiveParticles.Num();
+			UE_LOG(LogTemp, Error, TEXT("Particle Should Stop here: %i"), numParts);
 		}
 
-		ActiveParticles.Remove(EndOverlapActor);
+		
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("ActiveParticles does NOT contain..."));
 	}
 }
 

@@ -25,6 +25,16 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	/*UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UCapsuleComponent* CapsuleComp;
+
+	FVector CapCenter;
+	float CapHalfHeight;
+	FVector CapsuleUpVector;
+
+	FVector TraceStart;
+	FVector TraceEnd;*/
+
 protected:
 
 	UPROPERTY(EditAnywhere, Category = "Trace Sockets")
@@ -37,7 +47,7 @@ protected:
 	TEnumAsByte<ECollisionChannel> TraceChannel;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	float CapsuleHalfHeight{ 8.0f };
+	float HalfHeight{ 8.0f };
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	float CapsuleRadius{ 4.0f };
