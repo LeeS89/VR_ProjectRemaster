@@ -38,6 +38,8 @@ void UTraceComponent::BeginPlay()
 
 	IPlayerRef = Cast<IMainPlayer>(CharacterRef);
 
+	if (!IPlayerRef) { return; }
+
 	InitializeHands();
 	
 }
@@ -71,7 +73,7 @@ void UTraceComponent::PerformGrabTrace(EOculusXRHandType HandToTrace, UCustomHan
 	{
 		CurrentGrabComp = LeftHandGrabComp;
 	}
-	else if (HandToTrace == EOculusXRHandType::HandRight)
+	else if (HandToTrace == EOculusXRHandType::HandRight) // Can refactor later to a single if using ternary operator
 	{
 		CurrentGrabComp = RightHandGrabComp;
 	}
@@ -107,7 +109,7 @@ void UTraceComponent::PerformGrabTrace(EOculusXRHandType HandToTrace, UCustomHan
 			SocketLocation,
 			SocketLocation,
 			SocketRotation,
-			ECollisionChannel::ECC_GameTraceChannel1,
+			ECollisionChannel::ECC_GameTraceChannel1, 
 			Capsule,
 			IgnoreParams
 		) };
@@ -153,6 +155,86 @@ void UTraceComponent::PerformGrabTrace(EOculusXRHandType HandToTrace, UCustomHan
 	CurrentGrabComp = nullptr;
 	//FVector SocketLocation{ RightHandGrabComp->GetSocketLocation(Socket.Start) };
 
+}
+
+void UTraceComponent::PerformBulletTrace(EOculusXRHandType HandToTrace, UCustomHandPoseRecognizer* PoseClass)
+{
+	if (!IPlayerRef) { return; }
+
+	if (HandToTrace == EOculusXRHandType::HandLeft)
+	{
+		CurrentGrabComp = LeftHandGrabComp;
+	}
+	else if (HandToTrace == EOculusXRHandType::HandRight) // Can refactor later to a single if using ternary operator
+	{
+		CurrentGrabComp = RightHandGrabComp;
+	}
+
+	if (!IsValid(CurrentGrabComp)) { return; }
+
+	for (const TPair<EOculusXRHandType, FTraceSockets>& Pair : HandSockets)
+	{
+		EOculusXRHandType Hand = Pair.Key;
+		FTraceSockets Sockets = Pair.Value;
+
+		if (Hand != HandToTrace)
+		{
+			continue;
+		}
+		FVector SocketLocation{ CurrentGrabComp->GetSocketLocation(Sockets.Start) };
+		FQuat SocketRotation{ CurrentGrabComp->GetSocketQuaternion(Sockets.Rotation) };
+
+		/*FCollisionShape Capsule{
+			FCollisionShape::MakeCapsule(CapsuleRadius  * 10,CapsuleHalfHeight * 10)
+		};*/
+		IPlayerRef->GetTraceLocation(BulletTraceLocation, BulletTraceRotation);
+		
+		FCollisionShape Sphere = FCollisionShape::MakeSphere(SphereRadius);
+
+		FCollisionQueryParams IgnoreParams{
+			FName{TEXT("Ignore Params")},
+			false,
+			GetOwner()
+		};
+		//TArray<FHitResult> OutResults;
+		TArray<FHitResult> OutResults;
+
+		bool bHasFoundTargets{ GetWorld()->SweepMultiByChannel(
+			OutResults,
+			BulletTraceLocation,
+			BulletTraceLocation,
+			BulletTraceRotation,
+			TraceChannel,
+			Sphere,
+			IgnoreParams
+		) };
+
+		if (bHasFoundTargets)
+		{
+			OnFreezeDelegate.Broadcast(OutResults);
+		}
+
+		if (!bDebugMode) { return; }
+
+		FVector CenterPoint{
+				UKismetMathLibrary::VLerp(
+					BulletTraceLocation, BulletTraceLocation, 0.5f
+				)
+		};
+
+		UKismetSystemLibrary::DrawDebugSphere(
+			GetWorld(),
+			CenterPoint,               // The center of the sphere
+			SphereRadius,// The radius of the sphere
+			12,                        // Segments for sphere detail (12 is a good default)
+			bHasFoundTargets ? FLinearColor::Green : FLinearColor::Red, // Sphere color
+			0.0f,                      // Duration (0 means one frame)
+			2.0f                       // Line thickness
+		);
+
+
+	}
+	//CurrentGrabComp = nullptr;
 }
 
 void UTraceComponent::ReleaseGrabbedActor()

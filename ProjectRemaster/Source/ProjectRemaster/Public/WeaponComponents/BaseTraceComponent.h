@@ -41,7 +41,7 @@ protected:
 	FTraceSockets Sockets;
 
 	UPROPERTY(VisibleAnywhere)
-	UStaticMeshComponent* StaticMeshComp;
+	UStaticMeshComponent* MeshComp;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Trace Channel")
 	TEnumAsByte<ECollisionChannel> TraceChannel;

@@ -16,6 +16,7 @@
 #include "CharacterComponents/LocomotionComponent.h"
 #include <Components/Image.h>
 #include "CharacterComponents/DamageHandler.h"
+#include "CharacterComponents/PlayerAbilitiesComponent.h"
 
 // Sets default values
 AMainCharacter::AMainCharacter()
@@ -78,6 +79,8 @@ AMainCharacter::AMainCharacter()
 	TraceComp = CreateDefaultSubobject<UTraceComponent>(TEXT("Trace Component"));
 
 	StatsComp = CreateDefaultSubobject<UStatsComponent>(TEXT("Stats Component"));
+
+	//AbilitiesComp = CreateDefaultSubobject<UPlayerAbilitiesComponent>(TEXT("Abilities Component"));
 
 	DamageHandlerComp = CreateDefaultSubobject<UDamageHandler>(TEXT("Damage Handler Component"));
 }
@@ -181,6 +184,12 @@ TEnumAsByte<EDamageType> AMainCharacter::GetCurrentStatus() const
 void AMainCharacter::UpdateStatusEffect(EDamageType NewStatus)
 {
 	StatsComp->StatusEffect = NewStatus; 
+}
+
+void AMainCharacter::GetTraceLocation(FVector& OutLocation, FQuat& OutRotation)
+{
+	OutLocation = DamageCollider->GetComponentLocation();
+	OutRotation = DamageCollider->GetComponentRotation().Quaternion();
 }
 
 

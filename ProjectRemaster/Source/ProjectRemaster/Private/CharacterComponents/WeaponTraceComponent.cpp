@@ -27,7 +27,7 @@ void UWeaponTraceComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	StaticMeshComp = GetOwner()->FindComponentByClass<UStaticMeshComponent>();
+	MeshComp = GetOwner()->FindComponentByClass<UStaticMeshComponent>();
 	
 }
 

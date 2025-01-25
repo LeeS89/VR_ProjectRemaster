@@ -14,13 +14,24 @@ DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_OneParam(
 	class UCustomHandPoseRecognizer*, PoseClass
 );
 
+DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_OneParam(
+	FOnFreezeSignature,
+	UTraceComponent, OnFreezeDelegate,
+	TArray<FHitResult>, OutResults
+);
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class PROJECTREMASTER_API UTraceComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
-	/*UPROPERTY(EditAnywhere)
-	TArray<FTraceSockets> BoneSockets;*/
+private:
+
+	UPROPERTY(VisibleAnywhere)
+	FVector BulletTraceLocation;
+
+	UPROPERTY(VisibleAnywhere)
+	FQuat BulletTraceRotation;
 
 	UPROPERTY(EditAnywhere)
 	TMap<EOculusXRHandType,FTraceSockets > HandSockets;
@@ -47,14 +58,26 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float CapsuleRadius{ 4.0f };
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float SphereRadius{ 4.0f };
+
 	UFUNCTION(BlueprintCallable)
 	void PerformGrabTrace(EOculusXRHandType HandToTrace, class UCustomHandPoseRecognizer* PoseClass);
 
 	UFUNCTION(BlueprintCallable)
+	void PerformBulletTrace(EOculusXRHandType HandToTrace, class UCustomHandPoseRecognizer* PoseClass);
+
+	UFUNCTION(BlueprintCallable)
 	void ReleaseGrabbedActor();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Trace Channel")
+	TEnumAsByte<ECollisionChannel> TraceChannel;
 
 	UPROPERTY(BlueprintAssignable)
 	FOnGrabSignature OnGrabDelegate;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnFreezeSignature OnFreezeDelegate;
 	
 protected:
 	// Called when the game starts
@@ -63,6 +86,9 @@ protected:
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	UFUNCTION(BlueprintCallable)
+	void SetTraceChannel(TEnumAsByte<ECollisionChannel> Channel) { TraceChannel = Channel; }
 
 private:
 

@@ -14,7 +14,7 @@ void UBulletTraceComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	StaticMeshComp = GetOwner()->FindComponentByClass<UStaticMeshComponent>();
+	//Old  MeshComp = GetOwner()->FindComponentByClass<UStaticMeshComponent>();
 
 	OwnerRef = GetOwner<ABulletBase>();
 }
@@ -51,22 +51,22 @@ void UBulletTraceComponent::HandleTraceResults(const TArray<FHitResult>& HitResu
 
 void UBulletTraceComponent::SetTraceLocationAndRotation()
 {
-	if (!StaticMeshComp) { return; }
+	// Old if (!MeshComp) { return; }
 
 	if (PreviousLocation.IsZero())
 	{
 		// Initialize PreviousLocation to the starting socket's position on the first frame
-		PreviousLocation = StaticMeshComp->GetSocketLocation(Sockets.Start);
+	  	// Old PreviousLocation = MeshComp->GetSocketLocation(Sockets.Start);
 	}
 
 	// StartLocation is the previous frame's position
 	FVector StartLocation = PreviousLocation;
 
 	// EndLocation is the current frame's socket end position
-	FVector EndLocation = StaticMeshComp->GetSocketLocation(Sockets.End);
+	// Old FVector EndLocation = MeshComp->GetSocketLocation(Sockets.End);
 
 	// Perform the trace from the last position to the current end position
-	PerformTrace(StartLocation, EndLocation, FQuat::Identity);
+	// Old PerformTrace(StartLocation, EndLocation, FQuat::Identity);
 
 	// Update PreviousLocation for the next frame
 	PreviousLocation = StartLocation;

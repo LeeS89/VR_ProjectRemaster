@@ -121,6 +121,11 @@ bool ABaseBullet::GetDeflectionHasBeenProcessed() const
 }
 
 
+void ABaseBullet::FreezeBullet()
+{
+	MovementComp->StopMovementImmediately();
+}
+
 void ABaseBullet::OnExpired()
 {
 	OnBulletHasExpired.Broadcast(this);

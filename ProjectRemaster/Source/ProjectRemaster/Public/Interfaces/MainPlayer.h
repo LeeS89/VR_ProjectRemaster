@@ -30,5 +30,5 @@ public:
 
 	virtual USceneComponent* GetTargetComponent() = 0;
 
-	
+	virtual void GetTraceLocation(FVector& OutLocation, FQuat& OutRotation) { return; }
 };

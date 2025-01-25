@@ -112,7 +112,7 @@ void UBaseTraceComponent::PerformTrace(const FVector& StartLocation, const FVect
 
 void UBaseTraceComponent::SetTraceLocationAndRotation()
 {
-	if (!StaticMeshComp) { return; }
+	if (!MeshComp) { return; }
 	/*if (CapsuleComp)
 	{
 		CapCenter = CapsuleComp->GetComponentLocation();
@@ -122,9 +122,9 @@ void UBaseTraceComponent::SetTraceLocationAndRotation()
 		TraceStart = CapCenter - (CapsuleUpVector * CapHalfHeight);
 		TraceEnd = CapCenter + (CapsuleUpVector * CapHalfHeight);
 	}*/
-	FVector StartSocketLocation{ StaticMeshComp->GetSocketLocation(Sockets.Start) };
-	FVector EndSocketLocation{ StaticMeshComp->GetSocketLocation(Sockets.End) };
-	FQuat SocketRotation{ StaticMeshComp->GetSocketQuaternion(Sockets.Rotation) };
+	FVector StartSocketLocation{ MeshComp->GetSocketLocation(Sockets.Start) };
+	FVector EndSocketLocation{ MeshComp->GetSocketLocation(Sockets.End) };
+	FQuat SocketRotation{ MeshComp->GetSocketQuaternion(Sockets.Rotation) };
 
 	PerformTrace(StartSocketLocation, EndSocketLocation, SocketRotation);
 }

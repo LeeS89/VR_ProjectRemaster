@@ -89,6 +89,7 @@ public:
 
 	virtual void SetHitHasBeenProcessed(bool HasBeenProcessed) override { bHasHitBeenProcesed = HasBeenProcessed; }
 
+	virtual void FreezeBullet() override;
 
 	UFUNCTION(BlueprintCallable)
 	virtual void OnExpired() override;

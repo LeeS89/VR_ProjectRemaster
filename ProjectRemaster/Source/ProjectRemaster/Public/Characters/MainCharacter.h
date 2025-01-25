@@ -66,20 +66,23 @@ public:
 
 
 	// Actor Components
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Locomotion")
 	class ULocomotionComponent* LocomotionComp;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Tracing")
 	class UTraceComponent* TraceComp;
 
+	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities")
+	class UPlayerAbilitiesComponent* AbilitiesComp;*/
 
+	// Out of bounds widget
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite, Category = "UI")
 	class UWidgetComponent* BlackoutWidgetComp;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TSubclassOf<class UUserWidget> BlackoutWidget;
 
-	//Damage Collider
+	//Damage Collider, stats component
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	class UBoxComponent* DamageCollider;
 
@@ -126,6 +129,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	virtual	void UpdateStatusEffect(EDamageType NewStatus) override;
+
+	UFUNCTION()
+	virtual void GetTraceLocation(FVector& OutLocation, FQuat& OutRotation) override;
 
 private:
 

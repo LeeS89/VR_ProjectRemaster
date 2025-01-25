@@ -36,4 +36,6 @@ public:
 
 	virtual void SetHitHasBeenProcessed(bool HasBeenProcessed) = 0;
 
+	virtual void FreezeBullet() { return; }
+
 };
