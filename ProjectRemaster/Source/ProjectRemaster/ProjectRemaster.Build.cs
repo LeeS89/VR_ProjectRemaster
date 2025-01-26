@@ -8,9 +8,13 @@ public class ProjectRemaster : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore","UMG", "HeadMountedDisplay", "OculusXRInput", "OculusHandPoseRecognition", "Niagara", "ProceduralMeshComponent" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore","UMG", "HeadMountedDisplay", "OculusXRInput", "OculusHandPoseRecognition", "Niagara", "ProceduralMeshComponent", "KismetCompiler" });
 
-		PrivateDependencyModuleNames.AddRange(new string[] {  });
+		PrivateDependencyModuleNames.AddRange(new string[] {  "Slate",
+            "SlateCore",
+            "BlueprintGraph",
+            "EditorStyle",    
+            "UnrealEd" });
 
 		// Uncomment if you are using Slate UI
 		// PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });

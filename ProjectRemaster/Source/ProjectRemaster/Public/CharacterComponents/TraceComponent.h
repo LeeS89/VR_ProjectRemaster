@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "Structs/FTraceSockets.h"
 #include "OculusXRInputFunctionLibrary.h"
+#include "Enums/ETraceType.h"
 #include "TraceComponent.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_OneParam(
@@ -46,6 +47,38 @@ private:
 	UPROPERTY(EditAnywhere)
 	bool bDebugMode{ false };
 
+	UFUNCTION()
+	void SetupTraceParams(
+		TEnumAsByte<ETraceType> TraceType,
+		TEnumAsByte<ECollisionChannel> Channel = ECollisionChannel::ECC_Visibility,
+		EOculusXRHandType HandToTrace = EOculusXRHandType::None,
+		class UCustomHandPoseRecognizer* PoseClass = nullptr,
+		const FVector& Start = FVector::ZeroVector,
+		const FVector& End = FVector::ZeroVector, const FRotator& Rot = FRotator::ZeroRotator,
+		float ShapeRadius = 5.0f, float HalfHeight = 0.0f, bool bDebugVisual = false
+	);
+
+	
+
+	UFUNCTION()
+	void PerformSingleTrace(
+		TEnumAsByte<ECollisionChannel> Channel = ECollisionChannel::ECC_Visibility,
+		EOculusXRHandType HandToTrace = EOculusXRHandType::None,
+		class UCustomHandPoseRecognizer* PoseClass = nullptr,
+		const FVector& Start = FVector::ZeroVector,
+		const FVector& End = FVector::ZeroVector, const FRotator& Rot = FRotator::ZeroRotator,
+		float ShapeRadius = 5.0f, float HalfHeight = 0.0f, bool bDebugVisual = false
+
+	);
+
+	UFUNCTION()
+	void PerformMultiTrace(
+		TEnumAsByte<ECollisionChannel> Channel = ECollisionChannel::ECC_Visibility,
+		const FVector& Start = FVector::ZeroVector,
+		const FVector& End = FVector::ZeroVector, const FRotator& Rot = FRotator::ZeroRotator,
+		float ShapeRadius = 5.0f, bool bDebugVisual = false
+	);
+
 public:	
 	// Sets default values for this component's properties
 	UTraceComponent();
@@ -64,8 +97,19 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void PerformGrabTrace(EOculusXRHandType HandToTrace, class UCustomHandPoseRecognizer* PoseClass);
 
+	
+
 	UFUNCTION(BlueprintCallable)
-	void PerformBulletTrace(EOculusXRHandType HandToTrace, class UCustomHandPoseRecognizer* PoseClass);
+	void PerformTrace(TEnumAsByte<ETraceType> TraceType,
+		TEnumAsByte<ECollisionChannel> Channel = ECollisionChannel::ECC_Visibility,
+		EOculusXRHandType HandToTrace = EOculusXRHandType::None, 
+		class UCustomHandPoseRecognizer* PoseClass = nullptr,
+		const FVector& Start = FVector::ZeroVector, 
+		const FVector& End = FVector::ZeroVector, const FRotator& Rot = FRotator::ZeroRotator,
+		float ShapeRadius = 5.0f, float HalfHeight = 0.0f, bool bDebugVisual = false
+		);
+
+	
 
 	UFUNCTION(BlueprintCallable)
 	void ReleaseGrabbedActor();

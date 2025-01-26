@@ -14,6 +14,9 @@
 #include "OculusXRInputFunctionLibrary.h"
 
 
+
+
+
 // Sets default values for this component's properties
 UTraceComponent::UTraceComponent()
 {
@@ -153,14 +156,31 @@ void UTraceComponent::PerformGrabTrace(EOculusXRHandType HandToTrace, UCustomHan
 
 	}
 	CurrentGrabComp = nullptr;
-	//FVector SocketLocation{ RightHandGrabComp->GetSocketLocation(Socket.Start) };
+	
 
 }
 
-void UTraceComponent::PerformBulletTrace(EOculusXRHandType HandToTrace, UCustomHandPoseRecognizer* PoseClass)
-{
-	if (!IPlayerRef) { return; }
 
+void UTraceComponent::SetupTraceParams(TEnumAsByte<ETraceType> TraceType, TEnumAsByte<ECollisionChannel> Channel, EOculusXRHandType HandToTrace, UCustomHandPoseRecognizer* PoseClass, const FVector& Start, const FVector& End, const FRotator& Rot, float ShapeRadius, float HalfHeight, bool bDebugVisual)
+{
+	if (TraceType == ETraceType::NoTrace) { return; }
+
+	switch (TraceType)
+	{
+	case ETraceType::BulletFreezeTrace:
+		PerformMultiTrace(Channel, Start, End, Rot, ShapeRadius, bDebugVisual);
+		break;
+	case ETraceType::GrabTrace:
+		PerformSingleTrace(Channel, HandToTrace, PoseClass, Start, End, Rot, ShapeRadius, HalfHeight, bDebugVisual);
+		break;
+	default:
+		UE_LOG(LogTemp, Warning, TEXT("No Trace type Selected"));
+		break;
+	}
+}
+
+void UTraceComponent::PerformSingleTrace(TEnumAsByte<ECollisionChannel> Channel, EOculusXRHandType HandToTrace, UCustomHandPoseRecognizer* PoseClass, const FVector& Start, const FVector& End, const FRotator& Rot, float ShapeRadius, float HalfHeight, bool bDebugVisual)
+{
 	if (HandToTrace == EOculusXRHandType::HandLeft)
 	{
 		CurrentGrabComp = LeftHandGrabComp;
@@ -184,12 +204,9 @@ void UTraceComponent::PerformBulletTrace(EOculusXRHandType HandToTrace, UCustomH
 		FVector SocketLocation{ CurrentGrabComp->GetSocketLocation(Sockets.Start) };
 		FQuat SocketRotation{ CurrentGrabComp->GetSocketQuaternion(Sockets.Rotation) };
 
-		/*FCollisionShape Capsule{
-			FCollisionShape::MakeCapsule(CapsuleRadius  * 10,CapsuleHalfHeight * 10)
-		};*/
-		IPlayerRef->GetTraceLocation(BulletTraceLocation, BulletTraceRotation);
-		
-		FCollisionShape Sphere = FCollisionShape::MakeSphere(SphereRadius);
+		FCollisionShape Capsule{
+			FCollisionShape::MakeCapsule(ShapeRadius,HalfHeight)
+		};
 
 		FCollisionQueryParams IgnoreParams{
 			FName{TEXT("Ignore Params")},
@@ -197,44 +214,122 @@ void UTraceComponent::PerformBulletTrace(EOculusXRHandType HandToTrace, UCustomH
 			GetOwner()
 		};
 		//TArray<FHitResult> OutResults;
-		TArray<FHitResult> OutResults;
+		FHitResult OutResult;
 
-		bool bHasFoundTargets{ GetWorld()->SweepMultiByChannel(
-			OutResults,
-			BulletTraceLocation,
-			BulletTraceLocation,
-			BulletTraceRotation,
-			TraceChannel,
-			Sphere,
+		bool bHasFoundTargets{ GetWorld()->SweepSingleByChannel(
+			OutResult,
+			SocketLocation,
+			SocketLocation,
+			SocketRotation,
+			Channel,//ECollisionChannel::ECC_GameTraceChannel1,
+			Capsule,
 			IgnoreParams
 		) };
 
 		if (bHasFoundTargets)
 		{
-			OnFreezeDelegate.Broadcast(OutResults);
+
+			if (OutResult.GetActor()->Implements<UGrabbableObject>())
+			{
+				CurrentGrabbedActor = OutResult.GetActor();
+				IGrabbableObject* GrabbableInterface = Cast<IGrabbableObject>(CurrentGrabbedActor);
+
+				if (!GrabbableInterface->IsGrabbed())
+				{
+					OnGrabDelegate.Broadcast(PoseClass);
+
+					GrabbableInterface->Execute_OnGrabbed(CurrentGrabbedActor, CurrentGrabComp, Sockets.WeaponSocket);
+				}
+			}
+		}
+		
+
+		if (bDebugMode)
+		{
+
+			FVector CenterPoint{
+					UKismetMathLibrary::VLerp(
+						SocketLocation, SocketLocation, 0.5f
+					)
+			};
+
+			UKismetSystemLibrary::DrawDebugCapsule(
+				GetWorld(),
+				CenterPoint,
+				Capsule.GetCapsuleHalfHeight(),
+				Capsule.GetCapsuleRadius(),
+				SocketRotation.Rotator(),
+				bHasFoundTargets ? FLinearColor::Green : FLinearColor::Red,
+				0.5f,
+				2.0f
+
+			);
 		}
 
-		if (!bDebugMode) { return; }
-
-		FVector CenterPoint{
-				UKismetMathLibrary::VLerp(
-					BulletTraceLocation, BulletTraceLocation, 0.5f
-				)
-		};
-
-		UKismetSystemLibrary::DrawDebugSphere(
-			GetWorld(),
-			CenterPoint,               // The center of the sphere
-			SphereRadius,// The radius of the sphere
-			12,                        // Segments for sphere detail (12 is a good default)
-			bHasFoundTargets ? FLinearColor::Green : FLinearColor::Red, // Sphere color
-			0.0f,                      // Duration (0 means one frame)
-			2.0f                       // Line thickness
-		);
-
-
 	}
-	//CurrentGrabComp = nullptr;
+	CurrentGrabComp = nullptr;
+
+}
+
+void UTraceComponent::PerformMultiTrace(TEnumAsByte<ECollisionChannel> Channel, const FVector& Start, const FVector& End, const FRotator& Rot, float ShapeRadius, bool bDebugVisual)
+{
+	if (Start == FVector::ZeroVector || End == FVector::ZeroVector) { return; }
+
+	FCollisionShape Sphere = FCollisionShape::MakeSphere(ShapeRadius);
+
+	FCollisionQueryParams IgnoreParams{
+		FName{TEXT("Ignore Params")},
+		false,
+		GetOwner()
+	};
+
+	TArray<FHitResult> OutResults;
+
+	bool bHasFoundTargets{ GetWorld()->SweepMultiByChannel(
+		OutResults,
+		Start,
+		End,
+		Rot.Quaternion(),
+		Channel,
+		Sphere,
+		IgnoreParams
+	) };
+
+	if (bHasFoundTargets)
+	{
+		OnFreezeDelegate.Broadcast(OutResults);
+	}
+
+	if (!bDebugVisual) { return; }
+
+	FVector CenterPoint{
+			UKismetMathLibrary::VLerp(
+				Start, End, 0.5f
+			)
+	};
+
+	UKismetSystemLibrary::DrawDebugSphere(
+		GetWorld(),
+		CenterPoint,               // The center of the sphere
+		ShapeRadius,// The radius of the sphere
+		12,                        // Segments for sphere detail (12 is a good default)
+		bHasFoundTargets ? FLinearColor::Green : FLinearColor::Red, // Sphere color
+		0.0f,                      // Duration (0 means one frame)
+		2.0f                       // Line thickness
+	);
+}
+
+//void UTraceComponent::StartTrace(TEnumAsByte<ETraceType> TraceType, TEnumAsByte<ECollisionChannel> Channel, EOculusXRHandType HandToTrace, UCustomHandPoseRecognizer* PoseClass, const FVector& Start, const FVector& End, const FRotator& Rot, float ShapeRadius, float HalfHeight, bool bDebugVisual)
+//{
+//	if (TraceType == ETraceType::NoTrace) { return; }
+//}
+
+
+void UTraceComponent::PerformTrace(TEnumAsByte<ETraceType> TraceType = ETraceType::NoTrace, TEnumAsByte<ECollisionChannel> Channel, EOculusXRHandType HandToTrace, UCustomHandPoseRecognizer* PoseClass, const FVector& Start, const FVector& End, const FRotator& Rot, float ShapeRadius, float HalfHeight, bool bDebugVisual)
+{
+	if (TraceType == ETraceType::NoTrace) { return; }
+
+	SetupTraceParams(TraceType, Channel, HandToTrace, PoseClass, Start, End, Rot, ShapeRadius, HalfHeight, bDebugVisual);
 }
 
 void UTraceComponent::ReleaseGrabbedActor()

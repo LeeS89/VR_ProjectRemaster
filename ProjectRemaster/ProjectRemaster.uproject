@@ -12,8 +12,8 @@
 				"Engine",
 				"OculusXRInput",
 				"OculusHandPoseRecognition",
-				"CoreUObject"
-				
+				"CoreUObject",
+				"BlueprintGraph"
 			]
 		}
 	],
