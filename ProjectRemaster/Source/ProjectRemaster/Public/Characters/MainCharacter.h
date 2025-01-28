@@ -101,7 +101,6 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	UCapsuleComponent* PlayerCapsuleComp;
 
-	virtual TArray<class UCustomXRHandComponent*> GetHandComponents() override;
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -130,8 +129,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual	void UpdateStatusEffect(EDamageType NewStatus) override;
 
-	UFUNCTION()
-	virtual void GetTraceLocation(FVector& OutLocation, FQuat& OutRotation) override;
+	/*UFUNCTION()
+	virtual void GetTraceLocation(FVector& OutLocation, FQuat& OutRotation) override;*/
 
 private:
 

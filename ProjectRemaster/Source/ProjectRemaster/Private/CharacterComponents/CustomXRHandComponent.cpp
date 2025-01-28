@@ -5,6 +5,4 @@
 
 UCustomXRHandComponent::UCustomXRHandComponent()
 {
-	GrabHandSide = EHand::None;
-
 }

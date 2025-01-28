@@ -14,7 +14,7 @@
 ABaseWeapon::ABaseWeapon()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	/*RootComp = CreateDefaultSubobject<USceneComponent>(TEXT("Root Component"));
 	RootComponent = RootComp;*/
@@ -46,9 +46,12 @@ void ABaseWeapon::Tick(float DeltaTime)
 
 void ABaseWeapon::OnGrabbed_Implementation(UCustomXRHandComponent* HandComponent, FName SocketName)
 {
+	if (!HandComponent) { return; }
+
 	bIsGrabbed = true;
 	OnWeaponGrabbedDelegate.Broadcast();
 	AttachToComponent(HandComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale, SocketName);
+	HandComponent->SetGrabbedActor(this);
 
 	CharacterRef = HandComponent->GetOwner<AMainCharacter>();
 	if (!CharacterRef) { return; }

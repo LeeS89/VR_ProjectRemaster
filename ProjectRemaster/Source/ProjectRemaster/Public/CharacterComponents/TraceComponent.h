@@ -4,16 +4,22 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "Structs/FTraceSockets.h"
 #include "OculusXRInputFunctionLibrary.h"
 #include "Enums/ETraceType.h"
 #include "TraceComponent.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_OneParam(
-	FOnGrabSignature,
-	UTraceComponent, OnGrabDelegate,
-	class UCustomHandPoseRecognizer*, PoseClass
+
+class UCustomXRHandComponent;
+
+DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_ThreeParams(
+	FOnTryGrabSignature,
+	UTraceComponent, OnTryGrabDelegate,
+	class UCustomHandPoseRecognizer*, PoseClass,
+	AActor*, ActorToGrab,
+	UCustomXRHandComponent*, GrabbingHand
 );
+
+
 
 DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_OneParam(
 	FOnFreezeSignature,
@@ -27,82 +33,64 @@ class PROJECTREMASTER_API UTraceComponent : public UActorComponent
 	GENERATED_BODY()
 
 private:
-
-	UPROPERTY(VisibleAnywhere)
-	FVector BulletTraceLocation;
-
-	UPROPERTY(VisibleAnywhere)
-	FQuat BulletTraceRotation;
-
-	UPROPERTY(EditAnywhere)
-	TMap<EOculusXRHandType,FTraceSockets > HandSockets;
-
-	class UCustomXRHandComponent* LeftHandGrabComp;
-	class UCustomXRHandComponent* RightHandGrabComp;
-
-	class UCustomXRHandComponent* CurrentGrabComp;
-
-	class IMainPlayer* IPlayerRef;
-
-	UPROPERTY(EditAnywhere)
-	bool bDebugMode{ false };
-
+	
 	UFUNCTION()
 	void SetupTraceParams(
 		TEnumAsByte<ETraceType> TraceType,
-		TEnumAsByte<ECollisionChannel> Channel = ECollisionChannel::ECC_Visibility,
-		EOculusXRHandType HandToTrace = EOculusXRHandType::None,
-		class UCustomHandPoseRecognizer* PoseClass = nullptr,
+		TEnumAsByte<ECollisionChannel> Channel,
+		UCustomXRHandComponent* GrabHand,
+		class UCustomHandPoseRecognizer* PoseClass,
 		const FVector& Start = FVector::ZeroVector,
 		const FVector& End = FVector::ZeroVector, const FRotator& Rot = FRotator::ZeroRotator,
-		float ShapeRadius = 5.0f, float HalfHeight = 0.0f, bool bDebugVisual = false
+		float ShapeRadius = 0.0f, float HalfHeight = 0.0f, bool bDebugVisual = false
 	);
 
 	
 
 	UFUNCTION()
 	void PerformSingleTrace(
-		TEnumAsByte<ECollisionChannel> Channel = ECollisionChannel::ECC_Visibility,
-		EOculusXRHandType HandToTrace = EOculusXRHandType::None,
-		class UCustomHandPoseRecognizer* PoseClass = nullptr,
+		TEnumAsByte<ECollisionChannel> Channel,
+		UCustomXRHandComponent* GrabHand,
+		class UCustomHandPoseRecognizer* PoseClass,
 		const FVector& Start = FVector::ZeroVector,
 		const FVector& End = FVector::ZeroVector, const FRotator& Rot = FRotator::ZeroRotator,
-		float ShapeRadius = 5.0f, float HalfHeight = 0.0f, bool bDebugVisual = false
+		float ShapeRadius = 0.0f, float HalfHeight = 0.0f, bool bDebugVisual = false
 
 	);
 
+	// Moving to Abilities Component - Broadcasting Event Here Instead
+	UFUNCTION()
+	void HandleGrabResult(class UCustomHandPoseRecognizer* PoseClass, AActor* ActorToGrab, UCustomXRHandComponent* GrabHand);
+
 	UFUNCTION()
 	void PerformMultiTrace(
-		TEnumAsByte<ECollisionChannel> Channel = ECollisionChannel::ECC_Visibility,
+		TEnumAsByte<ECollisionChannel> Channel,
 		const FVector& Start = FVector::ZeroVector,
 		const FVector& End = FVector::ZeroVector, const FRotator& Rot = FRotator::ZeroRotator,
-		float ShapeRadius = 5.0f, bool bDebugVisual = false
+		float ShapeRadius = 0.0f, bool bDebugVisual = false
 	);
 
 public:	
 	// Sets default values for this component's properties
 	UTraceComponent();
 
-	AActor* CurrentGrabbedActor;
-
+	//Redundant
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float CapsuleHalfHeight{ 8.0f };
 
+	//Redundant
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float CapsuleRadius{ 4.0f };
 
+	//Redundant
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float SphereRadius{ 4.0f };
 
-	UFUNCTION(BlueprintCallable)
-	void PerformGrabTrace(EOculusXRHandType HandToTrace, class UCustomHandPoseRecognizer* PoseClass);
-
 	
-
 	UFUNCTION(BlueprintCallable)
 	void PerformTrace(TEnumAsByte<ETraceType> TraceType,
 		TEnumAsByte<ECollisionChannel> Channel = ECollisionChannel::ECC_Visibility,
-		EOculusXRHandType HandToTrace = EOculusXRHandType::None, 
+		UCustomXRHandComponent* GrabHand = nullptr,
 		class UCustomHandPoseRecognizer* PoseClass = nullptr,
 		const FVector& Start = FVector::ZeroVector, 
 		const FVector& End = FVector::ZeroVector, const FRotator& Rot = FRotator::ZeroRotator,
@@ -110,15 +98,8 @@ public:
 		);
 
 	
-
-	UFUNCTION(BlueprintCallable)
-	void ReleaseGrabbedActor();
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Trace Channel")
-	TEnumAsByte<ECollisionChannel> TraceChannel;
-
 	UPROPERTY(BlueprintAssignable)
-	FOnGrabSignature OnGrabDelegate;
+	FOnTryGrabSignature OnTryGrabDelegate;
 
 	UPROPERTY(BlueprintAssignable)
 	FOnFreezeSignature OnFreezeDelegate;
@@ -131,11 +112,4 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	UFUNCTION(BlueprintCallable)
-	void SetTraceChannel(TEnumAsByte<ECollisionChannel> Channel) { TraceChannel = Channel; }
-
-private:
-
-	void InitializeHands();
-	
 };

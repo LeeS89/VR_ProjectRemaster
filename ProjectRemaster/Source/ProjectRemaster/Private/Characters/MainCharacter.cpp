@@ -22,7 +22,7 @@
 AMainCharacter::AMainCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 
 	VROrigin = CreateDefaultSubobject<USceneComponent>(TEXT("Scene Component"));
@@ -100,14 +100,7 @@ void AMainCharacter::BeginPlay()
 	}*/
 	OnTakeAnyDamage.AddDynamic(this, &AMainCharacter::OnReceiveAnyDamage);
 
-	if (OnTakeAnyDamage.IsBound())
-	{
-		UE_LOG(LogTemp, Error, TEXT("Take Damage is bound"));
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("No Take Damage bindings"));
-	}
+	
 
 	if (BlackoutWidget)
 	{
@@ -122,26 +115,12 @@ void AMainCharacter::BeginPlay()
 	
 }
 
-TArray<class UCustomXRHandComponent*> AMainCharacter::GetHandComponents()
-{
-	TArray<UCustomXRHandComponent*> HandComponents;
-
-	HandComponents.Add(LeftXRHandComp);
-	HandComponents.Add(RightXRHandComp);
-
-	return HandComponents;
-}
 
 // Called every frame
 void AMainCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	/*float HeadHeight = VRCameraComp->GetComponentLocation().Z;
-
-	float NewHalfHeight{ FMath::Clamp(HeadHeight, PlayerCapsuleMinHeight, PlayerCapsuleMaxHeight) };
-
-	PlayerCapsuleComp->SetCapsuleHalfHeight(NewHalfHeight / 2.0f);*/
 }
 
 // Called to bind functionality to input
@@ -186,20 +165,18 @@ void AMainCharacter::UpdateStatusEffect(EDamageType NewStatus)
 	StatsComp->StatusEffect = NewStatus; 
 }
 
-void AMainCharacter::GetTraceLocation(FVector& OutLocation, FQuat& OutRotation)
-{
-	OutLocation = DamageCollider->GetComponentLocation();
-	OutRotation = DamageCollider->GetComponentRotation().Quaternion();
-}
+//void AMainCharacter::GetTraceLocation(FVector& OutLocation, FQuat& OutRotation)
+//{
+//	OutLocation = DamageCollider->GetComponentLocation();
+//	OutRotation = DamageCollider->GetComponentRotation().Quaternion();
+//}
 
 
 void AMainCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (OtherActor && OtherActor != this)
 	{
-		//UE_LOG(LogTemp, Error, TEXT("Overlapping with: %s"), *OtherActor->GetName());
-		//if (OtherComp->GetCollisionObjectType() == ECC_GameTraceChannel3)
-		//{
+		
 
 		if (BlackoutWidget)
 		{
@@ -214,17 +191,9 @@ void AMainCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor*
 				BlackoutImage->SetColorAndOpacity(NewColor);
 				//BlackoutImage->SetRenderOpacity(1.0f); // Fully visible
 			}
-			else
-			{
-				UE_LOG(LogTemp, Error, TEXT("BLACKOUT SHOULD WORK!!!!!!!!!!!!!!!!!!!!!!"));
-			}
+			
 		}
-		
-		//}
-
 	}
-
-	
 }
 
 

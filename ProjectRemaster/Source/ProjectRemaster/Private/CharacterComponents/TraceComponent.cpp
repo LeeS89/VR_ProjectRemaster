@@ -2,13 +2,8 @@
 
 
 #include "CharacterComponents/TraceComponent.h"
-#include "GameFramework/Character.h"
-#include "Interfaces/MainPlayer.h"
 #include "Interfaces/GrabbableObject.h"
-#include "Enums/EHand.h"
-#include "Structs/FTraceSockets.h"
 #include "CharacterComponents/CustomXRHandComponent.h"
-#include "Components/SkeletalMeshComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "OculusXRInputFunctionLibrary.h"
@@ -22,7 +17,7 @@ UTraceComponent::UTraceComponent()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bCanEverTick = false;
 
 	// ...
 }
@@ -33,135 +28,18 @@ void UTraceComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	ACharacter* CharacterRef{ GetOwner<ACharacter>() };
-
-	if (!IsValid(CharacterRef)) { return; }
-
-	if (!CharacterRef->Implements<UMainPlayer>()) { return; }
-
-	IPlayerRef = Cast<IMainPlayer>(CharacterRef);
-
-	if (!IPlayerRef) { return; }
-
-	InitializeHands();
-	
 }
 
-void UTraceComponent::InitializeHands()
+
+void UTraceComponent::PerformTrace(TEnumAsByte<ETraceType> TraceType, TEnumAsByte<ECollisionChannel> Channel, UCustomXRHandComponent* GrabHand, UCustomHandPoseRecognizer* PoseClass, const FVector& Start, const FVector& End, const FRotator& Rot, float ShapeRadius, float HalfHeight, bool bDebugVisual)
 {
-	TArray<UCustomXRHandComponent*> HandComponents = IPlayerRef->GetHandComponents();
+	if (TraceType == ETraceType::NoTrace) { return; }
 
-	for (UCustomXRHandComponent* HandComponent : HandComponents)
-	{
-		if (HandComponent)
-		{
-			EHand CurrentHandType = HandComponent->GrabHandSide;
-
-			if (CurrentHandType == EHand::Left)
-			{
-				LeftHandGrabComp = HandComponent;
-			}
-			else if (CurrentHandType == EHand::Right)
-			{
-				RightHandGrabComp = HandComponent;
-			}
-		}
-	}
+	SetupTraceParams(TraceType, Channel, GrabHand, PoseClass, Start, End, Rot, ShapeRadius, HalfHeight, bDebugVisual);
 }
 
 
-void UTraceComponent::PerformGrabTrace(EOculusXRHandType HandToTrace, UCustomHandPoseRecognizer* PoseClass)
-{
-	if (HandToTrace == EOculusXRHandType::HandLeft)
-	{
-		CurrentGrabComp = LeftHandGrabComp;
-	}
-	else if (HandToTrace == EOculusXRHandType::HandRight) // Can refactor later to a single if using ternary operator
-	{
-		CurrentGrabComp = RightHandGrabComp;
-	}
-
-	if (!IsValid(CurrentGrabComp)) { return; }
-
-	for (const TPair<EOculusXRHandType, FTraceSockets>& Pair : HandSockets)
-	{
-		EOculusXRHandType Hand = Pair.Key;
-		FTraceSockets Sockets = Pair.Value;
-
-		if (Hand != HandToTrace)
-		{
-			continue;
-		}
-		FVector SocketLocation{ CurrentGrabComp->GetSocketLocation(Sockets.Start) };
-		FQuat SocketRotation{ CurrentGrabComp->GetSocketQuaternion(Sockets.Rotation) };
-
-		FCollisionShape Capsule{
-			FCollisionShape::MakeCapsule(CapsuleRadius,CapsuleHalfHeight)
-		};
-
-		FCollisionQueryParams IgnoreParams{
-			FName{TEXT("Ignore Params")},
-			false,
-			GetOwner()
-		};
-		//TArray<FHitResult> OutResults;
-		FHitResult OutResult;
-
-		bool bHasFoundTargets{ GetWorld()->SweepSingleByChannel(
-			OutResult,
-			SocketLocation,
-			SocketLocation,
-			SocketRotation,
-			ECollisionChannel::ECC_GameTraceChannel1, 
-			Capsule,
-			IgnoreParams
-		) };
-
-		if (bHasFoundTargets)
-		{
-		
-			if (OutResult.GetActor()->Implements<UGrabbableObject>())
-			{
-				CurrentGrabbedActor = OutResult.GetActor();
-				IGrabbableObject* GrabbableInterface = Cast<IGrabbableObject>(CurrentGrabbedActor);
-
-				if (!GrabbableInterface->IsGrabbed())
-				{
-					OnGrabDelegate.Broadcast(PoseClass);
-
-					GrabbableInterface->Execute_OnGrabbed(CurrentGrabbedActor, CurrentGrabComp, Sockets.WeaponSocket);
-				}
-			}
-		}
-
-		if (!bDebugMode) { return; }
-
-		FVector CenterPoint{
-				UKismetMathLibrary::VLerp(
-					SocketLocation, SocketLocation, 0.5f
-				)
-		};
-
-		UKismetSystemLibrary::DrawDebugCapsule(
-			GetWorld(),
-			CenterPoint,
-			Capsule.GetCapsuleHalfHeight(),
-			Capsule.GetCapsuleRadius(),
-			SocketRotation.Rotator(),
-			bHasFoundTargets ? FLinearColor::Green : FLinearColor::Red,
-			0.5f,
-			2.0f
-
-		);
-
-	}
-	CurrentGrabComp = nullptr;
-	
-
-}
-
-
-void UTraceComponent::SetupTraceParams(TEnumAsByte<ETraceType> TraceType, TEnumAsByte<ECollisionChannel> Channel, EOculusXRHandType HandToTrace, UCustomHandPoseRecognizer* PoseClass, const FVector& Start, const FVector& End, const FRotator& Rot, float ShapeRadius, float HalfHeight, bool bDebugVisual)
+void UTraceComponent::SetupTraceParams(TEnumAsByte<ETraceType> TraceType, TEnumAsByte<ECollisionChannel> Channel, UCustomXRHandComponent* GrabHand, UCustomHandPoseRecognizer* PoseClass, const FVector& Start, const FVector& End, const FRotator& Rot, float ShapeRadius, float HalfHeight, bool bDebugVisual)
 {
 	if (TraceType == ETraceType::NoTrace) { return; }
 
@@ -171,7 +49,7 @@ void UTraceComponent::SetupTraceParams(TEnumAsByte<ETraceType> TraceType, TEnumA
 		PerformMultiTrace(Channel, Start, End, Rot, ShapeRadius, bDebugVisual);
 		break;
 	case ETraceType::GrabTrace:
-		PerformSingleTrace(Channel, HandToTrace, PoseClass, Start, End, Rot, ShapeRadius, HalfHeight, bDebugVisual);
+		PerformSingleTrace(Channel, GrabHand, PoseClass, Start, End, Rot, ShapeRadius, HalfHeight, bDebugVisual);
 		break;
 	default:
 		UE_LOG(LogTemp, Warning, TEXT("No Trace type Selected"));
@@ -179,95 +57,70 @@ void UTraceComponent::SetupTraceParams(TEnumAsByte<ETraceType> TraceType, TEnumA
 	}
 }
 
-void UTraceComponent::PerformSingleTrace(TEnumAsByte<ECollisionChannel> Channel, EOculusXRHandType HandToTrace, UCustomHandPoseRecognizer* PoseClass, const FVector& Start, const FVector& End, const FRotator& Rot, float ShapeRadius, float HalfHeight, bool bDebugVisual)
+void UTraceComponent::PerformSingleTrace(TEnumAsByte<ECollisionChannel> Channel, UCustomXRHandComponent* GrabHand, UCustomHandPoseRecognizer* PoseClass, const FVector& Start, const FVector& End, const FRotator& Rot, float ShapeRadius, float HalfHeight, bool bDebugVisual)
 {
-	if (HandToTrace == EOculusXRHandType::HandLeft)
-	{
-		CurrentGrabComp = LeftHandGrabComp;
-	}
-	else if (HandToTrace == EOculusXRHandType::HandRight) // Can refactor later to a single if using ternary operator
-	{
-		CurrentGrabComp = RightHandGrabComp;
-	}
+	if (Start == FVector::ZeroVector) { return; }
 
-	if (!IsValid(CurrentGrabComp)) { return; }
+	FCollisionShape Capsule{
+		FCollisionShape::MakeCapsule(ShapeRadius,HalfHeight)
+	};
 
-	for (const TPair<EOculusXRHandType, FTraceSockets>& Pair : HandSockets)
+	FCollisionQueryParams IgnoreParams{
+		FName{TEXT("Ignore Params")},
+		false,
+		GetOwner()
+	};
+
+	FHitResult OutResult;
+
+	bool bHasFoundTargets{ GetWorld()->SweepSingleByChannel(
+		OutResult,
+		Start,
+		End,
+		Rot.Quaternion(),
+		Channel,
+		Capsule,
+		IgnoreParams
+	) };
+
+	if (bHasFoundTargets)
 	{
-		EOculusXRHandType Hand = Pair.Key;
-		FTraceSockets Sockets = Pair.Value;
-
-		if (Hand != HandToTrace)
+		if (GrabHand)
 		{
-			continue;
+			HandleGrabResult(PoseClass, OutResult.GetActor(), GrabHand);
 		}
-		FVector SocketLocation{ CurrentGrabComp->GetSocketLocation(Sockets.Start) };
-		FQuat SocketRotation{ CurrentGrabComp->GetSocketQuaternion(Sockets.Rotation) };
+	}
 
-		FCollisionShape Capsule{
-			FCollisionShape::MakeCapsule(ShapeRadius,HalfHeight)
+	if (bDebugVisual)
+	{
+
+		FVector CenterPoint{
+				UKismetMathLibrary::VLerp(
+					Start, End, 0.5f
+				)
 		};
 
-		FCollisionQueryParams IgnoreParams{
-			FName{TEXT("Ignore Params")},
-			false,
-			GetOwner()
-		};
-		//TArray<FHitResult> OutResults;
-		FHitResult OutResult;
+		UKismetSystemLibrary::DrawDebugCapsule(
+			GetWorld(),
+			CenterPoint,
+			Capsule.GetCapsuleHalfHeight(),
+			Capsule.GetCapsuleRadius(),
+			Rot,
+			bHasFoundTargets ? FLinearColor::Green : FLinearColor::Red,
+			0.5f,
+			2.0f
 
-		bool bHasFoundTargets{ GetWorld()->SweepSingleByChannel(
-			OutResult,
-			SocketLocation,
-			SocketLocation,
-			SocketRotation,
-			Channel,//ECollisionChannel::ECC_GameTraceChannel1,
-			Capsule,
-			IgnoreParams
-		) };
-
-		if (bHasFoundTargets)
-		{
-
-			if (OutResult.GetActor()->Implements<UGrabbableObject>())
-			{
-				CurrentGrabbedActor = OutResult.GetActor();
-				IGrabbableObject* GrabbableInterface = Cast<IGrabbableObject>(CurrentGrabbedActor);
-
-				if (!GrabbableInterface->IsGrabbed())
-				{
-					OnGrabDelegate.Broadcast(PoseClass);
-
-					GrabbableInterface->Execute_OnGrabbed(CurrentGrabbedActor, CurrentGrabComp, Sockets.WeaponSocket);
-				}
-			}
-		}
-		
-
-		if (bDebugMode)
-		{
-
-			FVector CenterPoint{
-					UKismetMathLibrary::VLerp(
-						SocketLocation, SocketLocation, 0.5f
-					)
-			};
-
-			UKismetSystemLibrary::DrawDebugCapsule(
-				GetWorld(),
-				CenterPoint,
-				Capsule.GetCapsuleHalfHeight(),
-				Capsule.GetCapsuleRadius(),
-				SocketRotation.Rotator(),
-				bHasFoundTargets ? FLinearColor::Green : FLinearColor::Red,
-				0.5f,
-				2.0f
-
-			);
-		}
-
+		);
 	}
-	CurrentGrabComp = nullptr;
+
+}
+
+void UTraceComponent::HandleGrabResult(UCustomHandPoseRecognizer* PoseClass, AActor* ActorToGrab, UCustomXRHandComponent* GrabHand)
+{
+	if (!ActorToGrab->Implements<UGrabbableObject>()) { return; }
+
+	OnTryGrabDelegate.Broadcast(PoseClass, ActorToGrab, GrabHand);
+	
 
 }
 
@@ -319,37 +172,131 @@ void UTraceComponent::PerformMultiTrace(TEnumAsByte<ECollisionChannel> Channel, 
 	);
 }
 
-//void UTraceComponent::StartTrace(TEnumAsByte<ETraceType> TraceType, TEnumAsByte<ECollisionChannel> Channel, EOculusXRHandType HandToTrace, UCustomHandPoseRecognizer* PoseClass, const FVector& Start, const FVector& End, const FRotator& Rot, float ShapeRadius, float HalfHeight, bool bDebugVisual)
-//{
-//	if (TraceType == ETraceType::NoTrace) { return; }
-//}
-
-
-void UTraceComponent::PerformTrace(TEnumAsByte<ETraceType> TraceType = ETraceType::NoTrace, TEnumAsByte<ECollisionChannel> Channel, EOculusXRHandType HandToTrace, UCustomHandPoseRecognizer* PoseClass, const FVector& Start, const FVector& End, const FRotator& Rot, float ShapeRadius, float HalfHeight, bool bDebugVisual)
-{
-	if (TraceType == ETraceType::NoTrace) { return; }
-
-	SetupTraceParams(TraceType, Channel, HandToTrace, PoseClass, Start, End, Rot, ShapeRadius, HalfHeight, bDebugVisual);
-}
-
-void UTraceComponent::ReleaseGrabbedActor()
-{
-	if (CurrentGrabbedActor && CurrentGrabbedActor->Implements<UGrabbableObject>())
-	{
-		IGrabbableObject::Execute_OnReleased(CurrentGrabbedActor);
-		CurrentGrabbedActor = nullptr;
-	}
-}
-
 
 // Called every frame
 void UTraceComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	//TArray<FHitResult> AllResults;
+}
 
-	if (!IsValid(RightHandGrabComp) || !IsValid(LeftHandGrabComp)) { return; }
+#pragma region Redundant
+//void UTraceComponent::PerformGrabTrace(EOculusXRHandType HandToTrace, UCustomHandPoseRecognizer* PoseClass)
+//{
+//	if (HandToTrace == EOculusXRHandType::HandLeft)
+//	{
+//		CurrentGrabComp = LeftHandGrabComp;
+//	}
+//	else if (HandToTrace == EOculusXRHandType::HandRight) // Can refactor later to a single if using ternary operator
+//	{
+//		CurrentGrabComp = RightHandGrabComp;
+//	}
+//
+//	if (!IsValid(CurrentGrabComp)) { return; }
+//
+//	for (const TPair<EOculusXRHandType, FTraceSockets>& Pair : HandSockets)
+//	{
+//		EOculusXRHandType Hand = Pair.Key;
+//		FTraceSockets Sockets = Pair.Value;
+//
+//		if (Hand != HandToTrace)
+//		{
+//			continue;
+//		}
+//		FVector SocketLocation{ CurrentGrabComp->GetSocketLocation(Sockets.Start) };
+//		FQuat SocketRotation{ CurrentGrabComp->GetSocketQuaternion(Sockets.Rotation) };
+//
+//		FCollisionShape Capsule{
+//			FCollisionShape::MakeCapsule(CapsuleRadius,CapsuleHalfHeight)
+//		};
+//
+//		FCollisionQueryParams IgnoreParams{
+//			FName{TEXT("Ignore Params")},
+//			false,
+//			GetOwner()
+//		};
+//		//TArray<FHitResult> OutResults;
+//		FHitResult OutResult;
+//
+//		bool bHasFoundTargets{ GetWorld()->SweepSingleByChannel(
+//			OutResult,
+//			SocketLocation,
+//			SocketLocation,
+//			SocketRotation,
+//			ECollisionChannel::ECC_GameTraceChannel1,
+//			Capsule,
+//			IgnoreParams
+//		) };
+//
+//		if (bHasFoundTargets)
+//		{
+//
+//			if (OutResult.GetActor()->Implements<UGrabbableObject>())
+//			{
+//				CurrentGrabbedActor = OutResult.GetActor();
+//				IGrabbableObject* GrabbableInterface = Cast<IGrabbableObject>(CurrentGrabbedActor);
+//
+//				if (!GrabbableInterface->IsGrabbed())
+//				{
+//					OnGrabDelegate.Broadcast(PoseClass);
+//
+//					GrabbableInterface->Execute_OnGrabbed(CurrentGrabbedActor, CurrentGrabComp, Sockets.WeaponSocket);
+//				}
+//			}
+//		}
+//
+//		if (!bDebugMode) { return; }
+//
+//		FVector CenterPoint{
+//				UKismetMathLibrary::VLerp(
+//					SocketLocation, SocketLocation, 0.5f
+//				)
+//		};
+//
+//		UKismetSystemLibrary::DrawDebugCapsule(
+//			GetWorld(),
+//			CenterPoint,
+//			Capsule.GetCapsuleHalfHeight(),
+//			Capsule.GetCapsuleRadius(),
+//			SocketRotation.Rotator(),
+//			bHasFoundTargets ? FLinearColor::Green : FLinearColor::Red,
+//			0.5f,
+//			2.0f
+//
+//		);
+//
+//	}
+//	CurrentGrabComp = nullptr;
+//
+//
+//}
+
+//void UTraceComponent::InitializeHands()
+//{
+//	TArray<UCustomXRHandComponent*> HandComponents = IPlayerRef->GetHandComponents();
+//
+//	for (UCustomXRHandComponent* HandComponent : HandComponents)
+//	{
+//		if (HandComponent)
+//		{
+//			EHand CurrentHandType = HandComponent->GrabHandSide;
+//
+//			if (CurrentHandType == EHand::Left)
+//			{
+//				LeftHandGrabComp = HandComponent;
+//			}
+//			else if (CurrentHandType == EHand::Right)
+//			{
+//				RightHandGrabComp = HandComponent;
+//			}
+//		}
+//	}
+//}
+
+//////Previously in Tick
+//TArray<FHitResult> AllResults;
+
+	//if (!IsValid(RightHandGrabComp) || !IsValid(LeftHandGrabComp)) { return; }
 
 
 
@@ -457,9 +404,9 @@ void UTraceComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 	//		UE_LOG(LogTemp, Warning, TEXT("GRABBALE OBJECT DETECTED!!!"));
 	//	}*/
 	//}
+///////////// To Here
+#pragma endregion
 
-	
-}
 
 
 

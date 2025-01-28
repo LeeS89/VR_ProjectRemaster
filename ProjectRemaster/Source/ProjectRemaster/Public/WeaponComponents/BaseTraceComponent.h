@@ -25,15 +25,6 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	/*UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class UCapsuleComponent* CapsuleComp;
-
-	FVector CapCenter;
-	float CapHalfHeight;
-	FVector CapsuleUpVector;
-
-	FVector TraceStart;
-	FVector TraceEnd;*/
 
 protected:
 

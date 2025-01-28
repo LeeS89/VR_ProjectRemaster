@@ -3,6 +3,7 @@
 
 #include "CharacterComponents/PlayerAbilitiesComponent.h"
 #include <Interfaces/DeflectableInterface.h>
+#include <Interfaces/GrabbableObject.h>
 
 // Sets default values for this component's properties
 UPlayerAbilitiesComponent::UPlayerAbilitiesComponent()
@@ -61,6 +62,35 @@ void UPlayerAbilitiesComponent::HandleBulletTraceResults(const TArray<FHitResult
 		Bullet->FreezeBullet();
 	}
 
+}
+
+void UPlayerAbilitiesComponent::GrabObject(UCustomHandPoseRecognizer* PoseClass, AActor* GrabbedActor, UCustomXRHandComponent* GrabHand, FName SocketName)
+{
+	if (!GrabbedActor->Implements<UGrabbableObject>()) { return; }
+
+	/*CurrentGrabbedActor = GrabbedActor;*/
+
+	if (!GrabbedActor) { return; }
+
+	IGrabbableObject* GrabbableInterface = Cast<IGrabbableObject>(GrabbedActor);
+
+	if (!GrabbableInterface->IsGrabbed())
+	{
+		OnGrabbedDelegate.Broadcast(PoseClass);
+
+		GrabbableInterface->Execute_OnGrabbed(GrabbedActor, GrabHand, SocketName);
+
+	}
+
+}
+
+void UPlayerAbilitiesComponent::ReleaseGrabbedActor(AActor* ActorToRelease)
+{
+	if (ActorToRelease && ActorToRelease->Implements<UGrabbableObject>())
+	{
+		IGrabbableObject::Execute_OnReleased(ActorToRelease);
+		
+	}
 }
 
 

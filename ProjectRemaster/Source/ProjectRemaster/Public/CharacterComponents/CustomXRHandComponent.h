@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "OculusXRHandComponent.h"
-#include "Enums/EHand.h"
 #include "CustomXRHandComponent.generated.h"
 
 /**
@@ -18,7 +17,14 @@ class PROJECTREMASTER_API UCustomXRHandComponent : public UOculusXRHandComponent
 public:
 	UCustomXRHandComponent();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hand")
-	TEnumAsByte<EHand> GrabHandSide;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	AActor* CurrentGrabbedActor;
+
+	UFUNCTION(BlueprintCallable)
+	void SetGrabbedActor(AActor* GrabbedActor) { CurrentGrabbedActor = GrabbedActor; }
+
+	UFUNCTION(BlueprintCallable)
+	AActor* GetGrabbedActor() { return CurrentGrabbedActor; }
 	
 };

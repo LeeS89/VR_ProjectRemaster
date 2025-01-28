@@ -23,14 +23,6 @@ void UBaseTraceComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	/*CapsuleComp = GetOwner()->FindComponentByClass<UCapsuleComponent>();
-
-	if (CapsuleComp)
-	{
-		CapHalfHeight = CapsuleComp->GetScaledCapsuleHalfHeight();
-		UE_LOG(LogTemp, Error, TEXT("Half Height is: %f"), CapHalfHeight);
-	}*/
-	// ...
 	
 }
 
@@ -45,12 +37,7 @@ void UBaseTraceComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 
 void UBaseTraceComponent::PerformTrace(const FVector& StartLocation, const FVector& EndLocation, const FQuat& Rotation)
 {
-	/*FVector StartSocketLocation{ StaticMeshComp->GetSocketLocation(Sockets.Start) };
-	FVector EndSocketLocation{ StaticMeshComp->GetSocketLocation(Sockets.End) };
-	FQuat SocketRotation{ StaticMeshComp->GetSocketQuaternion(Sockets.Rotation) };*/
-
-
-
+	
 	FCollisionShape Capsule{
 		FCollisionShape::MakeCapsule(CapsuleRadius, HalfHeight)
 	};
@@ -77,7 +64,6 @@ void UBaseTraceComponent::PerformTrace(const FVector& StartLocation, const FVect
 
 	if (bHasFoundTargets)
 	{
-		//OutResults[0].GetActor()->Destroy();
 		HandleTraceResults(OutResults);
 	}
 
@@ -93,8 +79,6 @@ void UBaseTraceComponent::PerformTrace(const FVector& StartLocation, const FVect
 			)
 		};
 
-		//FVector CenterPoint{ (StartSocketLocation + EndSocketLocation) / 2.0f };
-		//float CapsuleHeight = CenterPoint.Size() / 2.0f;
 
 		UKismetSystemLibrary::DrawDebugCapsule(
 			GetWorld(),
@@ -113,15 +97,7 @@ void UBaseTraceComponent::PerformTrace(const FVector& StartLocation, const FVect
 void UBaseTraceComponent::SetTraceLocationAndRotation()
 {
 	if (!MeshComp) { return; }
-	/*if (CapsuleComp)
-	{
-		CapCenter = CapsuleComp->GetComponentLocation();
-		CapHalfHeight = CapsuleComp->GetScaledCapsuleHalfHeight();
-		CapsuleUpVector = CapsuleComp->GetUpVector();
-
-		TraceStart = CapCenter - (CapsuleUpVector * CapHalfHeight);
-		TraceEnd = CapCenter + (CapsuleUpVector * CapHalfHeight);
-	}*/
+	
 	FVector StartSocketLocation{ MeshComp->GetSocketLocation(Sockets.Start) };
 	FVector EndSocketLocation{ MeshComp->GetSocketLocation(Sockets.End) };
 	FQuat SocketRotation{ MeshComp->GetSocketQuaternion(Sockets.Rotation) };
