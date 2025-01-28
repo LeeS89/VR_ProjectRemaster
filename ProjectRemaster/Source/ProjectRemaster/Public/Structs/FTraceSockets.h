@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Enums/EHand.h"
 #include "FTraceSockets.generated.h"
 
 /**
