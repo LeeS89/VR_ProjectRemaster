@@ -24,7 +24,7 @@ class PROJECTREMASTER_API IDeflectableInterface
 public:
 
 	UFUNCTION(BlueprintNativeEvent)
-	void OnDeflected(const FVector& DeflectionLocation, const FRotator& DeflectionRotation);
+	void OnDeflected(const FVector& DeflectionLocation, const FRotator& DeflectionRotation, APawn* NewInstigator);
 
 	virtual void OnExpired() = 0;
 

@@ -23,8 +23,8 @@ void ALaserBullet::Tick(float DeltaTime)
 
 }
 
-void ALaserBullet::ToggleActiveState(bool bActive, const FVector& SpawnLocation, const FRotator& SpawnRotation)
+void ALaserBullet::ToggleActiveState(bool bActive, const FVector& SpawnLocation, const FRotator& SpawnRotation, AActor* NewOwner, APawn* NewInstigator)
 {
-	Super::ToggleActiveState(bActive, SpawnLocation, SpawnRotation);
+	Super::ToggleActiveState(bActive, SpawnLocation, SpawnRotation, NewOwner, NewInstigator);
 
 }

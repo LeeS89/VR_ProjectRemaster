@@ -26,8 +26,8 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void ToggleActiveState(bool bActive, const FVector& SpawnLocation = FVector::ZeroVector, const FRotator& SpawnRotation = FRotator::ZeroRotator) final override;
+	virtual void ToggleActiveState(bool bActive, const FVector& SpawnLocation = FVector::ZeroVector, const FRotator& SpawnRotation = FRotator::ZeroRotator, AActor* NewOwner = nullptr, APawn* NewInstigator = nullptr) final override;
 
-	virtual void OnDeflected_Implementation(const FVector& DeflectionLocation, const FRotator& DeflectionRotation) final override;
+	virtual void OnDeflected_Implementation(const FVector& DeflectionLocation, const FRotator& DeflectionRotation, APawn* NewInstigator = nullptr) final override;
 	
 };

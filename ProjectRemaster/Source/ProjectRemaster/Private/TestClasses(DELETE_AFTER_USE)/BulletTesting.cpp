@@ -109,8 +109,8 @@ void ABulletTesting::Fire()
 	//ABulletBase* Bullet{ BulletPoolManager->GetBullet() };
 	ABaseBullet* Bullet{ BulletPoolManager->GetBullet() };
 	if (!Bullet) { return; }
-	Bullet->SetOwner(this);
-	Bullet->SetInstigator(this);
+	//Bullet->SetOwner(this);
+	//Bullet->SetInstigator(this);
 	
 
 	if (AimTargetComp)
@@ -118,11 +118,11 @@ void ABulletTesting::Fire()
 		FRotator DirectionToTarget = UTargetingUtility::GetDirectionToTarget(AimTargetComp, SpawnPoint, true).Rotation();
 
 
-		Bullet->ToggleActiveState(true, SpawnPoint->GetComponentLocation(), DirectionToTarget);
+		Bullet->ToggleActiveState(true, SpawnPoint->GetComponentLocation(), DirectionToTarget, this, this);
 	}
 	else
 	{
-		Bullet->ToggleActiveState(true, SpawnPoint->GetComponentLocation(), SpawnPoint->GetComponentRotation());
+		Bullet->ToggleActiveState(true, SpawnPoint->GetComponentLocation(), SpawnPoint->GetComponentRotation(), this, this);
 	}
 
 }

@@ -57,6 +57,20 @@ void UTraceComponent::SetupTraceParams(TEnumAsByte<ETraceType> TraceType, TEnumA
 	}
 }
 
+/// <summary>
+/// Used for simple traces such as when the player makes a fist,
+/// performs a trace on the first frame once fist is recognized,
+/// if the trace detects a grabbable object, the player grabs the object, otherwise the player moves instead
+/// </summary>
+/// <param name="Channel"></param>
+/// <param name="GrabHand">The hand used to trigger the trace</param>
+/// <param name="PoseClass">The Pose recognizer class i.e. the class the "fist gesture belongs to"</param>
+/// <param name="Start"></param>
+/// <param name="End"></param>
+/// <param name="Rot"></param>
+/// <param name="ShapeRadius"></param>
+/// <param name="HalfHeight"></param>
+/// <param name="bDebugVisual"></param>
 void UTraceComponent::PerformSingleTrace(TEnumAsByte<ECollisionChannel> Channel, UCustomXRHandComponent* GrabHand, UCustomHandPoseRecognizer* PoseClass, const FVector& Start, const FVector& End, const FRotator& Rot, float ShapeRadius, float HalfHeight, bool bDebugVisual)
 {
 	if (Start == FVector::ZeroVector) { return; }
@@ -115,6 +129,14 @@ void UTraceComponent::PerformSingleTrace(TEnumAsByte<ECollisionChannel> Channel,
 
 }
 
+/// <summary>
+/// If a grabbable object is dectected during the trace, this 
+/// broadcasts the result to any listeners.
+/// In this case, the player abilities component to handle the grabbing
+/// </summary>
+/// <param name="PoseClass"></param>
+/// <param name="ActorToGrab"></param>
+/// <param name="GrabHand"></param>
 void UTraceComponent::HandleGrabResult(UCustomHandPoseRecognizer* PoseClass, AActor* ActorToGrab, UCustomXRHandComponent* GrabHand)
 {
 	if (!ActorToGrab->Implements<UGrabbableObject>()) { return; }
@@ -124,6 +146,16 @@ void UTraceComponent::HandleGrabResult(UCustomHandPoseRecognizer* PoseClass, AAc
 
 }
 
+/// <summary>
+/// Used for more complex traces that can handle multiple results,
+/// such as special abilites like the bullet freeze ability for example.
+/// </summary>
+/// <param name="Channel"></param>
+/// <param name="Start"></param>
+/// <param name="End"></param>
+/// <param name="Rot"></param>
+/// <param name="ShapeRadius"></param>
+/// <param name="bDebugVisual"></param>
 void UTraceComponent::PerformMultiTrace(TEnumAsByte<ECollisionChannel> Channel, const FVector& Start, const FVector& End, const FRotator& Rot, float ShapeRadius, bool bDebugVisual)
 {
 	if (Start == FVector::ZeroVector || End == FVector::ZeroVector) { return; }

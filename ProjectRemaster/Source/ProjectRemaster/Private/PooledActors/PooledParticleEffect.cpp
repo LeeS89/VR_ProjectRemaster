@@ -46,7 +46,7 @@ void APooledParticleEffect::Tick(float DeltaTime)
 
 }
 
-void APooledParticleEffect::ToggleActiveState(bool bActive, const FVector& SpawnLocation, const FRotator& SpawnRotation)
+void APooledParticleEffect::ToggleActiveState(bool bActive, const FVector& SpawnLocation, const FRotator& SpawnRotation, AActor* NewOwner, APawn* NewInstigator)
 {
 	SetActorLocation(SpawnLocation);
 	SetActorRotation(SpawnRotation);

@@ -37,6 +37,7 @@ ABaseBullet::ABaseBullet()
 void ABaseBullet::BeginPlay()
 {
 	Super::BeginPlay();
+	PointLightComp->SetVisibility(false);
 	DestroyTimeCountdown = DestroyTime;
 }
 
@@ -55,6 +56,7 @@ void ABaseBullet::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (bIsFrozen) { return; }
 	TimeOut(DeltaTime);
 }
 
@@ -71,14 +73,18 @@ void ABaseBullet::TimeOut(float DeltaTime)
 }
 
 
-void ABaseBullet::ToggleActiveState(bool bActive, const FVector& SpawnLocation, const FRotator& SpawnRotation)
+void ABaseBullet::ToggleActiveState(bool bActive, const FVector& SpawnLocation, const FRotator& SpawnRotation, AActor* NewOwner, APawn* NewInstigator)
 {
 	if (!MovementComp || !PointLightComp) { return; }
+
+	SetOwner(NewOwner);
+	SetInstigator(NewInstigator);
+
 	SetActorLocation(SpawnLocation);
 	SetActorRotation(SpawnRotation);
 
 	MovementComp->SetActive(bActive);
-	PointLightComp->SetVisibility(bActive);
+	//PointLightComp->SetVisibility(bActive);
 
 	if (bActive)
 	{
@@ -97,15 +103,18 @@ void ABaseBullet::ToggleActiveState(bool bActive, const FVector& SpawnLocation, 
 	SetActorTickEnabled(bActive);
 }
 
+/// <summary>
+/// Delegates registered collisions to the collision component
+/// </summary>
 void ABaseBullet::NotifyHit(UPrimitiveComponent* MyComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit)
 {
 	if (!CollisionComp) { return; }
 	CollisionComp->HandleHit(MyComp, OtherActor, OtherComp, NormalImpulse, Hit);
 }
 
-void ABaseBullet::OnDeflected_Implementation(const FVector& DeflectionLocation, const FRotator& DeflectionRotation)
+void ABaseBullet::OnDeflected_Implementation(const FVector& DeflectionLocation, const FRotator& DeflectionRotation, APawn* NewInstigator)
 {
-	
+	SetInstigator(NewInstigator);
 	FVector NewNormal = UTargetingUtility::GetDirectionToTarget(GetOwner(), this);
 	MovementComp->DeflectBullet(NewNormal);
 	
@@ -123,6 +132,8 @@ bool ABaseBullet::GetDeflectionHasBeenProcessed() const
 
 void ABaseBullet::FreezeBullet()
 {
+	bIsFrozen = true;
+	DestroyTimeCountdown += 5.0f;
 	MovementComp->StopMovementImmediately();
 }
 

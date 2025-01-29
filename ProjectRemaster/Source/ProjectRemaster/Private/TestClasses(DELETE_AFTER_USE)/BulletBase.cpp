@@ -86,7 +86,7 @@ void ABulletBase::TimeOut(float DeltaTime)
 
 
 
-void ABulletBase::ToggleActiveState(bool bActive, const FVector& SpawnLocation, const FRotator& SpawnRotation)
+void ABulletBase::ToggleActiveState(bool bActive, const FVector& SpawnLocation, const FRotator& SpawnRotation, AActor* NewOwner, APawn* NewInstigator)
 {
 	SetActorLocation(SpawnLocation);
 	SetActorRotation(SpawnRotation);

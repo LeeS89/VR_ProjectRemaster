@@ -10,7 +10,7 @@ UPlayerAbilitiesComponent::UPlayerAbilitiesComponent()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bCanEverTick = false;
 
 	// ...
 }
@@ -25,25 +25,7 @@ void UPlayerAbilitiesComponent::BeginPlay()
 	
 }
 
-void UPlayerAbilitiesComponent::PerformBulletTrace()
-{
-	FCollisionShape Capsule{
-		FCollisionShape::MakeCapsule(CapsuleRadius, HalfHeight)
-	};
 
-	FCollisionQueryParams IgnoreParams{
-		FName{ TEXT("Ignore Params") },
-		true,
-		GetOwner()
-	};
-
-	TArray<FHitResult> OutResults;
-
-	/*bool bHasFoundTargets{ GetWorld()->SweepMultiByChannel(
-		OutResults,
-
-	) };*/
-}
 
 void UPlayerAbilitiesComponent::HandleBulletTraceResults(const TArray<FHitResult>& HitResults)
 {
@@ -53,13 +35,17 @@ void UPlayerAbilitiesComponent::HandleBulletTraceResults(const TArray<FHitResult
 	{
 		AActor* HitActor = Hit.GetActor();
 
-		if (!HitActor || !HitActor->Implements<UDeflectableInterface>())
+		if (!HitActor || !HitActor->Implements<UDeflectableInterface>() || ProcessedBullets.Contains(HitActor))
 		{
 			continue;
 		}
+
+		ProcessedBullets.Add(HitActor);
 		
 		IDeflectableInterface* Bullet = Cast<IDeflectableInterface>(HitActor);
 		Bullet->FreezeBullet();
+
+		
 	}
 
 }

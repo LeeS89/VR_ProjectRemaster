@@ -24,6 +24,8 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	bool bHasHitBeenProcesed{ false };
 
+	bool bIsFrozen{ false };
+
 protected:
 
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(
@@ -76,10 +78,10 @@ public:
 
 	virtual void SetIsInUse(bool InUse) override { bIsInUse = InUse; }
 
-	virtual void ToggleActiveState(bool bActive, const FVector& SpawnLocation = FVector::ZeroVector, const FRotator& SpawnRotation = FRotator::ZeroRotator) override;
+	virtual void ToggleActiveState(bool bActive, const FVector& SpawnLocation = FVector::ZeroVector, const FRotator& SpawnRotation = FRotator::ZeroRotator, AActor* NewOwner = nullptr, APawn* NewInstigator = nullptr) override;
 
 	// Deflectable Interface functions
-	virtual void OnDeflected_Implementation(const FVector& DeflectionLocation, const FRotator& DeflectionRotation) override;
+	virtual void OnDeflected_Implementation(const FVector& DeflectionLocation, const FRotator& DeflectionRotation, APawn* NewInstigator) override;
 
 	virtual bool GetDeflectionHasBeenProcessed() const override;
 

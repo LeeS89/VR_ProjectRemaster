@@ -34,7 +34,7 @@ void UBulletCollisionComponent::BeginPlay()
 
 	MeshComp = OwnerRef->FindComponentByClass<UStaticMeshComponent>();
 
-	if (!MeshComp) { return; }
+	if (!MeshComp) { return; }// Not sure if used anymore
 
 	
 	if (!OwnerRef->Implements<UDeflectableInterface>()) { return; }

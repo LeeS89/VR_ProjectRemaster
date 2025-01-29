@@ -29,6 +29,9 @@ private:
 
 	AActor* CurrentGrabbedActor;
 
+	UPROPERTY()
+	TSet<AActor*> ProcessedBullets;
+
 public:	
 	// Sets default values for this component's properties
 	UPlayerAbilitiesComponent();
@@ -37,7 +40,7 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-	void PerformBulletTrace();
+
 
 	UFUNCTION(BlueprintCallable)
 	void HandleBulletTraceResults(const TArray<FHitResult>& HitResults);

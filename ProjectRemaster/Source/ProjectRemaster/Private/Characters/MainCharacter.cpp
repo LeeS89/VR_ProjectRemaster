@@ -145,7 +145,7 @@ float AMainCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageE
 
 void AMainCharacter::OnReceiveAnyDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser)
 {
-	UE_LOG(LogTemp, Error, TEXT("I got hurt"));
+	//UE_LOG(LogTemp, Error, TEXT("I got hurt"));
 }
 
 void AMainCharacter::SetElementalClass_Implementation(const class UElementalDamageType* ElementDamageType)

@@ -26,7 +26,7 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void ToggleActiveState(bool bActive, const FVector& SpawnLocation = FVector::ZeroVector, const FRotator& SpawnRotation = FRotator::ZeroRotator) final override;
+	virtual void ToggleActiveState(bool bActive, const FVector& SpawnLocation = FVector::ZeroVector, const FRotator& SpawnRotation = FRotator::ZeroRotator, AActor* NewOwner = nullptr, APawn* NewInstigator = nullptr) final override;
 
 	/*UPROPERTY(EditAnywhere)
 	float DestroyTime{ 1.5f };*/

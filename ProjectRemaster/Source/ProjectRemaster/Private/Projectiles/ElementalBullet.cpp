@@ -10,9 +10,9 @@ AElementalBullet::AElementalBullet()
 	Trail->SetupAttachment(RootComponent);
 }
 
-void AElementalBullet::ToggleActiveState(bool bActive, const FVector& SpawnLocation, const FRotator& SpawnRotation)
+void AElementalBullet::ToggleActiveState(bool bActive, const FVector& SpawnLocation, const FRotator& SpawnRotation, AActor* NewOwner, APawn* NewInstigator)
 {
-	Super::ToggleActiveState(bActive, SpawnLocation, SpawnRotation);
+	Super::ToggleActiveState(bActive, SpawnLocation, SpawnRotation, NewOwner, NewInstigator);
 
 	Trail->SetVisibility(bActive);
 	if (bActive)

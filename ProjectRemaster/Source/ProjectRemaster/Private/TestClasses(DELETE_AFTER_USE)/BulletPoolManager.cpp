@@ -33,7 +33,7 @@ void ABulletPoolManager::InitializePool()
 		if (BulletType)
 		{
 			BulletToSpawn->SetIsInUse(false);
-			BulletToSpawn->ToggleActiveState(false, GetActorLocation(), GetActorRotation());
+			BulletToSpawn->ToggleActiveState(false, GetActorLocation(), GetActorRotation(), nullptr, nullptr);
 			BulletPool.Add(BulletToSpawn);
 		}
 	}

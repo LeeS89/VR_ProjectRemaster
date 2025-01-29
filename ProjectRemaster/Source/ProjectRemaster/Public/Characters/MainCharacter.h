@@ -129,8 +129,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual	void UpdateStatusEffect(EDamageType NewStatus) override;
 
-	/*UFUNCTION()
-	virtual void GetTraceLocation(FVector& OutLocation, FQuat& OutRotation) override;*/
 
 private:
 

@@ -18,15 +18,15 @@ void ABasicBullet::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void ABasicBullet::ToggleActiveState(bool bActive, const FVector& SpawnLocation, const FRotator& SpawnRotation)
+void ABasicBullet::ToggleActiveState(bool bActive, const FVector& SpawnLocation, const FRotator& SpawnRotation, AActor* NewOwner, APawn* NewInstigator)
 {
-	Super::ToggleActiveState(bActive, SpawnLocation, SpawnRotation);
+	Super::ToggleActiveState(bActive, SpawnLocation, SpawnRotation, NewOwner, NewInstigator);
 }
 
 
-void ABasicBullet::OnDeflected_Implementation(const FVector& DeflectionLocation, const FRotator& DeflectionRotation)
+void ABasicBullet::OnDeflected_Implementation(const FVector& DeflectionLocation, const FRotator& DeflectionRotation, APawn* NewInstigator)
 {
-	Super::OnDeflected_Implementation(DeflectionLocation, DeflectionRotation);
+	Super::OnDeflected_Implementation(DeflectionLocation, DeflectionRotation, nullptr);
 
 	OnDeflectedDelegate.Broadcast(true, DeflectionLocation, DeflectionRotation);
 }

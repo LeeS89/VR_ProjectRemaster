@@ -30,7 +30,7 @@ bool UDamageUtility::ShouldDamageActor(const APawn* Instigator, AActor* Target)
             //UE_LOG(LogTemp, Warning, TEXT("Interface from array: %s"), *Interface.Class->GetName());
             if (Target->GetClass()->ImplementsInterface(Interface.Class))
             {
-                UE_LOG(LogTemp, Warning, TEXT("Target implements interface: %s"), *Interface.Class->GetName());
+                //UE_LOG(LogTemp, Warning, TEXT("Target implements interface: %s"), *Interface.Class->GetName());
                 return false; // Prevent damage
             }
         }
