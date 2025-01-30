@@ -2,6 +2,7 @@
 
 
 #include "Projectiles/ElementalBullet.h"
+#include "Managers/BulletManager.h"
 #include "Particles/ParticleSystemComponent.h"
 
 AElementalBullet::AElementalBullet()
@@ -22,5 +23,16 @@ void AElementalBullet::ToggleActiveState(bool bActive, const FVector& SpawnLocat
 	else
 	{
 		Trail->Deactivate();
+	}
+}
+
+void AElementalBullet::FreezeBullet()
+{
+	Super::FreezeBullet();
+
+	if (BulletManager)
+	{
+		BulletManager->AddFrozenBullet(this, StaticMeshComp, Trail);
+		//BulletManager->HandleFrozenBulletMerge(this);
 	}
 }

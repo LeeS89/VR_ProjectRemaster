@@ -32,6 +32,10 @@ private:
 	UPROPERTY()
 	TSet<AActor*> ProcessedBullets;
 
+	
+
+	
+
 public:	
 	// Sets default values for this component's properties
 	UPlayerAbilitiesComponent();

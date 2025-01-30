@@ -65,6 +65,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	class UVFXComponent* VFXComp;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	class ABulletManager* BulletManager;
+
 	
 public:	
 	// Sets default values for this actor's properties

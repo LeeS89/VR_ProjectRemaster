@@ -7,6 +7,7 @@
 #include "Projectiles/BulletMovementComponent.h"
 #include "WeaponComponents/VFXComponent.h"
 #include <UtilityClasses/TargetingUtility.h>
+#include "Managers/BulletManager.h"
 #include <Kismet/KismetSystemLibrary.h>
 
 
@@ -135,6 +136,12 @@ void ABaseBullet::FreezeBullet()
 	bIsFrozen = true;
 	DestroyTimeCountdown += 5.0f;
 	MovementComp->StopMovementImmediately();
+
+	//if (BulletManager)
+	//{
+	//	BulletManager->AddFrozenBullet(this, StaticMeshComp);
+	//	//BulletManager->HandleFrozenBulletMerge(this);
+	//}
 }
 
 void ABaseBullet::OnExpired()

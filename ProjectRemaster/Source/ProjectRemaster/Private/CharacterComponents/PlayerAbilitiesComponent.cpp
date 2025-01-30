@@ -5,6 +5,8 @@
 #include <Interfaces/DeflectableInterface.h>
 #include <Interfaces/GrabbableObject.h>
 
+
+
 // Sets default values for this component's properties
 UPlayerAbilitiesComponent::UPlayerAbilitiesComponent()
 {
@@ -45,10 +47,10 @@ void UPlayerAbilitiesComponent::HandleBulletTraceResults(const TArray<FHitResult
 		IDeflectableInterface* Bullet = Cast<IDeflectableInterface>(HitActor);
 		Bullet->FreezeBullet();
 
-		
 	}
 
 }
+
 
 void UPlayerAbilitiesComponent::GrabObject(UCustomHandPoseRecognizer* PoseClass, AActor* GrabbedActor, UCustomXRHandComponent* GrabHand, FName SocketName)
 {
