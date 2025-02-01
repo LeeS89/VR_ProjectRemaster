@@ -41,7 +41,8 @@ private:
 	UPROPERTY(EditAnywhere)
 	class UInstancedStaticMeshComponent* InstancedBulletMesh;
 
-	
+	/*UPROPERTY(VisibleAnywhere, Category = "Bullet Management")
+	class UHierarchicalInstancedStaticMeshComponent* InstancedMesh;*/
 	
 public:	
 	// Sets default values for this actor's properties

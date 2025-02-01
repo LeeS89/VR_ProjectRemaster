@@ -7,7 +7,7 @@
 #include "Projectiles/BulletMovementComponent.h"
 #include "WeaponComponents/VFXComponent.h"
 #include <UtilityClasses/TargetingUtility.h>
-#include "Managers/BulletManager.h"
+#include "Managers/ProjectileManager.h"
 #include <Kismet/KismetSystemLibrary.h>
 
 
@@ -85,7 +85,7 @@ void ABaseBullet::ToggleActiveState(bool bActive, const FVector& SpawnLocation, 
 	SetActorRotation(SpawnRotation);
 
 	MovementComp->SetActive(bActive);
-	//PointLightComp->SetVisibility(bActive);
+	PointLightComp->SetVisibility(bActive);
 
 	if (bActive)
 	{

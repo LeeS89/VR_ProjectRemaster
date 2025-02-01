@@ -66,7 +66,7 @@ protected:
 	class UVFXComponent* VFXComp;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	class ABulletManager* BulletManager;
+	class AProjectileManager* BulletManager;
 
 	
 public:	

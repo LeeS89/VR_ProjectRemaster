@@ -3,6 +3,7 @@
 #include "Managers/BulletManager.h"
 #include "Projectiles/BaseBullet.h"
 #include "InstancedStaticMeshComponent.h"
+#include "Components/HierarchicalInstancedStaticMeshComponent.h"
 #include "ProceduralMeshComponent.h"
 
 
@@ -24,6 +25,7 @@ ABulletManager::ABulletManager()
     ProceduralMesh->bUseComplexAsSimpleCollision = false;*/
     InstancedBulletMesh = CreateDefaultSubobject<UInstancedStaticMeshComponent>(TEXT("InstancedBulletMesh"));
     InstancedBulletMesh->SetupAttachment(RootComponent);
+    
 
 }
 
@@ -32,6 +34,7 @@ void ABulletManager::BeginPlay()
 {
 	Super::BeginPlay();
 	
+    InstancedBulletMesh->SetCullDistances(75, 2000);
 }
 
 
@@ -39,6 +42,7 @@ void ABulletManager::BeginPlay()
 
 void ABulletManager::AddFrozenBullet(ABaseBullet* Bullet, UStaticMeshComponent* BulletMesh, UParticleSystemComponent* BulletParticles)
 {
+    UE_LOG(LogTemp, Error, TEXT("Add frozen bullet called"));
     if (!Bullet || FrozenBullets.Contains(Bullet)) return;
 
     FrozenBullets.Add(Bullet);
@@ -63,8 +67,8 @@ void ABulletManager::AddFrozenBullet(ABaseBullet* Bullet, UStaticMeshComponent* 
     // Add bullet instance to instanced mesh
     InstancedBulletMesh->AddInstance(BulletLocalTransform);
     Bullet->SetActorEnableCollision(false);
-    //BulletMesh->SetVisibility(false);
-    Bullet->SetActorHiddenInGame(true);
+    BulletMesh->SetVisibility(false);
+    //Bullet->SetActorHiddenInGame(true);
     // Destroy the original bullet actor (or just hide it if needed)
     //Bullet->Destroy();
 }

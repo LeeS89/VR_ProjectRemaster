@@ -2,7 +2,7 @@
 
 
 #include "Projectiles/ElementalBullet.h"
-#include "Managers/BulletManager.h"
+#include "Managers/ProjectileManager.h"
 #include "Particles/ParticleSystemComponent.h"
 
 AElementalBullet::AElementalBullet()
