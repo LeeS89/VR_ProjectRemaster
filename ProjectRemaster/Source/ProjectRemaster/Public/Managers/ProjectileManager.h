@@ -30,14 +30,29 @@ private:
 	class UHierarchicalInstancedStaticMeshComponent* InstancedBulletMesh;
 
 	void UpdateInstanceCulling();
+
+	void UpdateNiagaraParticles(int32 InstanceIndex, ABaseBullet* Bullet);
+
+	TArray <FVector> FrozenBulletLocations;
+
+	
 	
 public:	
 	// Sets default values for this actor's properties
 	AProjectileManager();
 
+	UFUNCTION(BlueprintImplementableEvent, Category = "Niagara")
+	void UpdateFrozenBulletParticles_BP(const FVector& BulletLocations, int32 NumBullets);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "FX")
+	class UNiagaraComponent* MergedBulletParticles;
+
+	UPROPERTY(EditAnywhere, Category = "FX")
+	class UNiagaraSystem* BulletEffectSystem;
 
 public:	
 	

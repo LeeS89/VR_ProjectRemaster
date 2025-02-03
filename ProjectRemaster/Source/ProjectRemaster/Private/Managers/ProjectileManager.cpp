@@ -4,6 +4,9 @@
 #include "Managers/ProjectileManager.h"
 #include "Components/HierarchicalInstancedStaticMeshComponent.h"
 #include "Particles/ParticleSystemComponent.h"
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraDataInterfaceArrayFunctionLibrary.h"
 #include "Projectiles/BaseBullet.h"
 
 
@@ -16,16 +19,26 @@ AProjectileManager::AProjectileManager()
     InstancedBulletMesh = CreateDefaultSubobject<UHierarchicalInstancedStaticMeshComponent>(TEXT("InstancedBulletMesh"));
     RootComponent = InstancedBulletMesh;
 
-    
+    MergedBulletParticles = CreateDefaultSubobject<UNiagaraComponent>(TEXT("MergedBulletParticles"));
+    MergedBulletParticles->SetupAttachment(RootComponent);
+
     InstancedBulletMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
     InstancedBulletMesh->SetCastShadow(false);
 }
+
+
 
 // Called when the game starts or when spawned
 void AProjectileManager::BeginPlay()
 {
 	Super::BeginPlay();
     
+    if (BulletEffectSystem)
+    {
+        MergedBulletParticles->SetAsset(BulletEffectSystem);
+        MergedBulletParticles->Activate();
+    }
+
 }
 
 void AProjectileManager::AddFrozenBullet(ABaseBullet* Bullet, UStaticMeshComponent* BulletMesh, UParticleSystemComponent* BulletParticles)
@@ -38,8 +51,8 @@ void AProjectileManager::AddFrozenBullet(ABaseBullet* Bullet, UStaticMeshCompone
     // Get bullet mesh
     if (!BulletMesh) return;
 
-    StartCullingTimer();
-
+    //StartCullingTimer();
+   
 
     // Set the same mesh on the Instanced Static Mesh Component if it's not set
     if (InstancedBulletMesh->GetStaticMesh() == nullptr)
@@ -61,7 +74,7 @@ void AProjectileManager::AddFrozenBullet(ABaseBullet* Bullet, UStaticMeshCompone
     //Bullet->SetActorHiddenInGame(true);
     Bullet->SetActorEnableCollision(false);
     BulletMesh->SetVisibility(false);
-    
+    UpdateNiagaraParticles(InstanceIndex, Bullet);
 }
 
 void AProjectileManager::StartCullingTimer()
@@ -75,6 +88,10 @@ void AProjectileManager::StartCullingTimer()
             0.2f,   // Interval 
             true    // Looping
         );
+    }
+    else
+    {
+        return;
     }
 }
 
@@ -132,4 +149,26 @@ void AProjectileManager::UpdateInstanceCulling()
     }
 
     
+}
+
+void AProjectileManager::UpdateNiagaraParticles(int32 InstanceIndex, ABaseBullet* Bullet)
+{
+    if (!MergedBulletParticles || !InstancedBulletMesh) return;
+
+    FTransform InstanceTransform;
+    if (InstancedBulletMesh->GetInstanceTransform(InstanceIndex, InstanceTransform, true))
+    {
+        
+
+        FVector BulletLocation = InstanceTransform.GetLocation();
+
+        // Ensure we always pass the full list
+        FrozenBulletLocations.Add(BulletLocation);
+        
+        //int32 NumFrozenBullets = FrozenBulletLocations.Num();
+        //UNiagaraDataInterfaceArrayFunctionLibrary::execSetNiagaraArrayPosition()
+        
+        // Call Blueprint function with the full array
+        UpdateFrozenBulletParticles_BP(BulletLocation, InstanceIndex);
+    }
 }
