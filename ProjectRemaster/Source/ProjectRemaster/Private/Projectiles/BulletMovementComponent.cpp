@@ -10,7 +10,8 @@ UBulletMovementComponent::UBulletMovementComponent()
 
 void UBulletMovementComponent::DeflectBullet(const FVector& NewNormal)
 {
-	float VelocityLength = Velocity.Size();
+	
+	float VelocityLength = StoredVelocity.Size();
 	float NewVelocityLength = VelocityLength * SpeedMultiplier;
 
 	Velocity = NewNormal * NewVelocityLength;
@@ -20,4 +21,5 @@ void UBulletMovementComponent::InitializeMovement(const FRotator& SpawnRotation)
 {
 	FVector NewVelocity{ SpawnRotation.Vector() * InitialSpeed };
 	Velocity = NewVelocity;
+	StoredVelocity = Velocity;
 }

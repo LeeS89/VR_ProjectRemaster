@@ -29,12 +29,12 @@ private:
 
 	AActor* CurrentGrabbedActor;
 
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere)
 	TSet<AActor*> ProcessedBullets;
 
 	
-
-	
+	UPROPERTY(EditDefaultsOnly)
+	float DelayAmount{ 0.1f };
 
 public:	
 	// Sets default values for this component's properties
@@ -48,6 +48,9 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	void HandleBulletTraceResults(const TArray<FHitResult>& HitResults);
+
+	UFUNCTION(BlueprintCallable)
+	void FireFrozenBullets();
 
 	UFUNCTION(BlueprintCallable)
 	void GrabObject(UCustomHandPoseRecognizer* PoseClass, AActor* GrabbedActor, UCustomXRHandComponent* GrabHand, FName SocketName);
@@ -67,5 +70,7 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnGrabbedSignature OnGrabbedDelegate;
-		
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bFreezeTest{ false };
 };

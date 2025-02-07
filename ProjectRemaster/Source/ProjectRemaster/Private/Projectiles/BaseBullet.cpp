@@ -57,7 +57,6 @@ void ABaseBullet::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (bIsFrozen) { return; }
 	TimeOut(DeltaTime);
 }
 
@@ -133,15 +132,26 @@ bool ABaseBullet::GetDeflectionHasBeenProcessed() const
 
 void ABaseBullet::FreezeBullet()
 {
-	bIsFrozen = true;
 	DestroyTimeCountdown += 5.0f;
 	MovementComp->StopMovementImmediately();
+	ToggleVisibility(false);
+}
 
-	//if (BulletManager)
-	//{
-	//	BulletManager->AddFrozenBullet(this, StaticMeshComp);
-	//	//BulletManager->HandleFrozenBulletMerge(this);
-	//}
+void ABaseBullet::UnFreezeBullet()
+{
+	
+	ToggleVisibility(true);
+	FVector NewNormal = UTargetingUtility::GetDirectionToTarget(GetOwner(), this);
+	MovementComp->DeflectBullet(NewNormal);
+}
+
+
+
+void ABaseBullet::ToggleVisibility(bool bVisibility)
+{
+	SetActorEnableCollision(bVisibility);
+	StaticMeshComp->SetVisibility(bVisibility);
+	SetActorTickEnabled(bVisibility);
 }
 
 void ABaseBullet::OnExpired()

@@ -43,6 +43,7 @@ void UBulletCollisionComponent::BeginPlay()
 
 	if (!DamageDataTable || !BulletInterface) { return; }
 
+	DamageType = BulletInterface->GetDamageType();
 	InitializeDamageType(DamageType);
 
 }

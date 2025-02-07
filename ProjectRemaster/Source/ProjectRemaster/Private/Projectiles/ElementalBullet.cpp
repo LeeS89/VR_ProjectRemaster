@@ -33,7 +33,18 @@ void AElementalBullet::FreezeBullet()
 	if (BulletManager)
 	{
 		Trail->Deactivate();
-		BulletManager->AddFrozenBullet(this, StaticMeshComp, Trail);
-		//BulletManager->HandleFrozenBulletMerge(this);
+		BulletManager->AddFrozenBullet(DamageType, this, StaticMeshComp);
 	}
 }
+
+void AElementalBullet::UnFreezeBullet()
+{
+	Super::UnFreezeBullet();
+	if (BulletManager)
+	{
+		Trail->Activate();
+		BulletManager->RemoveFrozenBullet(this);
+	}
+}
+
+

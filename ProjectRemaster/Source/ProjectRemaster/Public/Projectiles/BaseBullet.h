@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Interfaces/DeflectableInterface.h"
 #include "Interfaces/PooledObjectInterface.h"
+#include "Enums/EDamageType.h"
 #include "BaseBullet.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBulletHasExpired, ABaseBullet*, Bullet);
@@ -24,8 +25,9 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	bool bHasHitBeenProcesed{ false };
 
-	bool bIsFrozen{ false };
+	
 
+	
 protected:
 
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(
@@ -34,6 +36,9 @@ protected:
 		const FVector&, Location,
 		const FRotator&, Rotation
 	);
+
+	UPROPERTY(EditDefaultsOnly, Category = "Damage")
+	TEnumAsByte<EDamageType> DamageType;
 
 	virtual void NotifyHit(
 		UPrimitiveComponent* MyComp,
@@ -68,6 +73,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	class AProjectileManager* BulletManager;
 
+	void ToggleVisibility(bool bVisibility);
+
 	
 public:	
 	// Sets default values for this actor's properties
@@ -96,8 +103,14 @@ public:
 
 	virtual void FreezeBullet() override;
 
+	virtual void UnFreezeBullet() override;
+
+	
 	UFUNCTION(BlueprintCallable)
 	virtual void OnExpired() override;
+
+	UFUNCTION()
+	virtual TEnumAsByte<EDamageType> GetDamageType() override { return DamageType; }
 
 
 protected:

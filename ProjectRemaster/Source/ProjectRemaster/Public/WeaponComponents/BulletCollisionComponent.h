@@ -54,6 +54,9 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	TSubclassOf<UElementalDamageType> DamageTypeClass;
 
+	UPROPERTY(VisibleAnywhere, Category = "Damage")
+	TEnumAsByte<EDamageType> DamageType;
+
 public:	
 	// Sets default values for this component's properties
 	UBulletCollisionComponent();
@@ -102,8 +105,7 @@ protected:
 	UPROPERTY()
 	float DoTDuration;*/
 
-	UPROPERTY(EditDefaultsOnly, Category = "Damage")
-	TEnumAsByte<EDamageType> DamageType;
+	
 
 public:
 

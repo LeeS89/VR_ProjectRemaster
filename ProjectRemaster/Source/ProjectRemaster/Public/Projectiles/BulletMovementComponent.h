@@ -19,6 +19,8 @@ private:
 	UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "When deflected, multiply the speed by this amount"))
 	float SpeedMultiplier{ 3.0f };
 
+	FVector StoredVelocity;
+
 public:
 
 	UBulletMovementComponent();

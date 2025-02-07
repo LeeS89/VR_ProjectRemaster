@@ -27,12 +27,10 @@ void UPlayerAbilitiesComponent::BeginPlay()
 	
 }
 
-
-
 void UPlayerAbilitiesComponent::HandleBulletTraceResults(const TArray<FHitResult>& HitResults)
 {
 	if (HitResults.Num() <= 0) { return; }
-
+	UE_LOG(LogTemp, Error, TEXT("Processed bullets contains: %i"), ProcessedBullets.Num());
 	for (const FHitResult& Hit : HitResults)
 	{
 		AActor* HitActor = Hit.GetActor();
@@ -49,6 +47,37 @@ void UPlayerAbilitiesComponent::HandleBulletTraceResults(const TArray<FHitResult
 
 	}
 
+}
+
+void UPlayerAbilitiesComponent::FireFrozenBullets()
+{
+	
+	if (ProcessedBullets.Num() <= 0) { return; }
+
+	float CurrentDelay = 0.1f;
+
+	
+	for (AActor* Bullet : ProcessedBullets)
+	{
+		if (IDeflectableInterface* FBullet = Cast<IDeflectableInterface>(Bullet))
+		{
+
+			FTimerHandle BulletFireTimer;
+
+			GetWorld()->GetTimerManager().SetTimer(
+				BulletFireTimer,
+				[this, FBullet, Bullet]()
+				{
+					FBullet->UnFreezeBullet();
+					ProcessedBullets.Remove(Bullet);
+				},
+				CurrentDelay, false
+			);
+
+			CurrentDelay += DelayAmount; 
+		}
+	}
+	
 }
 
 

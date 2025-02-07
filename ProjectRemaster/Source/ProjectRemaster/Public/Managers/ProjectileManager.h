@@ -4,9 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Enums/EDamageType.h"
 #include "ProjectileManager.generated.h"
 
 class ABaseBullet;
+class UHierarchicalInstancedStaticMeshComponent;
 
 UCLASS()
 class PROJECTREMASTER_API AProjectileManager : public AActor
@@ -15,34 +17,39 @@ class PROJECTREMASTER_API AProjectileManager : public AActor
 
 private:
 
-	FTimerHandle CullCheckTimerHandle;
-
-	TArray<ABaseBullet*> BulletsToMerge; // Buffer new bullets before merging
-	FTimerHandle MergeTimerHandle;
-
+	
 	TArray<ABaseBullet*> FrozenBullets;
 
-	TMap<int32, FTransform> OriginalInstanceTransforms;
-	//TMap<int32, ABaseBullet*> InstanceToBulletMap;  
-	TMap<int32, UParticleSystemComponent*> InstanceToParticleMap;
+	//TMap<int32, FTransform> OriginalInstanceTransforms;
 
 	UPROPERTY(VisibleAnywhere, Category = "Bullet Management")
-	class UHierarchicalInstancedStaticMeshComponent* InstancedBulletMesh;
+	UHierarchicalInstancedStaticMeshComponent* FireInstancedBulletMesh;
 
+	UPROPERTY(VisibleAnywhere, Category = "Bullet Management")
+	UHierarchicalInstancedStaticMeshComponent* PoisonInstancedBulletMesh;
+
+	// Temporary Pointer to Current InstanceMesh
+	UHierarchicalInstancedStaticMeshComponent* TargetMesh;
+
+	//Redundant
 	void UpdateInstanceCulling();
 
-	void UpdateNiagaraParticles(int32 InstanceIndex, ABaseBullet* Bullet);
+	void UpdateNiagaraParticles(TEnumAsByte<EDamageType> DamageType, UHierarchicalInstancedStaticMeshComponent* TMPMesh ,int32 InstanceIndex);
 
-	TArray <FVector> FrozenBulletLocations;
-
-	
+	void CreateBulletInstance(TEnumAsByte<EDamageType> DamageType, ABaseBullet* Bullet, UStaticMeshComponent* BulletMesh);
 	
 public:	
 	// Sets default values for this actor's properties
 	AProjectileManager();
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Niagara")
-	void UpdateFrozenBulletParticles_BP(const FVector& BulletLocations, int32 NumBullets);
+	void UpdateFrozenBulletParticles_BP(EDamageType ParticleType, const FVector& BulletLocations, int32 NumBullets);
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Niagara")
+	void RemoveFrozenBulletParticles_BP(const FVector& BulletPosition);
+
+	UPROPERTY(BlueprintReadWrite)
+	TArray<FVector> UpdatedPositions;
 
 protected:
 	// Called when the game starts or when spawned
@@ -58,6 +65,11 @@ public:
 	
 
 	UFUNCTION()
-	void AddFrozenBullet(ABaseBullet* Bullet, UStaticMeshComponent* BulletMesh, UParticleSystemComponent* BulletParticles);
+	void AddFrozenBullet(TEnumAsByte<EDamageType> DamageType, ABaseBullet* Bullet, UStaticMeshComponent* BulletMesh);
+
+	UFUNCTION()
+	void RemoveFrozenBullet(ABaseBullet* Bullet);
+	
+	//Redundant
 	void StartCullingTimer();
 };

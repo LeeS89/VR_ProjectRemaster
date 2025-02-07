@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
+#include "Enums/EDamageType.h"
 #include "DeflectableInterface.generated.h"
 
 // This class does not need to be modified.
@@ -38,4 +39,8 @@ public:
 
 	virtual void FreezeBullet() { return; }
 
+	virtual void UnFreezeBullet() { return; }
+
+	virtual TEnumAsByte<EDamageType> GetDamageType() { return EDamageType::NoType; }
+	//virtual void UnFreezeDelayComplete() { return; }
 };
