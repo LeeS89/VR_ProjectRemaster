@@ -75,6 +75,9 @@ void AProjectileManager::CreateBulletInstance(TEnumAsByte<EDamageType> DamageTyp
     case EDamageType::Fire:
         TargetMesh = FireInstancedBulletMesh;
         break;
+    case EDamageType::Poison:
+        TargetMesh = PoisonInstancedBulletMesh;
+        break;
     default:
         UE_LOG(LogTemp, Warning, TEXT("No Compatible Mesh Found"));
         break;
@@ -96,7 +99,7 @@ void AProjectileManager::CreateBulletInstance(TEnumAsByte<EDamageType> DamageTyp
     UpdateNiagaraParticles(DamageType, TargetMesh, InstanceIndex);
 }
 
-void AProjectileManager::RemoveFrozenBullet(ABaseBullet* Bullet)
+void AProjectileManager::RemoveFrozenBullet(TEnumAsByte<EDamageType> DamageType, ABaseBullet* Bullet)
 {
     if (!Bullet || !FireInstancedBulletMesh || !MergedBulletParticles) { return; }
 
@@ -112,7 +115,7 @@ void AProjectileManager::RemoveFrozenBullet(ABaseBullet* Bullet)
 
     FrozenBullets.RemoveAt(InstanceIndex);
     
-    RemoveFrozenBulletParticles_BP(BulletPos);
+    RemoveFrozenBulletParticles_BP(DamageType, BulletPos);
     FireInstancedBulletMesh->RemoveInstance(InstanceIndex);
     if (FireInstancedBulletMesh->GetInstanceCount() <= 0)
     {
@@ -133,7 +136,7 @@ void AProjectileManager::UpdateNiagaraParticles(TEnumAsByte<EDamageType> DamageT
     {
         FVector BulletLocation = InstanceTransform.GetLocation();   
         // Call Blueprint function with the full array
-        UpdateFrozenBulletParticles_BP(DamageType, BulletLocation, InstanceIndex);
+        UpdateFrozenBulletParticles_BP(DamageType, BulletLocation);
 
         TargetMesh = nullptr;
     }

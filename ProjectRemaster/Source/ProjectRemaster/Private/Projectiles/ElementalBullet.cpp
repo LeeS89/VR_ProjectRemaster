@@ -43,7 +43,7 @@ void AElementalBullet::UnFreezeBullet()
 	if (BulletManager)
 	{
 		Trail->Activate();
-		BulletManager->RemoveFrozenBullet(this);
+		BulletManager->RemoveFrozenBullet(DamageType, this);
 	}
 }
 

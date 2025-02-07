@@ -43,10 +43,10 @@ public:
 	AProjectileManager();
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Niagara")
-	void UpdateFrozenBulletParticles_BP(EDamageType ParticleType, const FVector& BulletLocations, int32 NumBullets);
+	void UpdateFrozenBulletParticles_BP(EDamageType ParticleType, const FVector& BulletLocation);
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Niagara")
-	void RemoveFrozenBulletParticles_BP(const FVector& BulletPosition);
+	void RemoveFrozenBulletParticles_BP(EDamageType ParticleType, const FVector& BulletPosition);
 
 	UPROPERTY(BlueprintReadWrite)
 	TArray<FVector> UpdatedPositions;
@@ -68,7 +68,7 @@ public:
 	void AddFrozenBullet(TEnumAsByte<EDamageType> DamageType, ABaseBullet* Bullet, UStaticMeshComponent* BulletMesh);
 
 	UFUNCTION()
-	void RemoveFrozenBullet(ABaseBullet* Bullet);
+	void RemoveFrozenBullet(TEnumAsByte<EDamageType> DamageType, ABaseBullet* Bullet);
 	
 	//Redundant
 	void StartCullingTimer();
