@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "TObjectPool.h"
+#include "Enums/EDamageType.h"
 #include "PoolManager.generated.h"
 
 class ABulletBase;
@@ -18,10 +19,14 @@ class PROJECTREMASTER_API APoolManager : public AActor
 
 private:
 	// Bullet Pool
-	TObjectPool<ABaseBullet>* BulletPool;
+	TObjectPool<ABaseBullet>* FireBulletPool;
+	TObjectPool<ABaseBullet>* PoisonBulletPool;
 
 	UPROPERTY(EditAnywhere, Category = "Object to Pool")
-	TSubclassOf<ABaseBullet> BulletClass;
+	TSubclassOf<ABaseBullet> PoisonBulletClass;
+
+	UPROPERTY(EditAnywhere, Category = "Object to Pool")
+	TSubclassOf<ABaseBullet> FireBulletClass;
 
 	UPROPERTY(EditAnywhere, Category = "Pool Settings")
 	int32 BulletPoolSize{ 50 };
@@ -50,7 +55,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	ABaseBullet* GetBullet();
+	ABaseBullet* GetBullet(TEnumAsByte<EDamageType> BulletType);
 
 
 	APooledParticleEffect* GetParticle();

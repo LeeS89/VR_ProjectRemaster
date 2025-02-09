@@ -15,7 +15,9 @@ AProjectileManager::AProjectileManager()
 	PrimaryActorTick.bCanEverTick = false;
     //PrimaryActorTick.TickInterval = 0.2f;
     FireInstancedBulletMesh = CreateDefaultSubobject<UHierarchicalInstancedStaticMeshComponent>(TEXT("Fire InstancedBulletMesh"));
-    RootComponent = FireInstancedBulletMesh;
+    FireInstancedBulletMesh->SetupAttachment(RootComponent);
+    
+    //RootComponent = FireInstancedBulletMesh;
 
     PoisonInstancedBulletMesh = CreateDefaultSubobject<UHierarchicalInstancedStaticMeshComponent>(TEXT("Poison InstancedBulletMesh"));
     PoisonInstancedBulletMesh->SetupAttachment(RootComponent);
@@ -45,11 +47,18 @@ void AProjectileManager::BeginPlay()
 
 }
 
+#pragma region Bullet Freezing
+
 void AProjectileManager::AddFrozenBullet(TEnumAsByte<EDamageType> DamageType, ABaseBullet* Bullet, UStaticMeshComponent* BulletMesh)
 {
-    if (DamageType == EDamageType::NoType || !Bullet || !BulletMesh || FrozenBullets.Contains(Bullet)) return;
+    if (DamageType == EDamageType::NoType || !Bullet || !BulletMesh || AllFrozenBullets.Contains(Bullet)) return;
 
-    FrozenBullets.Add(Bullet);
+    if (AllFrozenBullets.Num() <= 0)
+    {
+        MergedBulletParticles->Activate();
+    }
+
+    AllFrozenBullets.Add(Bullet);
     CreateBulletInstance(DamageType, Bullet, BulletMesh);
    
     /*
@@ -70,22 +79,30 @@ void AProjectileManager::AddFrozenBullet(TEnumAsByte<EDamageType> DamageType, AB
 
 void AProjectileManager::CreateBulletInstance(TEnumAsByte<EDamageType> DamageType, ABaseBullet* Bullet, UStaticMeshComponent* BulletMesh)
 {
+    TargetMesh = nullptr;
+
     switch (DamageType)
     {
     case EDamageType::Fire:
-        TargetMesh = FireInstancedBulletMesh;
+        //TargetMesh = FireInstancedBulletMesh;
+        FrozenFireBullets.Add(Bullet);
+        UpdateInstanceMesh(DamageType, Bullet, BulletMesh, FireInstancedBulletMesh);
+        
         break;
     case EDamageType::Poison:
-        TargetMesh = PoisonInstancedBulletMesh;
+        //TargetMesh = PoisonInstancedBulletMesh;
+        UpdateInstanceMesh(DamageType, Bullet, BulletMesh, PoisonInstancedBulletMesh);
+        FrozenPoisonBullets.Add(Bullet);
         break;
     default:
         UE_LOG(LogTemp, Warning, TEXT("No Compatible Mesh Found"));
         break;
     }
 
-    if (!TargetMesh) { return; }
+    //if //(!TargetMesh) { return; }
+    //UpdateInstaceMesh(DamageType, Bullet, BulletMesh, TargetMesh);
 
-    if (TargetMesh->GetStaticMesh() == nullptr)
+    /*if (TargetMesh->GetStaticMesh() == nullptr)
     {
         TargetMesh->SetStaticMesh(BulletMesh->GetStaticMesh());
         TargetMesh->SetMaterial(0, BulletMesh->GetMaterial(0));
@@ -96,34 +113,91 @@ void AProjectileManager::CreateBulletInstance(TEnumAsByte<EDamageType> DamageTyp
 
     int32 InstanceIndex = TargetMesh->AddInstance(BulletLocalTransform);
 
-    UpdateNiagaraParticles(DamageType, TargetMesh, InstanceIndex);
+    UpdateNiagaraParticles(DamageType, TargetMesh, InstanceIndex);*/
 }
+
+
+
+
+void AProjectileManager::UpdateInstanceMesh(TEnumAsByte<EDamageType> DamageType, ABaseBullet* Bullet, UStaticMeshComponent* BulletMesh, UHierarchicalInstancedStaticMeshComponent* InstanceMesh)
+{
+    if (!Bullet || !BulletMesh || !InstanceMesh) { return; }
+
+    if (InstanceMesh->GetStaticMesh() == nullptr)
+    {
+        InstanceMesh->SetStaticMesh(BulletMesh->GetStaticMesh());
+        InstanceMesh->SetMaterial(0, BulletMesh->GetMaterial(0));
+    }
+
+    FTransform BulletWorldTransform = Bullet->GetActorTransform();
+    FTransform BulletLocalTransform = BulletWorldTransform.GetRelativeTransform(InstanceMesh->GetComponentTransform());
+
+    int32 InstanceIndex = InstanceMesh->AddInstance(BulletLocalTransform);
+    UE_LOG(LogTemp, Error, TEXT("%s BulletsCount: %i"),*InstanceMesh->GetName(), InstanceMesh->GetInstanceCount());
+    /*switch (DamageType)
+    {
+    case EDamageType::Fire:
+        FireBulletIndices.Add(Bullet, InstanceIndex);
+        break;
+    case EDamageType::Poison:
+        PoisonBulletIndices.Add(Bullet, InstanceIndex);
+        break;
+    default:
+        UE_LOG(LogTemp, Warning, TEXT("No Bullet Type Found"));
+        break;
+    }*/
+
+    UpdateNiagaraParticles(DamageType, InstanceMesh, InstanceIndex);
+}
+#pragma endregion
 
 void AProjectileManager::RemoveFrozenBullet(TEnumAsByte<EDamageType> DamageType, ABaseBullet* Bullet)
 {
-    if (!Bullet || !FireInstancedBulletMesh || !MergedBulletParticles) { return; }
+    if (!Bullet) return;
 
-    int32 InstanceIndex = FrozenBullets.Find(Bullet);
-    
-    if (InstanceIndex == INDEX_NONE) { return; }
+    UHierarchicalInstancedStaticMeshComponent* TempMesh = nullptr;
 
-   
+    int32 FrozenIndex = AllFrozenBullets.Find(Bullet);
+    if (FrozenIndex == INDEX_NONE) { return; }
+
+    int32 ElementIndex = 0;
+
+    switch (DamageType)
+    {
+    case EDamageType::Fire:
+        TempMesh = FireInstancedBulletMesh;
+        ElementIndex = FrozenFireBullets.Find(Bullet);
+        FrozenFireBullets.Remove(Bullet);
+        break;
+    case EDamageType::Poison:
+        TempMesh = PoisonInstancedBulletMesh;
+        ElementIndex = FrozenPoisonBullets.Find(Bullet);
+        FrozenPoisonBullets.Remove(Bullet);
+        break;
+    default:
+        break;
+    }
+
+    if (!TempMesh || ElementIndex == INDEX_NONE) { return; }
+
     FTransform InstanceTransform;
-    FireInstancedBulletMesh->GetInstanceTransform(InstanceIndex, InstanceTransform, true);
+    TempMesh->GetInstanceTransform(ElementIndex, InstanceTransform, true);
     FVector BulletPos = InstanceTransform.GetLocation();
 
+    AllFrozenBullets.RemoveAt(FrozenIndex);
 
-    FrozenBullets.RemoveAt(InstanceIndex);
-    
     RemoveFrozenBulletParticles_BP(DamageType, BulletPos);
-    FireInstancedBulletMesh->RemoveInstance(InstanceIndex);
-    if (FireInstancedBulletMesh->GetInstanceCount() <= 0)
+    TempMesh->RemoveInstance(ElementIndex);
+
+
+    if (FireInstancedBulletMesh->GetInstanceCount() <= 0 &&
+        PoisonInstancedBulletMesh->GetInstanceCount() <= 0)
     {
-        //MergedBulletParticles->DestroyInstance();
         MergedBulletParticles->Deactivate();
+        MergedBulletParticles->SetNiagaraVariableFloat(TEXT("user.FireKillRadius"), 0.0f);
+        MergedBulletParticles->SetNiagaraVariableFloat(TEXT("user.PoisonKillRadius"), 0.0f);
     }
 }
-
 
 
 
@@ -138,7 +212,7 @@ void AProjectileManager::UpdateNiagaraParticles(TEnumAsByte<EDamageType> DamageT
         // Call Blueprint function with the full array
         UpdateFrozenBulletParticles_BP(DamageType, BulletLocation);
 
-        TargetMesh = nullptr;
+        //TargetMesh = nullptr;
     }
 }
 
@@ -146,6 +220,7 @@ void AProjectileManager::UpdateNiagaraParticles(TEnumAsByte<EDamageType> DamageT
 
 
 #pragma region Redundant Code
+
 void AProjectileManager::UpdateInstanceCulling()
 {
     if (!FireInstancedBulletMesh) return;

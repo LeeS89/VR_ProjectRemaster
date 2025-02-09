@@ -10,6 +10,7 @@
 #include "UtilityClasses/TargetingUtility.h"
 #include "CharacterComponents/StatsComponent.h"
 #include <Kismet/GameplayStatics.h>
+#include "Enums/EDamageType.h"
 #include <KismetProceduralMeshLibrary.h>
 
 // Sets default values
@@ -105,14 +106,21 @@ void ABulletTesting::SliceMesh_Implementation(const FVector& PlaneLocation, cons
 
 void ABulletTesting::Fire()
 {
+	ABaseBullet* Bullet;
 
-	//ABulletBase* Bullet{ BulletPoolManager->GetBullet() };
-	ABaseBullet* Bullet{ BulletPoolManager->GetBullet() };
-	if (!Bullet) { return; }
-	//Bullet->SetOwner(this);
-	//Bullet->SetInstigator(this);
+	if (BulletInt == 0)
+	{
+		Bullet = BulletPoolManager->GetBullet(EDamageType::Fire);
+		++BulletInt;
+	}
+	else
+	{
+		Bullet = BulletPoolManager->GetBullet(EDamageType::Poison);
+		BulletInt = 0;
+	}
 	
-
+	if (!Bullet) { return; }
+	
 	if (AimTargetComp)
 	{
 		FRotator DirectionToTarget = UTargetingUtility::GetDirectionToTarget(AimTargetComp, SpawnPoint, true).Rotation();

@@ -24,6 +24,7 @@ void AElementalBullet::ToggleActiveState(bool bActive, const FVector& SpawnLocat
 	{
 		Trail->Deactivate();
 	}
+	bIsFrozen = false;
 }
 
 void AElementalBullet::FreezeBullet()
@@ -40,10 +41,11 @@ void AElementalBullet::FreezeBullet()
 void AElementalBullet::UnFreezeBullet()
 {
 	Super::UnFreezeBullet();
-	if (BulletManager)
+	if (BulletManager && !bIsFrozen)
 	{
 		Trail->Activate();
 		BulletManager->RemoveFrozenBullet(DamageType, this);
+		bIsFrozen = true;
 	}
 }
 

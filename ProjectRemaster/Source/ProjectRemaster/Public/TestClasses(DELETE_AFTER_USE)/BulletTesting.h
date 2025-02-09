@@ -60,6 +60,8 @@ private:
 
 	void Fire();
 
+	int BulletInt{ 0 };
+
 	UPROPERTY(VisibleAnywhere)
 	class AMainCharacter* PlayerRef;
 

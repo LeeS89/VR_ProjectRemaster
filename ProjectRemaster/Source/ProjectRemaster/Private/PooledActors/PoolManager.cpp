@@ -15,7 +15,7 @@ APoolManager::APoolManager()
 
 APoolManager::~APoolManager()
 {
-	UE_LOG(LogTemp, Warning, TEXT("APoolManager is being destroyed"));
+	//UE_LOG(LogTemp, Warning, TEXT("APoolManager is being destroyed"));
 }
 
 
@@ -25,10 +25,16 @@ void APoolManager::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (BulletClass)
+	if (FireBulletClass)
 	{
-		BulletPool = new TObjectPool<ABaseBullet>(BulletPoolSize, BulletClass, GetWorld());
-		BulletPool->InitializePool();
+		FireBulletPool = new TObjectPool<ABaseBullet>(BulletPoolSize, FireBulletClass, GetWorld());
+		FireBulletPool->InitializePool();
+	}
+
+	if (PoisonBulletClass)
+	{
+		PoisonBulletPool = new TObjectPool<ABaseBullet>(BulletPoolSize, PoisonBulletClass, GetWorld());
+		PoisonBulletPool->InitializePool();
 	}
 
 	if (ParticleClass)
@@ -43,10 +49,16 @@ void APoolManager::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
 
-	if (BulletPool)
+	if (FireBulletPool)
 	{
-		delete BulletPool;
-		BulletPool = nullptr;
+		delete FireBulletPool;
+		FireBulletPool = nullptr;
+	}
+
+	if (PoisonBulletPool)
+	{
+		delete PoisonBulletPool;
+		PoisonBulletPool = nullptr;
 	}
 
 	if (ParticlePool)
@@ -68,11 +80,25 @@ void APoolManager::Tick(float DeltaTime)
 
 
 
-ABaseBullet* APoolManager::GetBullet()
+ABaseBullet* APoolManager::GetBullet(TEnumAsByte<EDamageType> BulletType)
 {
-	if (!BulletPool) { return nullptr; }
+	if (BulletPoolSize <= 0) { return nullptr; }
 
-	ABaseBullet* Bullet{ BulletPool->GetObjectFromPool() };
+	ABaseBullet* Bullet = nullptr;
+	switch (BulletType)
+	{
+	case EDamageType::Fire:
+		Bullet = FireBulletPool->GetObjectFromPool();
+		break;
+	case EDamageType::Poison:
+		Bullet = PoisonBulletPool->GetObjectFromPool();
+		break;
+	default:
+		UE_LOG(LogTemp, Warning, TEXT("Invalid Bullet Type"));
+		break;
+	}
+
+	//ABaseBullet* Bullet{ FireBulletPool->GetObjectFromPool() };
 	if (Bullet)
 	{
 		Bullet->OnBulletHasExpired.AddDynamic(this, &APoolManager::ReturnBulletToPool);
@@ -85,9 +111,9 @@ ABaseBullet* APoolManager::GetBullet()
 void APoolManager::ReturnBulletToPool(ABaseBullet* Bullet)
 {
 	
-	if (!BulletPool || !Bullet) { return; }
+	if (!FireBulletPool || !Bullet) { return; }
 
-	BulletPool->ReturnObjectToPool(Bullet);
+	FireBulletPool->ReturnObjectToPool(Bullet);
 	Bullet->OnBulletHasExpired.RemoveDynamic(this, &APoolManager::ReturnBulletToPool);
 
 }

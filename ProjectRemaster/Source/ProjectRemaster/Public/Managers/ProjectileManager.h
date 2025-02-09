@@ -16,9 +16,17 @@ class PROJECTREMASTER_API AProjectileManager : public AActor
 	GENERATED_BODY()
 
 private:
-
 	
-	TArray<ABaseBullet*> FrozenBullets;
+
+	UPROPERTY(VisibleAnywhere)
+	TArray<ABaseBullet*> AllFrozenBullets;
+	UPROPERTY(VisibleAnywhere)
+	TArray<ABaseBullet*> FrozenFireBullets;
+	TArray<ABaseBullet*> FrozenPoisonBullets;
+
+
+	UFUNCTION()
+	void UpdateInstanceMesh(TEnumAsByte<EDamageType> DamageType, ABaseBullet* Bullet, UStaticMeshComponent* BulletMesh, UHierarchicalInstancedStaticMeshComponent* InstanceMesh);
 
 	//TMap<int32, FTransform> OriginalInstanceTransforms;
 
@@ -48,9 +56,7 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "Niagara")
 	void RemoveFrozenBulletParticles_BP(EDamageType ParticleType, const FVector& BulletPosition);
 
-	UPROPERTY(BlueprintReadWrite)
-	TArray<FVector> UpdatedPositions;
-
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
