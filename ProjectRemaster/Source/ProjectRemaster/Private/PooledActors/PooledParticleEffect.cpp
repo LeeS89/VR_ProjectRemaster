@@ -2,7 +2,9 @@
 
 
 #include "PooledActors/PooledParticleEffect.h"
-#include "Particles/ParticleSystemComponent.h"
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
+
 
 // Sets default values
 APooledParticleEffect::APooledParticleEffect()
@@ -10,12 +12,13 @@ APooledParticleEffect::APooledParticleEffect()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 
-	ParticleSystemComp = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Particle System Component"));
-	ParticleSystemComp->SetupAttachment(RootComponent);
+	ParticleSystem = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Niagara System"));
+	ParticleSystem->SetupAttachment(RootComponent);
 
-	ParticleSystemComp->bAutoActivate = false;
 
-	ParticleSystemComp->OnSystemFinished.AddDynamic(this, &APooledParticleEffect::OnExpired);
+	ParticleSystem->OnSystemFinished.AddDynamic(this, &APooledParticleEffect::OnExpired);
+
+	
 }
 
 // Called when the game starts or when spawned
@@ -23,16 +26,17 @@ void APooledParticleEffect::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (ParticleSystemComp)
+	if (ImpactParticles)
 	{
-		ParticleSystemComp->Deactivate();
+		ParticleSystem->SetAsset(ImpactParticles);
+		ParticleSystem->Deactivate();
 	}
 	
 }
 
-void APooledParticleEffect::OnExpired(UParticleSystemComponent* FinishedComponent)
+void APooledParticleEffect::OnExpired(UNiagaraComponent* PSystem)
 {
-	if (FinishedComponent == ParticleSystemComp)
+	if (PSystem == ParticleSystem)
 	{
 		//UE_LOG(LogTemp, Log, TEXT("Particle system finished, returning to pool"));
 		OnParticleExpired.Broadcast(this);
@@ -51,18 +55,22 @@ void APooledParticleEffect::ToggleActiveState(bool bActive, const FVector& Spawn
 	SetActorLocation(SpawnLocation);
 	SetActorRotation(SpawnRotation);
 	SetActorHiddenInGame(!bActive);
+	ParticleSystem->SetWorldLocation(SpawnLocation);
+	
 
-	if (ParticleSystemComp)
+	if (ParticleSystem)
 	{
 		if (bActive)
 		{
-			ParticleSystemComp->Activate(true);
+			ParticleSystem->Activate(true);
 		}
 		else
 		{
-			ParticleSystemComp->Deactivate();
-			ParticleSystemComp->SetActive(false, true);
+			ParticleSystem->Deactivate();
+			ParticleSystem->SetActive(false, true);
 		}
 	}
 }
+
+
 

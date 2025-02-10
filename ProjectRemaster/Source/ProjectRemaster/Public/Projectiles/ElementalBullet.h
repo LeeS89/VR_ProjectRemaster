@@ -36,5 +36,14 @@ public:
 
 	virtual void UnFreezeBullet() final override;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "FX")
+	class UNiagaraComponent* BulletParticles;
+
+	UPROPERTY(EditAnywhere, Category = "FX")
+	class UNiagaraSystem* BulletEffectSystem;
+
+protected:
+
+	virtual void BeginPlay() override;
 	
 };

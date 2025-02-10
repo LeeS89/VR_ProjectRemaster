@@ -6,6 +6,7 @@
 
 UCustomHandPoseRecognizer::UCustomHandPoseRecognizer()
 {
+	PrimaryComponentTick.bCanEverTick = true;
 }
 
 void UCustomHandPoseRecognizer::BeginPlay()
@@ -13,6 +14,41 @@ void UCustomHandPoseRecognizer::BeginPlay()
 	Super::BeginPlay();
 
 	HandPoseConfidence = DefaultConfidenceFloor;
+}
+
+void UCustomHandPoseRecognizer::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	ProcessHandPoses();
+}
+
+void UCustomHandPoseRecognizer::ProcessHandPoses()
+{
+	bool bSuccess = UHandPoseRecognizer::GetRecognizedHandPose(RecognizedIndex, RecognizedName, PoseDuration, PoseError, PoseConfidence);
+	if (bSuccess)
+	{
+
+		if (RecognizedIndex == 0 && !bHasPoseBeenProcessed)
+		{
+			OnPoseRecognizedDelegate.Broadcast(Side, this);
+			bHasPoseBeenProcessed = true;
+		}
+		else if (RecognizedIndex == 1)
+		{
+			OnFreezePoseRecognizeddelegate.Broadcast();
+		}
+
+	}
+	else
+	{
+		if (bHasPoseBeenProcessed)
+		{
+			OnPoseReleasedDelegate.Broadcast(this);
+			bHasPoseBeenProcessed = false;
+		}
+		
+	}
 }
 
 void UCustomHandPoseRecognizer::ResetHandPoseConfidenceFloor()
@@ -34,6 +70,7 @@ bool UCustomHandPoseRecognizer::GetRecognizedPose(int& Index, FString& Name, flo
 	if (bResult)
 	{
 		OnPoseRecognizedDelegate.Broadcast(Side, this);
+		
 	}
 	else
 	{

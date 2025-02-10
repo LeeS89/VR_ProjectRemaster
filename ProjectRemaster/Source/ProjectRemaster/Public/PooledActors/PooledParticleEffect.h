@@ -26,11 +26,10 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditDefaultsOnly)
-	class UParticleSystemComponent* ParticleSystemComp;
+	
 
 	UFUNCTION()
-	void OnExpired(UParticleSystemComponent* FinishedComponent);
+	void OnExpired(UNiagaraComponent* PSystem);
 
 public:	
 	// Called every frame
@@ -39,6 +38,14 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnParticleExpired OnParticleExpired;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "FX")
+	class UNiagaraComponent* ParticleSystem;
+
+	UPROPERTY(EditAnywhere, Category = "FX")
+	class UNiagaraSystem* ImpactParticles;
+
+
+
 	// Interface Functions
 	virtual bool IsInUse() const override { return bIsInUse; }
 
@@ -46,4 +53,5 @@ public:
 
 	virtual void ToggleActiveState(bool bActive, const FVector& SpawnLocation = FVector::ZeroVector, const FRotator& SpawnRotation = FRotator::ZeroRotator, AActor* NewOwner = nullptr, APawn* NewInstigator = nullptr) override;
 
+	
 };

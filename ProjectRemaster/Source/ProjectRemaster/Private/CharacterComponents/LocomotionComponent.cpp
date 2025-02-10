@@ -11,7 +11,7 @@ ULocomotionComponent::ULocomotionComponent()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = false;
+	PrimaryComponentTick.bCanEverTick = true;
 
 	CurrentHandInControl = EHandInControl::Neither;
 }
@@ -78,6 +78,7 @@ void ULocomotionComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// ...
+	if (!bCanMove) { return; }
+	MoveForward(1.0f);
 }
 

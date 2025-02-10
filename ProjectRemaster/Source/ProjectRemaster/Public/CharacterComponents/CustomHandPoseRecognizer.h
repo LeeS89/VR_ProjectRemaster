@@ -7,6 +7,10 @@
 #include "OculusXRInputFunctionLibrary.h"
 #include "CustomHandPoseRecognizer.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE(
+	FOnFreezePoseRecognizedSignature,
+	UCustomHandPoseRecognizer, OnFreezePoseRecognizeddelegate
+);
 
 DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_TwoParams(
 	FOnPoseRecognizedSignature,
@@ -29,6 +33,17 @@ class PROJECTREMASTER_API UCustomHandPoseRecognizer : public UHandPoseRecognizer
 {
 	GENERATED_BODY()
 
+private:
+
+	int RecognizedIndex;
+	FString RecognizedName;
+	float PoseDuration;
+	float PoseError;
+	float PoseConfidence;
+
+	UFUNCTION()
+	void ProcessHandPoses();
+
 public:
 
 	UCustomHandPoseRecognizer();
@@ -46,6 +61,9 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnPoseReleasedSignature OnPoseReleasedDelegate;
 
+	UPROPERTY(BlueprintAssignable)
+	FOnFreezePoseRecognizedSignature OnFreezePoseRecognizeddelegate;
+
 	UPROPERTY(VisibleAnywhere)
 	float HandPoseConfidence{ 0.0f };
 
@@ -61,4 +79,9 @@ public:
 protected:
 
 	virtual void BeginPlay() override;
+
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	UPROPERTY()
+	bool bHasPoseBeenProcessed{ false };
 };
