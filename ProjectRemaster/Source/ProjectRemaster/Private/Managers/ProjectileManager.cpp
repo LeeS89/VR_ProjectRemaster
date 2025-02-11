@@ -194,8 +194,8 @@ void AProjectileManager::RemoveFrozenBullet(TEnumAsByte<EDamageType> DamageType,
         PoisonInstancedBulletMesh->GetInstanceCount() <= 0)
     {
         MergedBulletParticles->Deactivate();
-        MergedBulletParticles->SetNiagaraVariableFloat(TEXT("user.FireKillRadius"), 0.0f);
-        MergedBulletParticles->SetNiagaraVariableFloat(TEXT("user.PoisonKillRadius"), 0.0f);
+        MergedBulletParticles->SetVariableFloat(FName("user.FireKillRadius"), 0.0f);
+        MergedBulletParticles->SetVariableFloat(FName("user.PoisonKillRadius"), 0.0f);
     }
 }
 

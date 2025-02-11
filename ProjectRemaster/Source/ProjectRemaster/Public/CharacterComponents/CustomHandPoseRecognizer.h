@@ -9,7 +9,7 @@
 
 DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE(
 	FOnFreezePoseRecognizedSignature,
-	UCustomHandPoseRecognizer, OnFreezePoseRecognizeddelegate
+	UCustomHandPoseRecognizer, OnFreezePoseRecognizedDelegate
 );
 
 DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_TwoParams(
@@ -22,6 +22,16 @@ DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_TwoParams(
 DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_OneParam(
 	FOnPoseReleasedSignature,
 	UCustomHandPoseRecognizer, OnPoseReleasedDelegate,
+	UCustomHandPoseRecognizer*, PoseClass
+);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(
+	FOnReleaseGrabbedActor, UCustomHandPoseRecognizer*, Recognizer
+);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(
+	FOnPerformGrabTrace,
+	EOculusXRHandType, HandUsed,
 	UCustomHandPoseRecognizer*, PoseClass
 );
 
@@ -41,13 +51,23 @@ private:
 	float PoseError;
 	float PoseConfidence;
 
+	static bool bLeftHandActive;
+	static bool bRightHandActive;
+
 	UFUNCTION()
 	void ProcessHandPoses();
+
+	bool CheckIfCanTriggerPoseResponse();
+
+	static EOculusXRHandType CurrentHandInControl;
+	static void SetHandActive(EOculusXRHandType Hand, bool bIsActive);
+	static void ResetHandInControlIfNeeded();
 
 public:
 
 	UCustomHandPoseRecognizer();
 	
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	bool bIsHandGrabbing{ false };
 
@@ -62,7 +82,13 @@ public:
 	FOnPoseReleasedSignature OnPoseReleasedDelegate;
 
 	UPROPERTY(BlueprintAssignable)
-	FOnFreezePoseRecognizedSignature OnFreezePoseRecognizeddelegate;
+	FOnFreezePoseRecognizedSignature OnFreezePoseRecognizedDelegate;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnReleaseGrabbedActor OnReleaseGrabbedActor;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnPerformGrabTrace OnPerformGrabTrace;
 
 	UPROPERTY(VisibleAnywhere)
 	float HandPoseConfidence{ 0.0f };
@@ -76,6 +102,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ReduceHandPoseConfidenceFloor();
 
+	
+
 protected:
 
 	virtual void BeginPlay() override;
@@ -84,4 +112,6 @@ protected:
 
 	UPROPERTY()
 	bool bHasPoseBeenProcessed{ false };
+
+	
 };
