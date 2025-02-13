@@ -5,9 +5,11 @@
 
 
 
-EOculusXRHandType UCustomHandPoseRecognizer::CurrentHandInControl = EOculusXRHandType::None;
+EOculusXRHandType UCustomHandPoseRecognizer::CurrentHandInControlOfMovement = EOculusXRHandType::None;
+EOculusXRHandType UCustomHandPoseRecognizer::CurrentHandTriggeringBulletFreezeAbility = EOculusXRHandType::None;
 bool UCustomHandPoseRecognizer::bLeftHandActive = false;
 bool UCustomHandPoseRecognizer::bRightHandActive = false;
+
 
 
 UCustomHandPoseRecognizer::UCustomHandPoseRecognizer()
@@ -15,13 +17,16 @@ UCustomHandPoseRecognizer::UCustomHandPoseRecognizer()
 	PrimaryComponentTick.bCanEverTick = true;
 }
 
-
-
 void UCustomHandPoseRecognizer::BeginPlay()
 {
 	Super::BeginPlay();
 
 	HandPoseConfidence = DefaultConfidenceFloor;
+
+	if (GetOwner()->Implements<UMainPlayer>())
+	{
+		PlayerRef = Cast<IMainPlayer>(GetOwner());
+	}
 	
 }
 
@@ -40,42 +45,37 @@ void UCustomHandPoseRecognizer::ProcessHandPoses()
 		switch (RecognizedIndex)
 		{
 		case 0:
-			if (!bHasPoseBeenProcessed)
-			{
-				OnPerformGrabTrace.Broadcast(Side, this);
-				
-				if (CheckIfCanTriggerPoseResponse())
-				{
-					OnPoseRecognizedDelegate.Broadcast(Side, this);
-				}
-				bHasPoseBeenProcessed = true;
-				SetHandActive(Side, true);
-			}
+			MovementPoseRecognized();
 			break;
 		case 1:
-			OnFreezePoseRecognizedDelegate.Broadcast();
+			BulletFreezAbilityPoseRecognized();
 			break;
 		}
-
 	}
 	else
 	{
-		if (bHasPoseBeenProcessed)
-		{
-			if (CheckIfCanTriggerPoseResponse())
-			{
-				OnPoseReleasedDelegate.Broadcast(this);
-			}
-			bHasPoseBeenProcessed = false;
-			SetHandActive(Side, false);
-		}
+		MovementPoseFinished();
 
-		if (bIsHandGrabbing)
-		{
-			bIsHandGrabbing = false;
-			OnReleaseGrabbedActor.Broadcast(this);
-		}
+		BulletFreezeAbilityPoseComplete(Side);
+
+		GrabbingPoseReleased();
 		
+	}
+}
+
+#pragma region Movement Pose Handlers
+void UCustomHandPoseRecognizer::MovementPoseRecognized()
+{
+	if (!bHasPoseBeenProcessed)
+	{
+		OnPerformGrabTrace.Broadcast(Side, this);
+
+		if (CheckIfCanTriggerMovementPoseResponse())
+		{
+			OnPoseRecognizedDelegate.Broadcast(Side, this);
+		}
+		bHasPoseBeenProcessed = true;
+		SetHandActive(Side, true);
 	}
 }
 
@@ -87,21 +87,32 @@ void UCustomHandPoseRecognizer::ProcessHandPoses()
 /// the relevant hand to be in control
 /// </summary>
 /// <returns></returns>
-bool UCustomHandPoseRecognizer::CheckIfCanTriggerPoseResponse()
+bool UCustomHandPoseRecognizer::CheckIfCanTriggerMovementPoseResponse()
 {
 	if (bIsHandGrabbing) { return false; }
 
-	if (CurrentHandInControl == EOculusXRHandType::None)
+	if (CurrentHandInControlOfMovement == EOculusXRHandType::None)
 	{
-		CurrentHandInControl = (Side == EOculusXRHandType::HandLeft) ? EOculusXRHandType::HandLeft : EOculusXRHandType::HandRight;
+		CurrentHandInControlOfMovement = (Side == EOculusXRHandType::HandLeft) ? EOculusXRHandType::HandLeft : EOculusXRHandType::HandRight;
 		return true;
 	}
 
-	return (CurrentHandInControl == EOculusXRHandType::HandLeft && Side == EOculusXRHandType::HandLeft) ||
-			(CurrentHandInControl == EOculusXRHandType::HandRight && Side == EOculusXRHandType::HandRight);
+	return (CurrentHandInControlOfMovement == EOculusXRHandType::HandLeft && Side == EOculusXRHandType::HandLeft) ||
+		(CurrentHandInControlOfMovement == EOculusXRHandType::HandRight && Side == EOculusXRHandType::HandRight);
 }
 
+void UCustomHandPoseRecognizer::MovementPoseFinished()
+{
+	if (!bHasPoseBeenProcessed) { return; }
 
+	if (CheckIfCanTriggerMovementPoseResponse())
+	{
+		OnPoseReleasedDelegate.Broadcast(this);
+	}
+	bHasPoseBeenProcessed = false;
+	SetHandActive(Side, false);
+
+}
 
 void UCustomHandPoseRecognizer::SetHandActive(EOculusXRHandType Hand, bool bIsActive)
 {
@@ -122,9 +133,56 @@ void UCustomHandPoseRecognizer::ResetHandInControlIfNeeded()
 {
 	if (!bLeftHandActive && !bRightHandActive) // If both hands are NOT active
 	{
-		CurrentHandInControl = EOculusXRHandType::None;
+		CurrentHandInControlOfMovement = EOculusXRHandType::None;
 	}
 }
+#pragma endregion
+
+
+#pragma region Bullet Freeze Ability Pose Handlers
+void UCustomHandPoseRecognizer::BulletFreezAbilityPoseRecognized()
+{
+	if (!PlayerRef) { return; }
+	
+	if (CanTriggerBulletFreezeAbility(Side))
+	{
+		OnFreezePoseRecognizedDelegate.Broadcast();
+	}
+}
+
+bool UCustomHandPoseRecognizer::CanTriggerBulletFreezeAbility(EOculusXRHandType Hand)
+{
+	if (CurrentHandTriggeringBulletFreezeAbility == EOculusXRHandType::None)
+	{
+		CurrentHandTriggeringBulletFreezeAbility = Hand;
+		//bCanTriggerReturnFire = true;
+		return true;
+	}
+
+	return CurrentHandTriggeringBulletFreezeAbility == Hand;
+}
+
+void UCustomHandPoseRecognizer::BulletFreezeAbilityPoseComplete(EOculusXRHandType Hand)
+{
+	if (!PlayerRef || Hand == EOculusXRHandType::None || !PlayerRef->CheckFrozenBulletcountGreaterThanZero()) { return; }
+	
+	OnFrozenBulletAbilityComplete.Broadcast();
+	//bCanTriggerReturnFire = false;
+	CurrentHandTriggeringBulletFreezeAbility = EOculusXRHandType::None;
+}
+
+#pragma endregion
+
+
+#pragma region Grab Pose Handlers
+void UCustomHandPoseRecognizer::GrabbingPoseReleased()
+{
+	if (!bIsHandGrabbing) { return; }
+
+	bIsHandGrabbing = false;
+	OnReleaseGrabbedActor.Broadcast(this);
+}
+
 
 void UCustomHandPoseRecognizer::ResetHandPoseConfidenceFloor()
 {
@@ -135,24 +193,10 @@ void UCustomHandPoseRecognizer::ReduceHandPoseConfidenceFloor()
 {
 	DefaultConfidenceFloor = ReducedHandPoseConfidenceFloor;
 }
+#pragma endregion
 
 
 
-bool UCustomHandPoseRecognizer::GetRecognizedPose(int& Index, FString& Name, float& Duration, float& Error, float& Confidence)
-{
-	bool bResult = UHandPoseRecognizer::GetRecognizedHandPose(Index, Name, Duration, Error, Confidence);
-	
-	if (bResult)
-	{
-		OnPoseRecognizedDelegate.Broadcast(Side, this);
-		
-	}
-	else
-	{
-		OnPoseReleasedDelegate.Broadcast(this);
-	}
 
-	return bResult;
-}
 
 

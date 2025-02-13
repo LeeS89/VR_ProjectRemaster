@@ -26,4 +26,6 @@ public:
 
 	virtual USceneComponent* GetTargetComponent() = 0;
 
+	virtual bool CheckFrozenBulletcountGreaterThanZero() { return false; }
+
 };

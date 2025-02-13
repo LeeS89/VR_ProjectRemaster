@@ -75,7 +75,7 @@ protected:
 
 	void ToggleVisibility(bool bVisibility);
 
-	
+
 public:	
 	// Sets default values for this actor's properties
 	ABaseBullet();
@@ -104,7 +104,7 @@ public:
 	virtual void FreezeBullet() override;
 
 	virtual void UnFreezeBullet() override;
-
+	
 	
 	UFUNCTION(BlueprintCallable)
 	virtual void OnExpired() override;
@@ -112,7 +112,8 @@ public:
 	UFUNCTION()
 	virtual TEnumAsByte<EDamageType> GetDamageType() override { return DamageType; }
 
-
+	
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

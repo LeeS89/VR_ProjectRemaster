@@ -76,7 +76,7 @@ void ABaseBullet::TimeOut(float DeltaTime)
 void ABaseBullet::ToggleActiveState(bool bActive, const FVector& SpawnLocation, const FRotator& SpawnRotation, AActor* NewOwner, APawn* NewInstigator)
 {
 	if (!MovementComp || !PointLightComp) { return; }
-
+	
 	SetOwner(NewOwner);
 	SetInstigator(NewInstigator);
 
@@ -96,6 +96,10 @@ void ABaseBullet::ToggleActiveState(bool bActive, const FVector& SpawnLocation, 
 		StaticMeshComp->SetRelativeLocation(FVector::ZeroVector);
 		SetDeflectionHasBeenProcessed(false);
 		SetHitHasBeenProcessed(false);
+		if (StaticMeshComp->GetCollisionResponseToChannel(ECC_GameTraceChannel6) == ECR_Ignore)
+		{
+			StaticMeshComp->SetCollisionResponseToChannel(ECC_GameTraceChannel6, ECR_Block);
+		}
 	}
 	
 	SetActorHiddenInGame(!bActive);
@@ -134,6 +138,7 @@ void ABaseBullet::FreezeBullet()
 {
 	DestroyTimeCountdown += 5.0f;
 	MovementComp->StopMovementImmediately();
+	StaticMeshComp->SetCollisionResponseToChannel(ECC_GameTraceChannel6, ECR_Ignore);
 	ToggleVisibility(false);
 }
 

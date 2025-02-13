@@ -32,8 +32,8 @@ AMainCharacter::AMainCharacter()
 	VRCameraComp = CreateDefaultSubobject<UVRCameraComponent>(TEXT("Camera Component"));
 	VRCameraComp->SetupAttachment(RootComponent);
 
-	BlackoutWidgetComp = CreateDefaultSubobject<UWidgetComponent>(TEXT("Blackout Widget Component"));
-	BlackoutWidgetComp->SetupAttachment(VRCameraComp);
+	//BlackoutWidgetComp = CreateDefaultSubobject<UWidgetComponent>(TEXT("Blackout Widget Component"));
+	//BlackoutWidgetComp->SetupAttachment(VRCameraComp);
 
 	///// Come back to later
 	BoxComp = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Component"));
@@ -80,7 +80,7 @@ AMainCharacter::AMainCharacter()
 
 	StatsComp = CreateDefaultSubobject<UStatsComponent>(TEXT("Stats Component"));
 
-	//AbilitiesComp = CreateDefaultSubobject<UPlayerAbilitiesComponent>(TEXT("Abilities Component"));
+	AbilitiesComp = CreateDefaultSubobject<UPlayerAbilitiesComponent>(TEXT("Abilities Component"));
 
 	DamageHandlerComp = CreateDefaultSubobject<UDamageHandler>(TEXT("Damage Handler Component"));
 }
@@ -102,12 +102,14 @@ void AMainCharacter::BeginPlay()
 
 	
 
-	if (BlackoutWidget)
-	{
-		BlackoutWidgetComp->SetWidgetClass(BlackoutWidget);
+	//if (BlackoutWidget)
+	//{
+	//	BlackoutWidgetComp->SetWidgetClass(BlackoutWidget);
 
-		BlackoutWidgetInstance = BlackoutWidgetComp->GetUserWidgetObject();
-	}
+	//	BlackoutWidgetInstance = BlackoutWidgetComp->GetUserWidgetObject();
+	//	/*SetVisibility(ESlateVisibility::Collapsed);
+	//	BlackoutWidgetComp->SetVisibility(true);*/
+	//}
 
 	BoxComp->SetCollisionObjectType(ECC_GameTraceChannel3);
 	//BoxComp->OnComponentBeginOverlap.AddDynamic(this, &AMainCharacter::OnOverlapBegin);
@@ -165,22 +167,23 @@ void AMainCharacter::UpdateStatusEffect(EDamageType NewStatus)
 	StatsComp->StatusEffect = NewStatus; 
 }
 
-//void AMainCharacter::GetTraceLocation(FVector& OutLocation, FQuat& OutRotation)
-//{
-//	OutLocation = DamageCollider->GetComponentLocation();
-//	OutRotation = DamageCollider->GetComponentRotation().Quaternion();
-//}
+bool AMainCharacter::CheckFrozenBulletcountGreaterThanZero()
+{
+	return AbilitiesComp->GetNumberOfFrozenBullets() > 0;
+}
 
 
+
+#pragma region Redundant Code
 void AMainCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (OtherActor && OtherActor != this)
 	{
-		
+
 
 		if (BlackoutWidget)
 		{
-			
+
 			UImage* BlackoutImage = Cast<UImage>(BlackoutWidgetInstance->GetWidgetFromName(TEXT("BlackoutImage")));
 			if (BlackoutImage)
 			{
@@ -191,10 +194,13 @@ void AMainCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor*
 				BlackoutImage->SetColorAndOpacity(NewColor);
 				//BlackoutImage->SetRenderOpacity(1.0f); // Fully visible
 			}
-			
+
 		}
 	}
 }
+#pragma endregion
+
+
 
 
 

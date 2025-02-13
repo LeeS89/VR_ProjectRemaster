@@ -41,6 +41,7 @@ public:
 
 	virtual void UnFreezeBullet() { return; }
 
+
 	virtual TEnumAsByte<EDamageType> GetDamageType() { return EDamageType::NoType; }
 	//virtual void UnFreezeDelayComplete() { return; }
 };

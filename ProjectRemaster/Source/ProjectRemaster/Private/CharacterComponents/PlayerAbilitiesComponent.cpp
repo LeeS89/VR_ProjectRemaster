@@ -2,7 +2,6 @@
 
 
 #include "CharacterComponents/PlayerAbilitiesComponent.h"
-#include <Interfaces/DeflectableInterface.h>
 #include <Interfaces/GrabbableObject.h>
 
 
@@ -23,14 +22,12 @@ void UPlayerAbilitiesComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
-	
 }
 
 void UPlayerAbilitiesComponent::HandleBulletTraceResults(const TArray<FHitResult>& HitResults)
 {
 	if (HitResults.Num() <= 0) { return; }
-	UE_LOG(LogTemp, Error, TEXT("Processed bullets contains: %i"), ProcessedBullets.Num());
+	//UE_LOG(LogTemp, Error, TEXT("Processed bullets contains: %i"), ProcessedBullets.Num());
 	for (const FHitResult& Hit : HitResults)
 	{
 		AActor* HitActor = Hit.GetActor();
@@ -42,9 +39,9 @@ void UPlayerAbilitiesComponent::HandleBulletTraceResults(const TArray<FHitResult
 
 		ProcessedBullets.Add(HitActor);
 		
-		IDeflectableInterface* Bullet = Cast<IDeflectableInterface>(HitActor);
-		Bullet->FreezeBullet();
-
+		IDeflectableInterface* BulletInterface = Cast<IDeflectableInterface>(HitActor);
+		BulletInterface->FreezeBullet();
+		
 	}
 
 }
@@ -53,11 +50,13 @@ void UPlayerAbilitiesComponent::FireFrozenBullets()
 {
 	
 	if (ProcessedBullets.Num() <= 0) { return; }
-
+	
 	float CurrentDelay = 0.1f;
 
+	TArray<AActor*> FrozenBullets = ProcessedBullets;
+	ProcessedBullets.Empty();
 	
-	for (AActor* Bullet : ProcessedBullets)
+	for (AActor* Bullet : FrozenBullets)
 	{
 		if (IDeflectableInterface* FBullet = Cast<IDeflectableInterface>(Bullet))
 		{
@@ -66,10 +65,9 @@ void UPlayerAbilitiesComponent::FireFrozenBullets()
 
 			GetWorld()->GetTimerManager().SetTimer(
 				BulletFireTimer,
-				[this, FBullet, Bullet]()
+				[this, FBullet, Bullet, &FrozenBullets]()
 				{
 					FBullet->UnFreezeBullet();
-					ProcessedBullets.Remove(Bullet);
 				},
 				CurrentDelay, false
 			);
@@ -77,7 +75,8 @@ void UPlayerAbilitiesComponent::FireFrozenBullets()
 			CurrentDelay += DelayAmount; 
 		}
 	}
-	
+	FrozenBullets.Empty();
+
 }
 
 

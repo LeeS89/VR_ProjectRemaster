@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Structs/FTraceSockets.h"
+#include <Interfaces/DeflectableInterface.h>
 #include "OculusXRInputFunctionLibrary.h"
 #include "PlayerAbilitiesComponent.generated.h"
 
@@ -21,25 +22,23 @@ class PROJECTREMASTER_API UPlayerAbilitiesComponent : public UActorComponent
 
 private:
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	float HalfHeight{ 8.0f };
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	float CapsuleRadius{ 4.0f };
 
 	AActor* CurrentGrabbedActor;
 
 	UPROPERTY(VisibleAnywhere)
-	TSet<AActor*> ProcessedBullets;
+	TArray<AActor*> ProcessedBullets;
 
-	
 	UPROPERTY(EditDefaultsOnly)
 	float DelayAmount{ 0.1f };
+
 
 public:	
 	// Sets default values for this component's properties
 	UPlayerAbilitiesComponent();
 
+	int GetNumberOfFrozenBullets() { return ProcessedBullets.Num(); }
+
+	
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -65,8 +64,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	TMap<EOculusXRHandType, FTraceSockets > HandSockets;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Trace Channel")
-	TEnumAsByte<ECollisionChannel> TraceChannel;
+	
 
 	UPROPERTY(BlueprintAssignable)
 	FOnGrabbedSignature OnGrabbedDelegate;
