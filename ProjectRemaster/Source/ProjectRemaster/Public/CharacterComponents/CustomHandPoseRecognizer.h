@@ -9,9 +9,8 @@
 #include "CustomHandPoseRecognizer.generated.h"
 
 #pragma region Event Declarations
-DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE(
-	FOnFreezePoseRecognizedSignature,
-	UCustomHandPoseRecognizer, OnFreezePoseRecognizedDelegate
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(
+	FOnFreezePoseRecognized
 );
 
 DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_TwoParams(
@@ -111,7 +110,7 @@ public:
 	FOnPoseReleasedSignature OnPoseReleasedDelegate;
 
 	UPROPERTY(BlueprintAssignable)
-	FOnFreezePoseRecognizedSignature OnFreezePoseRecognizedDelegate;
+	FOnFreezePoseRecognized OnFreezePoseRecognized;
 
 	UPROPERTY(BlueprintAssignable)
 	FOnReleaseGrabbedActor OnReleaseGrabbedActor;

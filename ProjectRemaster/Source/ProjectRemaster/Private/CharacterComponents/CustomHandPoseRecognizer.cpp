@@ -20,7 +20,8 @@ UCustomHandPoseRecognizer::UCustomHandPoseRecognizer()
 void UCustomHandPoseRecognizer::BeginPlay()
 {
 	Super::BeginPlay();
-
+	FString CValue = (CurrentHandTriggeringBulletFreezeAbility == EOculusXRHandType::None) ? TEXT("None") : TEXT("L or R");
+	UE_LOG(LogTemp, Error, TEXT("CurrentHandTriggeringBulletFreezeAbility is: %s"), *CValue);
 	HandPoseConfidence = DefaultConfidenceFloor;
 
 	if (GetOwner()->Implements<UMainPlayer>())
@@ -56,10 +57,12 @@ void UCustomHandPoseRecognizer::ProcessHandPoses()
 	{
 		MovementPoseFinished();
 
+
 		BulletFreezeAbilityPoseComplete(Side);
 
+
 		GrabbingPoseReleased();
-		
+
 	}
 }
 
@@ -146,7 +149,7 @@ void UCustomHandPoseRecognizer::BulletFreezAbilityPoseRecognized()
 	
 	if (CanTriggerBulletFreezeAbility(Side))
 	{
-		OnFreezePoseRecognizedDelegate.Broadcast();
+		OnFreezePoseRecognized.Broadcast();
 	}
 }
 
@@ -164,11 +167,14 @@ bool UCustomHandPoseRecognizer::CanTriggerBulletFreezeAbility(EOculusXRHandType 
 
 void UCustomHandPoseRecognizer::BulletFreezeAbilityPoseComplete(EOculusXRHandType Hand)
 {
-	if (!PlayerRef || Hand == EOculusXRHandType::None || !PlayerRef->CheckFrozenBulletcountGreaterThanZero()) { return; }
+	if (Hand != CurrentHandTriggeringBulletFreezeAbility) { return; }
+	CurrentHandTriggeringBulletFreezeAbility = EOculusXRHandType::None;
+
+	if (!PlayerRef || !PlayerRef->CheckFrozenBulletcountGreaterThanZero()) { return; }
 	
 	OnFrozenBulletAbilityComplete.Broadcast();
 	//bCanTriggerReturnFire = false;
-	CurrentHandTriggeringBulletFreezeAbility = EOculusXRHandType::None;
+	//CurrentHandTriggeringBulletFreezeAbility = EOculusXRHandType::None;
 }
 
 #pragma endregion

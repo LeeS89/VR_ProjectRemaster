@@ -136,6 +136,7 @@ bool ABaseBullet::GetDeflectionHasBeenProcessed() const
 
 void ABaseBullet::FreezeBullet()
 {
+	//GEngine->AddOnScreenDebugMessage(-1, 35.0f, FColor::Red, TEXT("I am frozen"));
 	DestroyTimeCountdown += 5.0f;
 	MovementComp->StopMovementImmediately();
 	StaticMeshComp->SetCollisionResponseToChannel(ECC_GameTraceChannel6, ECR_Ignore);
