@@ -4,12 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
-#include "MainPlayer.generated.h"
-
+#include "ResettableComponent.generated.h"
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
-class UMainPlayer : public UInterface
+class UResettableComponent : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -17,17 +16,12 @@ class UMainPlayer : public UInterface
 /**
  * 
  */
-class PROJECTREMASTER_API IMainPlayer
+class PROJECTREMASTER_API IResettableComponent
 {
 	GENERATED_BODY()
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 
-	virtual USceneComponent* GetTargetComponent() = 0;
-
-	virtual bool CheckFrozenBulletcountGreaterThanZero() { return false; }
-
-	virtual void HandleInputDisabled() = 0;
-
+	virtual void ResetComponent() = 0;
 };

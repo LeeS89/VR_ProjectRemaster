@@ -4,11 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Interfaces/ResettableComponent.h"
 #include "LocomotionComponent.generated.h"
 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class PROJECTREMASTER_API ULocomotionComponent : public UActorComponent
+class PROJECTREMASTER_API ULocomotionComponent : public UActorComponent, public IResettableComponent
 {
 	GENERATED_BODY()
 
@@ -37,6 +38,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Rotation")
 	void HandleRotation(float Direction);
+
+	UFUNCTION()
+	virtual void ResetComponent() override;
 
 
 protected:

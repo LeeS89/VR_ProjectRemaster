@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Camera/CameraComponent.h"
+#include "Interfaces/ResettableComponent.h"
 #include "VRCameraComponent.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_OneParam(
@@ -18,7 +19,7 @@ DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_OneParam(
  * the event also broadcasts the direction in which to rotate
  */
 UCLASS()
-class PROJECTREMASTER_API UVRCameraComponent : public UCameraComponent
+class PROJECTREMASTER_API UVRCameraComponent : public UCameraComponent, public IResettableComponent
 {
 	GENERATED_BODY()
 
@@ -45,7 +46,8 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnRotateSignature OnRotateDelegate;
 
-	
+	UFUNCTION()
+	virtual void ResetComponent() override;
 	
 private:
 

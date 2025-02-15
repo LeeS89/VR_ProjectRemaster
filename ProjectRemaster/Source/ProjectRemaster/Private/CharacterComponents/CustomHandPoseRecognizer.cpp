@@ -199,6 +199,19 @@ void UCustomHandPoseRecognizer::ReduceHandPoseConfidenceFloor()
 {
 	DefaultConfidenceFloor = ReducedHandPoseConfidenceFloor;
 }
+void UCustomHandPoseRecognizer::ResetComponent()
+{
+	SetComponentTickEnabled(false);
+	GrabbingPoseReleased();
+	if (CurrentHandTriggeringBulletFreezeAbility != EOculusXRHandType::None)
+	{
+		CurrentHandTriggeringBulletFreezeAbility = EOculusXRHandType::None;
+	}
+	if (bLeftHandActive || bRightHandActive)
+	{
+		SetHandActive(Side, false);
+	}
+}
 #pragma endregion
 
 

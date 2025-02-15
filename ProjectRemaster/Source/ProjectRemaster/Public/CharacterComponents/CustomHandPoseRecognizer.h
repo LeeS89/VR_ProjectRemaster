@@ -6,6 +6,7 @@
 #include "HandPoseRecognizer.h"
 #include "OculusXRInputFunctionLibrary.h"
 #include "Interfaces/MainPlayer.h"
+#include "Interfaces/ResettableComponent.h"
 #include "CustomHandPoseRecognizer.generated.h"
 
 #pragma region Event Declarations
@@ -44,7 +45,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(
 
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
-class PROJECTREMASTER_API UCustomHandPoseRecognizer : public UHandPoseRecognizer
+class PROJECTREMASTER_API UCustomHandPoseRecognizer : public UHandPoseRecognizer, public IResettableComponent
 {
 	GENERATED_BODY()
 
@@ -137,7 +138,10 @@ public:
 
 #pragma endregion
 
-	
+#pragma region Input Toggling
+	virtual void ResetComponent() override;
+#pragma endregion
+
 
 protected:
 

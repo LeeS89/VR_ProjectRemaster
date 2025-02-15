@@ -17,6 +17,7 @@
 #include <Components/Image.h>
 #include "CharacterComponents/DamageHandler.h"
 #include "CharacterComponents/PlayerAbilitiesComponent.h"
+#include "Controllers/CustomPlayerController.h"
 
 // Sets default values
 AMainCharacter::AMainCharacter()
@@ -90,7 +91,19 @@ void AMainCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	RegisterResettableComponents();
+
+	PC = Cast<ACustomPlayerController>(GetController());
+	if (PC)
+	{
+		PC->OnInputDisabled.AddDynamic(this, &AMainCharacter::HandleComponentDisabling);
+	}
+
 	
+	/*if (Components.Num() > 0)
+	{
+
+	}*/
 	/*if (BlackoutWidgetClass)
 	{
 
@@ -130,6 +143,53 @@ void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+
+void AMainCharacter::RegisterResettableComponents()
+{
+	ResettableComponents.Empty(); // Ensures no old data
+
+	TArray<UActorComponent*> Components = GetComponentsByInterface(UResettableComponent::StaticClass());
+
+	if (Components.Num() == 0)
+	{
+		//UE_LOG(LogTemp, Error, TEXT("No Resettable Components found"));
+		return;
+	}
+
+	for (UActorComponent* Component : Components)
+	{
+		if (Component->Implements<UResettableComponent>())
+		{
+			TScriptInterface<IResettableComponent> Resettable;
+			Resettable.SetObject(Component);  // Store the component as UObject
+			Resettable.SetInterface(Cast<IResettableComponent>(Component)); // Store the interface
+
+			if (Resettable)
+			{
+				ResettableComponents.Add(Resettable);
+				//UE_LOG(LogTemp, Warning, TEXT("Added Resettable Component: %s"), *Component->GetName());
+			}
+			/*else
+			{
+				UE_LOG(LogTemp, Error, TEXT("Failed to add resettable component: %s"), *Component->GetName());
+			}*/
+		}
+	}
+
+	//UE_LOG(LogTemp, Warning, TEXT("Total Resettable Components: %d"), ResettableComponents.Num());
+
+}
+
+void AMainCharacter::HandleComponentDisabling()
+{
+	for (TScriptInterface<IResettableComponent> Resettable : ResettableComponents)
+	{
+		if (Resettable)
+		{
+			Resettable->ResetComponent();  
+		}
+	}
 }
 
 USceneComponent* AMainCharacter::GetTargetComponent()
@@ -172,6 +232,11 @@ bool AMainCharacter::CheckFrozenBulletcountGreaterThanZero()
 	return AbilitiesComp->GetNumberOfFrozenBullets() > 0;
 }
 
+void AMainCharacter::HandleInputDisabled()
+{
+
+}
+
 
 
 #pragma region Redundant Code
@@ -198,6 +263,7 @@ void AMainCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor*
 		}
 	}
 }
+
 #pragma endregion
 
 

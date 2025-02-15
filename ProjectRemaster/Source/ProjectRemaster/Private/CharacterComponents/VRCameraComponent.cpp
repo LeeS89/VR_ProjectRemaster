@@ -88,6 +88,11 @@ void UVRCameraComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 
 }
 
+void UVRCameraComponent::ResetComponent()
+{
+	SetComponentTickEnabled(false);
+}
+
 void UVRCameraComponent::CheckRotation()
 {
 	MoveDirection = GetForwardVector();

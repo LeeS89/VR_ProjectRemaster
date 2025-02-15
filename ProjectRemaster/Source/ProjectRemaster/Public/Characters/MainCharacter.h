@@ -6,12 +6,15 @@
 #include "Interfaces/MainPlayer.h"
 #include "GameFramework/Character.h"
 #include "Interfaces/DamageableInterface.h"
+#include "Interfaces/ResettableComponent.h"
 #include "MainCharacter.generated.h"
 
 UCLASS()
 class PROJECTREMASTER_API AMainCharacter : public ACharacter, public IMainPlayer, public IDamageableInterface
 {
 	GENERATED_BODY()
+
+private:
 
 	UPROPERTY(EditAnywhere)
 	float PlayerCapsuleMinHeight{ 50.0f };
@@ -21,6 +24,10 @@ class PROJECTREMASTER_API AMainCharacter : public ACharacter, public IMainPlayer
 
 	class UUserWidget* BlackoutWidgetInstance;
 
+	class ACustomPlayerController* PC;
+	//TArray<IResettableComponent*> ResettableComponents;
+	UPROPERTY(VisibleAnywhere)
+	TArray<TScriptInterface<IResettableComponent>> ResettableComponents;
 
 public:
 	// Sets default values for this character's properties
@@ -132,6 +139,9 @@ public:
 	UFUNCTION()
 	virtual bool CheckFrozenBulletcountGreaterThanZero() override;
 
+	UFUNCTION()
+	virtual void HandleInputDisabled() override;
+
 private:
 
 	UFUNCTION()
@@ -139,5 +149,8 @@ private:
 						UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
 						bool bFromSweep, const FHitResult& SweepResult);
 
-	
+	void RegisterResettableComponents();
+
+	UFUNCTION()
+	void HandleComponentDisabling();
 };

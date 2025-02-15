@@ -52,6 +52,15 @@ void ULocomotionComponent::HandleRotation(float Direction)
 	CharacterRef->AddControllerYawInput(Direction * RotationSpeed * DeltaTime);
 }
 
+void ULocomotionComponent::ResetComponent()
+{
+	if (bCanMove)
+	{
+		bCanMove = false;
+	}
+	SetComponentTickEnabled(false);
+}
+
 
 // Called every frame
 void ULocomotionComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

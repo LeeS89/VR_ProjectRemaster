@@ -13,14 +13,14 @@ void ACustomPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	FTimerHandle DoTTimerHandle;
+	/*FTimerHandle DoTTimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(
 		DoTTimerHandle,
 		this,
 		&ACustomPlayerController::TestTimer,
 		5.0f,
 		false
-	);
+	);*/
 }
 
 void ACustomPlayerController::TestTimer()
