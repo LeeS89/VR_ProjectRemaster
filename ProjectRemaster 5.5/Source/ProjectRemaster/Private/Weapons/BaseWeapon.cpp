@@ -1,0 +1,73 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "Weapons/BaseWeapon.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "Kismet/KismetSystemLibrary.h"
+#include "Characters/MainCharacter.h"
+#include "Kismet/GameplayStatics.h"
+#include "Interfaces/BulletInterface.h"
+#include "Particles/ParticleSystemComponent.h"
+#include "CharacterComponents/CustomXRHandComponent.h"
+
+// Sets default values
+ABaseWeapon::ABaseWeapon()
+{
+ 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	PrimaryActorTick.bCanEverTick = false;
+
+	/*RootComp = CreateDefaultSubobject<USceneComponent>(TEXT("Root Component"));
+	RootComponent = RootComp;*/
+
+	StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Static Mesh Component"));
+	RootComponent = StaticMeshComp;
+	//StaticMeshComp->SetupAttachment(RootComponent);
+
+	/*CapsuleComp = CreateDefaultSubobject<ULightsaberCapsule>(TEXT("Capsule Component"));
+	CapsuleComp->SetupAttachment(StaticMeshComp);*/
+
+}
+
+// Called when the game starts or when spawned
+void ABaseWeapon::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	
+}
+
+// Called every frame
+void ABaseWeapon::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	
+
+}
+
+void ABaseWeapon::OnGrabbed_Implementation(UCustomXRHandComponent* HandComponent, FName SocketName)
+{
+	if (!HandComponent) { return; }
+	UE_LOG(LogTemp, Error, TEXT("Lightsaber Was Grabbed!!!!!"));
+	bIsGrabbed = true;
+	OnWeaponGrabbedDelegate.Broadcast();
+	AttachToComponent(HandComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale, SocketName);
+	HandComponent->SetGrabbedActor(this);
+
+	CharacterRef = HandComponent->GetOwner<AMainCharacter>();
+	if (!CharacterRef) { return; }
+	SetInstigator(CharacterRef);
+}
+
+void ABaseWeapon::OnReleased_Implementation()
+{
+	DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+	OnWeaponReleasedDelegate.Broadcast();
+	bIsGrabbed = false;
+	SetInstigator(nullptr);
+}
+
+bool ABaseWeapon::IsGrabbed()
+{
+	return bIsGrabbed;
+}
+
