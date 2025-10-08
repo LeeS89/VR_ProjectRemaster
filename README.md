@@ -1,5 +1,5 @@
 
-UNREAL ENGINE 5 VR PROTOTYPE (2024)
+UNREAL ENGINE 5 VR PROTOTYPE
 ===========================================================
 
 Platform:      PCVR (Quest 3 via Link)
