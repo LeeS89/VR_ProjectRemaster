@@ -200,12 +200,12 @@ void UTraceComponent::PerformMultiTrace(TEnumAsByte<ECollisionChannel> Channel, 
 
 	UKismetSystemLibrary::DrawDebugSphere(
 		GetWorld(),
-		CenterPoint,               
+		CenterPoint,
 		ShapeRadius,
-		12,                        
-		bHasFoundTargets ? FLinearColor::Green : FLinearColor::Red, 
-		0.0f,                      
-		2.0f                       
+		12,
+		bHasFoundTargets ? FLinearColor::Green : FLinearColor::Red,
+		0.0f,
+		2.0f
 	);
 }
 
